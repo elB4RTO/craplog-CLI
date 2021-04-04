@@ -43,7 +43,7 @@ INSTEAD, DO:<br>
 <b>LOG FILES</b>:<br>
 <br>
 At the moment, it only supports <b>Apache2</b> log files in their <b>default</b> form and path<br>
-If you're using a different path, please open the file named <b>Clean.py</b> (you can find it inside the folder named <i>Crappy</i>) and <b>modify</b> these lines:<br>
+If you're using a different path, please open the file named <b>Clean.py</b> (you can find it inside the folder named <i>crappy</i>) and <b>modify</b> these lines:<br>
 - <b>19</b> ] for the <i>access.log</i> file<br>
 - <b>91</b> ] for the <i>error.log</i> file<br>
 <br>
