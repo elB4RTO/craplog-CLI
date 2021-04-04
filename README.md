@@ -126,14 +126,16 @@ After completing the job, session files will be removed automatically.<br>
 <br>
 <br><hr><br>
 <br>
-<b>FINAL WORDS</b>:<br>
+<b>FINAL CONSIDERATIONS</b>:<br>
 <br>
 ESTIMATED WORK TIME:<br>
 2~10 sec / 1 MB<br>
+<br>
 May be higher or lower depending on the length of your GLOBALS, the power of your CPU and the complexity of your SESSION logs.<br>
 If CRAPLOG takes more than 1 minute for a 10 MB file, you've probably been tested in some way (better to check).<br>
 <br>
-As said before, CRAPLOG is under development<br>
+<br>
+CRAPLOG is under development<br>
 If you have suggestions about how to improve it please comment<br>
 <br>
-if you're not running Apache, but you like the tool: same as before, comment (bring a sample of a log file)<br>
+If you're not running Apache, but you like the tool: same as before, comment (bring a sample of a log file)<br>
