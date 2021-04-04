@@ -1,7 +1,8 @@
 # craplog
 A tool that scrapes Apache2 logs to create both Single-Session and Global statistics
 
-
+/<br>
+<br>
 CRAPLOG is a tool that takes Apache2 logs in their default form, scrapes them and creates simple statistics.<br>
 It's meant to be ran daily
 <br>
@@ -44,7 +45,6 @@ If you're using a different path, please open the file named <b>Clean.py</b> (yo
 <br>
 /var/log/apache2/<br>
 <br>
-<br>
 <i>DEFAULT LOG FORMS:</i><br>
 <br>
 <b>access.log.1</b><br>
@@ -63,6 +63,7 @@ As said before, CRAPLOG is meant to be ran daily. <br>
 <br>
 <br>
 <b>CLEAN ACCESS.LOG FILE</b>:<br>
+<br>
 This is nothing special. it just creates a file in which every line from a local connection is removed (this happens with statistics too).<br>
 After that the lines are re-arranged in order to be separeted by one empty line if the connection comes from the same IP address as the previous, or two empty lines if the IP is different from the above one.<br>
 This isn't much useful if you usually check logs using <i>cat | grep</i>, but it helps if you read them directly from file.<br>
