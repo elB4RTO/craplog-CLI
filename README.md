@@ -32,7 +32,7 @@ DON'T DO, for example:<br>
 INSTEAD, DO:<br>
 <code>cd /Path/to/craplog/ && ./craplog.sh</code><br>
 <br>
-<hr><br>
+<br><hr><br>
 <br>
 <b>LOG FILES</b>:<br>
 <br>
@@ -61,6 +61,7 @@ Please notice that CRAPLOG is taking <b>*.log.1</b> files as input. this is beca
 Because of that, when you run it, it will use yesterday's logs and store stat files cosequently.<br>
 As said before, CRAPLOG is meant to be ran daily. <br>
 <br>
+<br><hr><br>
 <br>
 <b>CLEAN ACCESS.LOG FILE</b>:<br>
 <br>
@@ -71,7 +72,7 @@ Not a default feature.<br>
 <br>
 <br>
 <br>
-<b>STATISTIC FILES</b>:<br>
+<b>SINGLE-SESSION STATISTIC FILES</b>:<br>
 <br>
 By default, CRAPLOG takes as input only the <b><i>access.log.1</i></b> file (unless you specify to not use it, calling the <i>--only-errors</i> argument, see below).<br>
 <br>
@@ -105,7 +106,7 @@ A maximum of 6 GLOBAL files will be created inside craplog/GLOBALS/:<br>
 - <b>GLOBAL.LEV.crapstats</b> = GLOBAL LOG LEVELs statistics<br>
 - <b>GLOBAL.ERR.crapstats</b> = GLOBAL ERROR REPORTs statistics<br>
 <br>
-<br>
+<br><hr><br>
 <br>
 <b>EXAMPLES</b>:<br>
 <br>
@@ -123,6 +124,7 @@ A maximum of 6 GLOBAL files will be created inside craplog/GLOBALS/:<br>
 Please notice that even usign <i>--only-glob</i>, normal <i>.crapstat</i> files will be created. CRAPLOG needs session files in order to update global ones.<br>
 After completing the job, session files will be removed automatically.<br>
 <br>
+<br><hr><br>
 <br>
 <b>FINAL WORDS</b>:<br>
 <br>
