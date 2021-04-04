@@ -32,7 +32,7 @@ DON'T DO, for example:<br>
 INSTEAD, DO:<br>
 <code>cd /Path/to/craplog/ && ./craplog.sh</code><br>
 <br>
-<br>
+<hr><br>
 <br>
 <b>LOG FILES</b>:<br>
 <br>
