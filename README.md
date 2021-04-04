@@ -12,6 +12,12 @@ It's meant to be ran daily
 <br>
 ./craplog.sh <i>[ARGUMENTS]</i><br>
 <br>
+<i>NOTE</i>:<br>
+In order to run it, please give execution permission to executable files.<br>
+From inside craplog's folder, run:<br>
+<code>sudo chmod +x ./craplog.sh ./crappy/Clean.py ./crappy/Stats.py ./crappy/Glob.py</code><br>
+<br>
+<br>
 <br>
 <b>ARGUMENTS</b>:<br>
 <br>
@@ -21,7 +27,7 @@ It's meant to be ran daily
 <b>--only-errors</b> <i>---></i> only makes statistics of error.log file (skips access.log)<br>
 <b>--only-globals</b> <i>---></i> only updates GLOBAL statistics (remove any other stat file when job is done)<br>
 <b>--avoid-globals</b> <i>---></i> avoid updating GLOBAL statistics with the processed file/s<br>
-<b>--auto-delete</b> <i>---></i> auto deletes EVERY conflict file found (!CAUTION!)<br>
+<b>--auto-delete</b> <i>---></i> auto deletes every conflict file found (!CAUTION!)<br>
 <b>--shred</b> <i>---></i> use 'shred' to delete files instead of 'remove'<br>
 <br>
 <br>
@@ -41,9 +47,11 @@ If you're using a different path, please open the file named <b>Clean.py</b> (yo
 - <b>19</b> ] for the <i>access.log</i> file<br>
 - <b>91</b> ] for the <i>error.log</i> file<br>
 <br>
+<br>
 <i>DEFAULT PATH:</i><br>
 <br>
 /var/log/apache2/<br>
+<br>
 <br>
 <i>DEFAULT LOG FORMS:</i><br>
 <br>
