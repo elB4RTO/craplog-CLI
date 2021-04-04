@@ -71,7 +71,7 @@ As said before, CRAPLOG is meant to be ran daily. <br>
 <br>
 <br><hr><br>
 <br>
-<b>CLEAN ACCESS.LOG FILE</b>:<br>
+<b>CLEAN.access.log FILE</b>:<br>
 <br>
 This is nothing special. it just creates a file in which every line from a local connection is removed (this happens with statistics too).<br>
 After that the lines are re-arranged in order to be separeted by one empty line if the connection comes from the same IP address as the previous, or two empty lines if the IP is different from the above one.<br>
