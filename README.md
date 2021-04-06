@@ -131,13 +131,13 @@ A maximum of 6 GLOBAL files will be created inside craplog/GLOBALS/:<br>
 <br>
 Statistics' files structure is the same for both SESSION and GLOBALS:<br>
 <br>
-<b>{ </b><i>COUNT</i><b> }   >>>   </b><i>ELEMENT</i><b><br>
+<b>{ </b><i>COUNT</i><b> }   >>>   </b><i>ELEMENT</i><br>
 <br>
 <br>
 <i>example</i>:<br>
 <br>
-{ 100 } \ \ >>> \ \ 200<br>
-{ 10 } \ \ >>> \ \ 404<br>
+{ 100 }&emsp;>>>&emsp;200<br>
+{ 10 }&emsp;>>>&emsp;404<br>
 <br>
 <br><hr><br>
 <br>
