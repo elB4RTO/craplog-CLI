@@ -161,20 +161,20 @@ After completing the job, session files will be removed automatically.<br>
 <br>
 <b>FINAL CONSIDERATIONS</b>:<br>
 <br>
-TOTAL ESTIMATED WORKING SPEED:<br>
+ESTIMATED WORKING SPEED:<br>
 1~10 sec / 1 MB<br>
 <br>
 May be higher or lower depending on the length of your GLOBALS, the power of your CPU and the complexity of your SESSION logs.<br>
 If CRAPLOG takes more than 1 minute for a 10 MB file, you've probably been tested in some way (better to check).<br>
 <br>
 <br>
-CRAPLOG automatically makes backups of GLOBAL statistic files, in case of fire<br>
-If something goes wrong and you lose your actual GLOBAL files, you can recover them (at least the last backup)<br>
+CRAPLOG automatically makes backups of GLOBAL statistic files, in case of fire.<br>
+If something goes wrong and you lose your actual GLOBAL files, you can recover them (at least the last backup).<br>
 Move inside CRAPLOG folder, open 'STATS', open 'GLOBALS', show hidden files and open '.BACKUPS'. Here you will find the last 7 backups taken.<br>
 Folder named '7' is always the newest and '1' the oldest.<br>
 A new BACKUP is made every 7th time you run CRAPLOG. If you run it once a day, it will take backups once a week, and will keep the older one for 7 weeks.<br>
 <br>
-CRAPLOG is under development<br>
-If you have suggestions about how to improve it please comment<br>
+CRAPLOG is under development.<br>
+If you have suggestions about how to improve it please comment.<br>
 <br>
-If you're not running Apache, but you like the tool: same as before, comment (bring a sample of a log file)<br>
+If you're not running Apache, but you like the tool: same as before, comment (bring a sample of a log file).<br>
