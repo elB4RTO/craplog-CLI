@@ -29,6 +29,7 @@ if AccessLogs == 1:
             items_tmp = items.split('>>>')
             count = items_tmp[0]
             count = count.strip('{ }')
+            count = int(count)
             IPcount.append(count)
             item = items_tmp[1]
             item = item.strip('{ }')
@@ -68,7 +69,7 @@ if AccessLogs == 1:
                 F_IPcount[item] = item_Fc
                 F_IPlist[item] = item
             else:
-                F_IPcount[item] = item_Gc
+                F_IPcount[item] = int(item_Gc)
                 F_IPlist[item] = item
         F_IParr = ({key: value for key, value in sorted(F_IPcount.items(), key=lambda item: item[1], reverse=True)})
         file = open("./STATS/GLOBALS/GLOBAL.IP.crapstats", "a")
@@ -111,6 +112,7 @@ if AccessLogs == 1:
             items_tmp = items.split('>>>')
             count = items_tmp[0]
             count = count.strip('{ }')
+            count = int(count)
             REQcount.append(count)
             item = items_tmp[1]
             item = item.strip('{ }')
@@ -150,7 +152,7 @@ if AccessLogs == 1:
                 F_REQcount[item] = item_Fc
                 F_REQlist[item] = item
             else:
-                F_REQcount[item] = item_Gc
+                F_REQcount[item] = int(item_Gc)
                 F_REQlist[item] = item
         F_REQarr = ({key: value for key, value in sorted(F_REQcount.items(), key=lambda item: item[1], reverse=True)})
         file = open("./STATS/GLOBALS/GLOBAL.REQ.crapstats", "a")
@@ -193,6 +195,7 @@ if AccessLogs == 1:
             items_tmp = items.split('>>>')
             count = items_tmp[0]
             count = count.strip('{ }')
+            count = int(count)
             REScount.append(count)
             item = items_tmp[1]
             item = item.strip('{ }')
@@ -232,7 +235,7 @@ if AccessLogs == 1:
                 F_REScount[item] = item_Fc
                 F_RESlist[item] = item
             else:
-                F_REScount[item] = item_Gc
+                F_REScount[item] = int(item_Gc)
                 F_RESlist[item] = item
         F_RESarr = ({key: value for key, value in sorted(F_REScount.items(), key=lambda item: item[1], reverse=True)})
         file = open("./STATS/GLOBALS/GLOBAL.RES.crapstats", "a")
@@ -275,6 +278,7 @@ if AccessLogs == 1:
             items_tmp = items.split('>>>')
             count = items_tmp[0]
             count = count.strip('{ }')
+            count = int(count)
             UAcount.append(count)
             item = items_tmp[1]
             item = item.strip('{ }')
@@ -314,7 +318,7 @@ if AccessLogs == 1:
                 F_UAcount[item] = item_Fc
                 F_UAlist[item] = item
             else:
-                F_UAcount[item] = item_Gc
+                F_UAcount[item] = int(item_Gc)
                 F_UAlist[item] = item
         F_UAarr = ({key: value for key, value in sorted(F_UAcount.items(), key=lambda item: item[1], reverse=True)})
         file = open("./STATS/GLOBALS/GLOBAL.UA.crapstats", "a")
@@ -366,6 +370,7 @@ if ErrorLogs == 1:
             items_tmp = items.split('>>>')
             count = items_tmp[0]
             count = count.strip('{ }')
+            count = int(count)
             LEVcount.append(count)
             item = items_tmp[1]
             item = item.strip('{ }')
@@ -405,7 +410,7 @@ if ErrorLogs == 1:
                 F_LEVcount[item] = item_Fc
                 F_LEVlist[item] = item
             else:
-                F_LEVcount[item] = item_Gc
+                F_LEVcount[item] = int(item_Gc)
                 F_LEVlist[item] = item
         F_LEVarr = ({key: value for key, value in sorted(F_LEVcount.items(), key=lambda item: item[1], reverse=True)})
         file = open("./STATS/GLOBALS/GLOBAL.LEV.crapstats", "a")
@@ -447,6 +452,7 @@ if ErrorLogs == 1:
             items_tmp = items.split('>>>')
             count = items_tmp[0]
             count = count.strip('{ }')
+            count = int(count)
             ERRcount.append(count)
             item = items_tmp[1]
             item = item.strip('{ }')
@@ -486,7 +492,7 @@ if ErrorLogs == 1:
                 F_ERRcount[item] = item_Fc
                 F_ERRlist[item] = item
             else:
-                F_ERRcount[item] = item_Gc
+                F_ERRcount[item] = int(item_Gc)
                 F_ERRlist[item] = item
         F_ERRarr = ({key: value for key, value in sorted(F_ERRcount.items(), key=lambda item: item[1], reverse=True)})
         file = open("./STATS/GLOBALS/GLOBAL.ERR.crapstats", "a")
