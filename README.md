@@ -42,12 +42,12 @@ From inside craplog's folder, run:<br>
 <b>--backup+delete</b> <i>---></i> creates a BACKUP.tar.gz archive and delete both access.log.1 and error.log.1 original files (!CAUTION!)<br>
 <br>
 <br>
-<b>NOTE</b>:<br>
+<b>IMPORTANT NOTE</b>:<br>
 MAKE SURE TO BE INSIDE CRAPLOG'S DIRECTORY WHENEVER YOU RUN IT, or it will use your actual path as base path and will create files and folders in that point.<br>
 DON'T DO, for example:<br>
-<code>/Path/to/craplog/craplog.sh</code><br>
+<code>/path/to/craplog/craplog.sh</code><br>
 INSTEAD, DO:<br>
-<code>cd /Path/to/craplog/ && ./craplog.sh</code><br>
+<code>cd /path/to/craplog/ && ./craplog.sh</code><br>
 <br>
 <br><hr><br>
 <br>
