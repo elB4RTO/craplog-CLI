@@ -136,8 +136,8 @@ Statistics' files structure is the same for both SESSION and GLOBALS:<br>
 <br>
 <i>example</i>:<br>
 <br>
-{ 100 }&emsp;>>>&emsp;200<br>
-{ 10 }&emsp;>>>&emsp;404<br>
+{ 100 } &emsp; >>> &emsp; 200<br>
+{ 10 } &emsp; >>> &emsp; 404<br>
 <br>
 <br><hr><br>
 <br>
