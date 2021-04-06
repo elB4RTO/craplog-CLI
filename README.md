@@ -15,21 +15,30 @@ It's meant to be ran daily
 <i>NOTE</i>:<br>
 In order to run it, please give execution permission to executable files.<br>
 From inside craplog's folder, run:<br>
-<code>sudo chmod +x ./craplog.sh ./crappy/Clean.py ./crappy/Stats.py ./crappy/Glob.py</code><br>
+<code>chmod +x ./craplog.sh ./crappy/Clean.py ./crappy/Stats.py ./crappy/Glob.py</code><br>
 <br>
 <br>
 <br>
 <b>ARGUMENTS</b>:<br>
 <br>
 <b>-h</b> / <b>--help</b> <i>---></i> prints help screen and exit<br>
+<br>
 <b>-c</b> / <b>--clean</b> <i>---></i> creates a cleaned ACCESS logs file<br>
+<br>
 <b>-e</b> / <b>--errors</b> <i>---></i> makes statistics of error.log.1 file too<br>
+<br>
 <b>--only-errors</b> <i>---></i> only makes statistics of error.log.1 file (skips access.log.1)<br>
+<br>
 <b>--only-globals</b> <i>---></i> only updates GLOBAL statistics (remove any other stat file when job is done)<br>
+<br>
 <b>--avoid-globals</b> <i>---></i> avoid updating GLOBAL statistics with the processed file/s<br>
+<br>
 <b>--auto-delete</b> <i>---></i> auto deletes every conflict file found (!CAUTION!)<br>
+<br>
 <b>--shred</b> <i>---></i> use 'shred' to delete files instead of 'remove'<br>
+<br>
 <b>-b</b> / <b>--backup</b> <i>---></i> creates a BACKUP.tar.gz archive of both ACCESS and ERROR log files inside SESSION's stats folder<br>
+<br>
 <b>--backup+delete</b> <i>---></i> creates a BACKUP.tar.gz archive and delete both access.log.1 and error.log.1 original files (!CAUTION!)<br>
 <br>
 <br>
@@ -127,8 +136,8 @@ Statistics' files structure is the same for both SESSION and GLOBALS:<br>
 <br>
 <i>example</i>:<br>
 <br>
-{ 100 }   >>>   200<br>
-{ 10 }   >>>   404<br>
+{ 100 } \ \ >>> \ \ 200<br>
+{ 10 } \ \ >>> \ \ 404<br>
 <br>
 <br><hr><br>
 <br>
