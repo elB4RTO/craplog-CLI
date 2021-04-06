@@ -22,13 +22,15 @@ From inside craplog's folder, run:<br>
 <b>ARGUMENTS</b>:<br>
 <br>
 <b>-h</b> / <b>--help</b> <i>---></i> prints help screen and exit<br>
-<b>-c</b> / <b>--clean</b> <i>---></i> creates a cleaned access.log file<br>
-<b>-e</b> / <b>--errors</b> <i>---></i> makes statistics of error.log file too<br>
-<b>--only-errors</b> <i>---></i> only makes statistics of error.log file (skips access.log)<br>
+<b>-c</b> / <b>--clean</b> <i>---></i> creates a cleaned ACCESS logs file<br>
+<b>-e</b> / <b>--errors</b> <i>---></i> makes statistics of error.log.1 file too<br>
+<b>--only-errors</b> <i>---></i> only makes statistics of error.log.1 file (skips access.log.1)<br>
 <b>--only-globals</b> <i>---></i> only updates GLOBAL statistics (remove any other stat file when job is done)<br>
 <b>--avoid-globals</b> <i>---></i> avoid updating GLOBAL statistics with the processed file/s<br>
 <b>--auto-delete</b> <i>---></i> auto deletes every conflict file found (!CAUTION!)<br>
 <b>--shred</b> <i>---></i> use 'shred' to delete files instead of 'remove'<br>
+<b>-b</b> / <b>--backup</b> <i>---></i> creates a BACKUP.tar.gz archive of both ACCESS and ERROR log files inside SESSION's stats folder<br>
+<b>--backup+delete</b> <i>---></i> creates a BACKUP.tar.gz archive and delete both access.log.1 and error.log.1 original files (!CAUTION!)<br>
 <br>
 <br>
 <b>NOTE</b>:<br>
@@ -116,10 +118,24 @@ A maximum of 6 GLOBAL files will be created inside craplog/GLOBALS/:<br>
 <br>
 <br><hr><br>
 <br>
-<b>EXAMPLES</b>:<br>
+<b>STATISTICS STRUCTURE</b>:<br>
 <br>
-<i>- CRAPLOG's complete functionalities: makes a clean access logs file, creates statisics of both access.log and error.log files and use them to updates globals</i><br>
-<code>./craplog.sh -c -e</code><br>
+Statistics' files structure is the same for both SESSION and GLOBALS:<br>
+<br>
+<b>{ </b><i>COUNT</i><b> }   >>>   </b><i>ELEMENT</i><b><br>
+<br>
+<br>
+<i>example</i>:<br>
+<br>
+{ 100 }   >>>   200<br>
+{ 10 }   >>>   404<br>
+<br>
+<br><hr><br>
+<br>
+<b>USAGE EXAMPLES</b>:<br>
+<br>
+<i>- CRAPLOG's complete functionalities: makes a clean access logs file, creates statisics of both access.log.1 and error.log.1 files, uses them to update globals and creates a backup of the original files</i><br>
+<code>./craplog.sh -b -c -e</code><br>
 <br>
 <i>- Also creates statisics of error logs file, but avoids updating globals</i><br>
 <code>./craplog.sh -e --avoid-glob</code><br>
@@ -136,12 +152,18 @@ After completing the job, session files will be removed automatically.<br>
 <br>
 <b>FINAL CONSIDERATIONS</b>:<br>
 <br>
-ESTIMATED WORK TIME:<br>
-2~10 sec / 1 MB<br>
+TOTAL ESTIMATED WORKING SPEED:<br>
+1~10 sec / 1 MB<br>
 <br>
 May be higher or lower depending on the length of your GLOBALS, the power of your CPU and the complexity of your SESSION logs.<br>
 If CRAPLOG takes more than 1 minute for a 10 MB file, you've probably been tested in some way (better to check).<br>
 <br>
+<br>
+CRAPLOG automatically makes backups of GLOBAL statistic files, in case of fire<br>
+If something goes wrong and you lose your actual GLOBAL files, you can recover them (at least the last backup)<br>
+Move inside CRAPLOG folder, open 'STATS', open 'GLOBALS', show hidden files and open '.BACKUPS'. Here you will find the last 7 backups taken.<br>
+Folder named '7' is always the newest and '1' the oldest.<br>
+A new BACKUP is made every 7th time you run CRAPLOG. If you run it once a day, it will take backups once a week, and will keep the older one for 7 weeks.<br>
 <br>
 CRAPLOG is under development<br>
 If you have suggestions about how to improve it please comment<br>
