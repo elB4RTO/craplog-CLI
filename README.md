@@ -85,7 +85,7 @@ As said before, CRAPLOG is meant to be ran daily. <br>
 <b>CLEAN.access.log FILE</b>:<br>
 <br>
 This is nothing special. it just creates a file in which every line from a local connection is removed (this happens with statistics too).<br>
-After that the lines are re-arranged in order to be separeted by one empty line if the connection comes from the same IP address as the previous, or two empty lines if the IP is different from the above one.<br>
+After that, the lines are re-arranged in order to be separeted by one empty line if the connection comes from the same IP address as the previous, or two empty lines if the IP is different from the above one.<br>
 This isn't much useful if you usually check logs using <i>cat | grep</i>, but it helps if you read them directly from file.<br>
 Not a default feature.<br>
 <br>
@@ -112,7 +112,7 @@ This will create 2 additional files inside STATS folder:<br>
 <br>
 <b>GLOBAL STATISTIC FILES</b>:<br>
 <br>
-Additionally, by default CRAPLOG updates the GLOBAL statistics inside the <i>/STATS/GLOBALS</i> folder every time you run it (unless you specify to not do it, calling <i>--avoid-glob</i>).<br>
+Additionally, by default CRAPLOG updates the GLOBAL statistics inside the <i>/STATS/GLOBALS</i> folder every time you run it (unless you specify to not do it, calling <i>--avoid-globals</i>).<br>
 <br>
 Please notice that if you run it twice for the same log file, GLOBAL statistics will not be reliable (obviously).<br>
 <br>
@@ -147,14 +147,14 @@ Statistics' files structure is the same for both SESSION and GLOBALS:<br>
 <code>./craplog.sh -b -c -e</code><br>
 <br>
 <i>- Also creates statisics of error logs file, but avoids updating globals</i><br>
-<code>./craplog.sh -e --avoid-glob</code><br>
+<code>./craplog.sh -e --avoid-globals</code><br>
 <br>
-<i>- Takes both access.log and error.log files as input, but only updates global statistics. also auto-deletes every conflict file it finds</i><br>
-<code>./craplog.sh -e --only-glob --auto-del</code><br>
+<i>- Takes both access.log and error.log files as input, but only updates global statistics. Also auto-deletes every conflict file it finds</i><br>
+<code>./craplog.sh -e --only-globals --auto-delete</code><br>
 <br>
 <br>
 <b>PS</b>:<br>
-Please notice that even usign <i>--only-glob</i>, normal <i>.crapstat</i> files will be created. CRAPLOG needs session files in order to update global ones.<br>
+Please notice that even usign <i>--only-globals</i>, normal SESSION's statistic files will be created. CRAPLOG needs session files in order to update global ones.<br>
 After completing the job, session files will be removed automatically.<br>
 <br>
 <br><hr><br>
