@@ -31,4 +31,9 @@
  ¦  --auto-delete  ¦ auto-delete conflict files              ¦
  ¦-----------------------------------------------------------¦
  ¦    --shred      ¦ shred files instead of remove           ¦
+ ¦-----------------------------------------------------------¦
+ ¦       -b        ¦ create a backup archive                 ¦
+ ¦    --backup     ¦                                         ¦
+ ¦-----------------------------------------------------------¦
+ ¦ --backu+delete  ¦ create a backup + delete original files ¦
   -----------------------------------------------------------
