@@ -145,7 +145,7 @@ Statistics' structure is the same for both SESSION and GLOBALS:<br>
 <b>USAGE EXAMPLES</b>:<br>
 <br>
 <i>- CRAPLOG's complete functionalities: makes a clean access logs file, creates statisics of both access.log.1 and error.log.1 files, uses them to update globals and creates a backup of the original files</i><br>
-<code>./craplog.sh -b -c -e</code><br>
+<code>./craplog.sh -c -e -b</code><br>
 <br>
 <i>- Takes both access logs and error logs files as input, but only updates global statistics. Also auto-deletes every conflict file it finds</i><br>
 <code>./craplog.sh -e --only-globals --auto-delete</code><br>
