@@ -165,7 +165,7 @@ After completing the job, session files will be automatically removed.<br>
 ESTIMATED WORKING SPEED:<br>
 1~10 sec / 1 MB<br>
 <br>
-May be higher or lower depending on the length of your GLOBALS, the power of your CPU and the complexity of your SESSION logs.<br>
+May be higher or lower depending on the complexity of your SESSION logs, the length of your GLOBALS and the power of your CPU.<br>
 If CRAPLOG takes more than 1 minute for a 10 MB file, you've probably been tested in some way (better to check).<br>
 <br>
 <br>
