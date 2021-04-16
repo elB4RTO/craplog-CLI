@@ -29,7 +29,7 @@ From inside craplog's folder, run:<br>
 <br>
 <b>--only-errors</b> <i>---></i> only makes statistics of error.log.1 file (skips access.log.1)<br>
 <br>
-<b>--only-globals</b> <i>---></i> only updates GLOBAL statistics (removes any other stat file when the job is done)<br>
+<b>--only-globals</b> <i>---></i> only updates GLOBAL statistics<br>
 <br>
 <b>--avoid-globals</b> <i>---></i> avoid updating GLOBAL statistics with the processed file/s<br>
 <br>
