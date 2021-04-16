@@ -21,21 +21,21 @@ From inside craplog's folder, run:<br>
 <br>
 <b>ARGUMENTS</b>:<br>
 <br>
-<b>-h</b> / <b>--help</b> <i>---></i> prints help screen and exit<br>
+<b>-h</b> / <b>--help</b> <i>---></i> prints help screen and exits<br>
 <br>
-<b>-c</b> / <b>--clean</b> <i>---></i> creates a cleaned ACCESS logs file<br>
+<b>-c</b> / <b>--clean</b> <i>---></i> creates a CLEAN.access.log file (see below for details)<br>
 <br>
 <b>-e</b> / <b>--errors</b> <i>---></i> makes statistics of error.log.1 file too<br>
 <br>
 <b>--only-errors</b> <i>---></i> only makes statistics of error.log.1 file (skips access.log.1)<br>
 <br>
-<b>--only-globals</b> <i>---></i> only updates GLOBAL statistics (remove any other stat file when job is done)<br>
+<b>--only-globals</b> <i>---></i> only updates GLOBAL statistics (removes any other stat file when the job is done)<br>
 <br>
 <b>--avoid-globals</b> <i>---></i> avoid updating GLOBAL statistics with the processed file/s<br>
 <br>
-<b>--auto-delete</b> <i>---></i> auto deletes every conflict file found (!CAUTION!)<br>
+<b>--auto-delete</b> <i>---></i> automatically deletes every conflict file found (!CAUTION!)<br>
 <br>
-<b>--shred</b> <i>---></i> use 'shred' to delete files instead of 'remove'<br>
+<b>--shred</b> <i>---></i> uses 'shred' to delete files instead of 'remove'<br>
 <br>
 <b>-b</b> / <b>--backup</b> <i>---></i> creates a BACKUP.tar.gz archive of both ACCESS and ERROR log files inside SESSION's stats folder<br>
 <br>
@@ -55,8 +55,8 @@ INSTEAD, DO:<br>
 <br>
 At the moment, it only supports <b>Apache2</b> log files in their <b>default</b> form and path<br>
 If you're using a different path, please open the file named <b>Clean.py</b> (you can find it inside the folder named <i>crappy</i>) and <b>modify</b> these lines:<br>
-- <b>19</b> ] for the <i>access.log</i> file<br>
-- <b>91</b> ] for the <i>error.log</i> file<br>
+- <b>19</b> ] for the <i>access.log.1</i> file<br>
+- <b>91</b> ] for the <i>error.log.1</i> file<br>
 <br>
 <br>
 <i>DEFAULT PATH:</i><br>
@@ -76,15 +76,15 @@ IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URL" "USER AGENT"<br>
 <br>
 <br>
 <i>NOTE</i>:<br>
-Please notice that CRAPLOG is taking <b>*.log.1</b> files as input. this is because these files (by default) are renewed every day at midnight, so they contain the full log stack of the (past) day.<br>
+Please notice that CRAPLOG is taking <b>*.log.1</b> files as input. This is because these files (by default) are renewed every day at midnight, so they contain the full log stack of the (past) day.<br>
 Because of that, when you run it, it will use yesterday's logs and store stat files cosequently.<br>
-As said before, CRAPLOG is meant to be ran daily. <br>
+CRAPLOG is meant to be ran daily.<br>
 <br>
 <br><hr><br>
 <br>
 <b>CLEAN.access.log FILE</b>:<br>
 <br>
-This is nothing special. it just creates a file in which every line from a local connection is removed (this happens with statistics too).<br>
+This is nothing special. It just creates a file in which every line from a local connection is removed (this happens with statistics too).<br>
 After that, the lines are re-arranged in order to be separeted by one empty line if the connection comes from the same IP address as the previous, or two empty lines if the IP is different from the above one.<br>
 This isn't much useful if you usually check logs using <i>cat | grep</i>, but it helps if you read them directly from file.<br>
 Not a default feature.<br>
@@ -98,7 +98,7 @@ By default, CRAPLOG takes as input only the <b><i>access.log.1</i></b> file (unl
 The first time you run it, it will create a folder named <i>STATS</i>.<br>
 Stat files will be stored inside that folder and sorted by date.<br>
 <br>
-Four <i>.crapstats</i> files will be created inside the folder named STATS:<br>
+Four <i>*.crapstats</i> files will be created inside the folder named STATS:<br>
 - <b>IP.crapstats</b> = IPs statistics of the choosen file<br>
 - <b>REQ.crapstats</b> = REQUESTs statistics of the choosen file<br>
 - <b>RES.crapstats</b> = RESPONSEs statistics of the choosen file<br>
@@ -129,7 +129,7 @@ A maximum of 6 GLOBAL files will be created inside craplog/GLOBALS/:<br>
 <br>
 <b>STATISTICS STRUCTURE</b>:<br>
 <br>
-Statistics' files structure is the same for both SESSION and GLOBALS:<br>
+Statistics' structure is the same for both SESSION and GLOBALS:<br>
 <br>
 <b>{ </b><i>COUNT</i><b> }   >>>   </b><i>ELEMENT</i><br>
 <br>
@@ -146,16 +146,16 @@ Statistics' files structure is the same for both SESSION and GLOBALS:<br>
 <i>- CRAPLOG's complete functionalities: makes a clean access logs file, creates statisics of both access.log.1 and error.log.1 files, uses them to update globals and creates a backup of the original files</i><br>
 <code>./craplog.sh -b -c -e</code><br>
 <br>
+<i>- Takes both access logs and error logs files as input, but only updates global statistics. Also auto-deletes every conflict file it finds</i><br>
+<code>./craplog.sh -e --only-globals --auto-delete</code><br>
+<br>
 <i>- Also creates statisics of error logs file, but avoids updating globals</i><br>
 <code>./craplog.sh -e --avoid-globals</code><br>
-<br>
-<i>- Takes both access.log and error.log files as input, but only updates global statistics. Also auto-deletes every conflict file it finds</i><br>
-<code>./craplog.sh -e --only-globals --auto-delete</code><br>
 <br>
 <br>
 <b>PS</b>:<br>
 Please notice that even usign <i>--only-globals</i>, normal SESSION's statistic files will be created. CRAPLOG needs session files in order to update global ones.<br>
-After completing the job, session files will be removed automatically.<br>
+After completing the job, session files will be automatically removed.<br>
 <br>
 <br><hr><br>
 <br>
@@ -172,9 +172,9 @@ CRAPLOG automatically makes backups of GLOBAL statistic files, in case of fire.<
 If something goes wrong and you lose your actual GLOBAL files, you can recover them (at least the last backup).<br>
 Move inside CRAPLOG folder, open 'STATS', open 'GLOBALS', show hidden files and open '.BACKUPS'. Here you will find the last 7 backups taken.<br>
 Folder named '7' is always the newest and '1' the oldest.<br>
-A new BACKUP is made every 7th time you run CRAPLOG. If you run it once a day, it will take backups once a week, and will keep the older one for 7 weeks.<br>
+A new BACKUP is made every 7th time you run CRAPLOG. If you run it once a day, it will takes backups once a week, and will keep the older one for 7 weeks.<br>
 <br>
 CRAPLOG is under development.<br>
 If you have suggestions about how to improve it please comment.<br>
 <br>
-If you're not running Apache, but you like the tool: same as before, comment (bring a sample of a log file).<br>
+If you're not running Apache, but you like this tool: same as before, comment (bring a sample of a log file).<br>
