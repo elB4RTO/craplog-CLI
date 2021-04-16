@@ -110,6 +110,7 @@ This will create 2 additional files inside STATS folder:<br>
 - <b>ERR.crapstats</b> = ERROR REPORTs statistics of the choosen file<br>
 <br>
 <br>
+<br>
 <b>GLOBAL STATISTIC FILES</b>:<br>
 <br>
 Additionally, by default CRAPLOG updates the GLOBAL statistics inside the <i>/STATS/GLOBALS</i> folder every time you run it (unless you specify to not do it, calling <i>--avoid-globals</i>).<br>
