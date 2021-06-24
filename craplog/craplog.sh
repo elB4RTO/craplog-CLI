@@ -124,7 +124,7 @@ printf "   $(tput setaf 1)C      $(tput setaf 3)RRRR   $(tput setaf 2)AAAAA  $(t
 printf "   $(tput setaf 1)C      $(tput setaf 3)R  R   $(tput setaf 2)A   A  $(tput setaf 6)P      $(tput setaf 4)L      $(tput setaf 5)O   O  $(tput setaf 7)G   G\n"
 printf "   $(tput setaf 1) CCCC  $(tput setaf 3)R   R  $(tput setaf 2)A   A  $(tput setaf 6)P      $(tput setaf 4)LLLLL  $(tput setaf 5)OOOOO  $(tput setaf 7)GGGGG\n\n$(tput sgr0)"
 
-if [[ ! -e /var/log/apache2 ]];
+if [[ ! -e /var/log/apache2 ]]
 	then
 		printf "\n$(tput setaf 3)Error$(tput sgr0): directory $(tput setaf 1)/var/log/apache2/$(tput sgr0) does not exist\n\n"
 		exit
