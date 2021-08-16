@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# EDIT THE NEXT LINES TO SETUP CRAPLOG AND RUN IT WITHOUT HAVING TO USE ARGUMENTS
-# 1 = YES , 0 = NO
+# INITIALIZING VARIABLES
+# EDIT THE NEXT LINES TO SETUP CRAPLOG AND RUN IT WITHOUT HAVING TO USE ARGUMENTS EVERY TIME
+#
+# 1 = YES
+# 0 = NO
+#
 # THESE VARIABLES WILL DETERMINE THE EXECUTION OF THE CODE
 # TO HAVE IT WORKING AS EXPECTED, EDIT USING COMMON SENSE AND LOGIC
 #
@@ -54,6 +58,10 @@ BackupDelete=0
 # [ --auto-delete ]
 AutoDelete=0
 #
+# MOVE FILES TO TRASH INSTEAD OF COMPLETELY REMOVE (default 0)
+# [ --shred ]
+Trash=0
+#
 # SHRED FILES INSTEAD OF SIMPLE REMOVE (default 0)
 # [ --shred ]
 Shred=0
@@ -61,6 +69,7 @@ Shred=0
 # END
 
 
+# IF ARGUMENTS ARE ALLOWED (UseArguments=1), GET THEM
 if [[ "$UseArguments" -eq "1" ]]
 	then
 		for arg in "$@"
@@ -68,7 +77,7 @@ if [[ "$UseArguments" -eq "1" ]]
 				case "$arg" in
 					"-h" | "--help" | "-help" | "help")
 						printf "\n"
-						cat ./.elbarto.txt ./README.txt
+						cat ./aux/elbarto ./aux/craplogo ./aux/help
 						printf "\n"
 						exit
 						;;
@@ -100,6 +109,9 @@ if [[ "$UseArguments" -eq "1" ]]
 					"--auto-delete")
 						AutoDelete=1
 						;;
+					"--trash")
+						Trash=1
+						;;
 					"--shred")
 						Shred=1
 						;;
@@ -124,26 +136,11 @@ printf "   $(tput setaf 1)C      $(tput setaf 3)RRRR   $(tput setaf 2)AAAAA  $(t
 printf "   $(tput setaf 1)C      $(tput setaf 3)R  R   $(tput setaf 2)A   A  $(tput setaf 6)P      $(tput setaf 4)L      $(tput setaf 5)O   O  $(tput setaf 7)G   G\n"
 printf "   $(tput setaf 1) CCCC  $(tput setaf 3)R   R  $(tput setaf 2)A   A  $(tput setaf 6)P      $(tput setaf 4)LLLLL  $(tput setaf 5)OOOOO  $(tput setaf 7)GGGGG\n\n$(tput sgr0)"
 
-if [[ ! -e /var/log/apache2 ]]
+# VARIABLES' INTEGRITY CHECKINGS
+if [[ "$AccessLogs" -eq "0" && "$ErrorLogs" -eq "0" ]]
 	then
-		printf "\n$(tput setaf 3)Error$(tput sgr0): directory $(tput setaf 1)/var/log/apache2/$(tput sgr0) does not exist\n\n"
+		printf "\n$(tput setaf 3)Error$(tput sgr0): you can't avoid using both access and error log files, nothing will be done\n\n"
 		exit
-	fi
-if [[ "$AccessLogs" -eq "1" ]]
-	then
-		if [[ ! -e /var/log/apache2/access.log.1 ]]
-			then
-				printf "\n$(tput setaf 3)Error$(tput sgr0): there is no $(tput setaf 1)access.log.1$(tput sgr0) file inside $(tput setaf 2)/var/log/apache2/$(tput sgr0)\n\n"
-				exit
-			fi
-	fi
-if [[ "$ErrorLogs" -eq "1" ]]
-	then
-		if [[ ! -e /var/log/apache2/error.log.1 ]]
-			then
-				printf "\n$(tput setaf 3)Error$(tput sgr0): there is no $(tput setaf 1)error.log.1$(tput sgr0) file inside $(tput setaf 2)/var/log/apache2/$(tput sgr0)\n\n"
-				exit
-			fi
 	fi
 if [[ "$AccessLogs" -eq "0" && "$CleanAccessLogs" -eq "1" ]]
 	then
@@ -155,12 +152,56 @@ if [[ "$GlobalsOnly" -eq "1" && "$GlobalsAvoid" -eq "1" ]]
 		printf "\n$(tput setaf 3)Error$(tput sgr0): you can't use $(tput setaf 6)--only-globals$(tput sgr0) toghether with $(tput setaf 6)--avoid-globals$(tput sgr0)\n\n"
 		exit
 	fi
-if [[ "$GlobalsAvoid" -eq "1" && "$AccessLogs" -eq "0" && "$ErrorLogs" -eq "0" ]]
+if [[ "$Trash" -eq "1" && "$Shred" -eq "1" ]]
 	then
-		printf "\n$(tput setaf 3)Error$(tput sgr0): you can't avoid making both global and session statistics, nothing will be done\n\n"
+		printf "\n$(tput setaf 3)Error$(tput sgr0): you can't use $(tput setaf 6)--trash$(tput sgr0) toghether with $(tput setaf 6)--shred$(tput sgr0)\n\n"
 		exit
 	fi
 
+# INPUT FILES EXISTENCE CHECKINGS
+if [[ ! -d /var/log/apache2 ]]
+	then
+		printf "\n$(tput setaf 3)Error$(tput sgr0): directory $(tput setaf 1)/var/log/apache2/$(tput sgr0) does not exist\n\n"
+		exit
+	fi
+if [[ "$AccessLogs" -eq "1" ]]
+	then
+		if [[ ! -e /var/log/apache2/access.log.1 ]]
+			then
+				printf "\n$(tput setaf 3)Error$(tput sgr0): there is no $(tput setaf 1)access.log.1$(tput sgr0) file inside $(tput setaf 2)/var/log/apache2/$(tput sgr0)\n\n"
+				exit
+		elif [[ ! -r /var/log/apache2/access.log.1 ]]
+			then
+				printf "\n$(tput setaf 3)Error$(tput sgr0): can't read $(tput setaf 2)/var/log/apache2/$(tput setaf 1)access.log.1$(tput sgr0)\n\n"
+				exit
+			fi
+	fi
+if [[ "$ErrorLogs" -eq "1" ]]
+	then
+		if [[ ! -e /var/log/apache2/error.log.1 ]]
+			then
+				printf "\n$(tput setaf 3)Error$(tput sgr0): there is no $(tput setaf 1)error.log.1$(tput sgr0) file inside $(tput setaf 2)/var/log/apache2/$(tput sgr0)\n\n"
+				exit
+		elif [[ ! -r /var/log/apache2/error.log.1 ]]
+			then
+				printf "\n$(tput setaf 3)Error$(tput sgr0): can't read $(tput setaf 2)/var/log/apache2/$(tput setaf 1)error.log.1$(tput sgr0)\n\n"
+				exit
+			fi
+	fi
+
+# TRASH EXISTENCE CHECKING
+if [[ "$Trash" -eq "1" ]]
+	then
+		TrashPath=~/.local/share/Trash/files/
+		if [[ ! -e "$TrashPath" ]]
+			then
+				printf "\n$(tput setaf 3)Error$(tput sgr0): directory $(tput setaf 1)$TrashPath$(tput sgr0) does not exist\n\n"
+				exit
+			fi
+	fi
+
+
+# STARTING CRAPLOG
 printf "\nWELCOME TO CRAPLOG\nUse $(tput setaf 6)craplog.sh --help$(tput sgr0) to view an help screen\n"
 if [[ "$AutoDelete" -eq "1" ]]
 	then
@@ -168,28 +209,25 @@ if [[ "$AutoDelete" -eq "1" ]]
 	fi
 printf "\n"
 sleep 2 && wait
-if [[ ! -e ./STATS ]]
+
+# GETTING PATH
+crapdir="$(dirname $(realpath $0))"
+
+# STARGING CRAPLOG
+if [[ ! -e "$crapdir"/STATS/GLOBALS/.BACKUPS ]]
 	then
-		mkdir ./STATS &> /dev/null && wait
+		mkdir -p "$crapdir"/STATS/GLOBALS/.BACKUPS &> /dev/null && wait
+		echo "0" > "$crapdir"/STATS/GLOBALS/.BACKUPS/.last_time && wait
 	fi
-if [[ ! -e ./STATS/GLOBALS ]]
+if [[ ! -e "$crapdir"/STATS/GLOBALS/.BACKUPS/.last_time ]]
 	then
-		mkdir ./STATS/GLOBALS &> /dev/null && wait
-	fi
-if [[ ! -e ./STATS/GLOBALS/.BACKUPS ]]
-	then
-		mkdir ./STATS/GLOBALS/.BACKUPS &> /dev/null && wait
-		echo "0" > ./STATS/GLOBALS/.BACKUPS/.last_time && wait
-	fi
-if [[ ! -e ./STATS/GLOBALS/.BACKUPS/.last_time ]]
-	then
-		touch ./STATS/GLOBALS/.BACKUPS/.last_time && wait
-		echo "7" > ./STATS/GLOBALS/.BACKUPS/.last_time && wait
+		touch "$crapdir"/STATS/GLOBALS/.BACKUPS/.last_time && wait
+		echo "7" > "$crapdir"/STATS/GLOBALS/.BACKUPS/.last_time && wait
 	fi
 
 if [[ "$AutoDelete" -eq "1" ]]
 	then
-		if [ -e ./STATS/CLEAN.access.log ] || [ -e ./STATS/IP.crapstats ] || [ -e ./STATS/REQ.crapstats ] || [ -e ./STATS/RES.crapstats ] || [ -e ./STATS/UA.crapstats ] || [ -e ./STATS/LEV.crapstats ] || [ -e ./STATS/ERR.crapstats ] || [ -e ./STATS/.IP.crap ] || [ -e ./STATS/.REQ.crap ] || [ -e ./STATS/.RES.crap ] || [ -e ./STATS/.UA.crap ] || [ -e ./STATS/.LEV.crap ] || [ -e ./STATS/.ERR.crap ]
+		if [ -e "$crapdir"/STATS/CLEAN.access.log ] || [ -e "$crapdir"/STATS/IP.crapstats ] || [ -e "$crapdir"/STATS/REQ.crapstats ] || [ -e "$crapdir"/STATS/RES.crapstats ] || [ -e "$crapdir"/STATS/UA.crapstats ] || [ -e "$crapdir"/STATS/LEV.crapstats ] || [ -e "$crapdir"/STATS/ERR.crapstats ] || [ -e "$crapdir"/STATS/.IP.crap ] || [ -e "$crapdir"/STATS/.REQ.crap ] || [ -e "$crapdir"/STATS/.RES.crap ] || [ -e "$crapdir"/STATS/.UA.crap ] || [ -e "$crapdir"/STATS/.LEV.crap ] || [ -e "$crapdir"/STATS/.ERR.crap ]
 			then
 				if [[ "$LessOutput" -eq "0" ]]
 					then
@@ -197,70 +235,82 @@ if [[ "$AutoDelete" -eq "1" ]]
 						sleep 1 && wait
 					fi
 			fi
-		if [ -e ./STATS/CLEAN.access.log ]
+		if [ -e "$crapdir"/STATS/CLEAN.access.log ]
 			then
-				if [[ "$Shred" -eq "1" ]]
+				if [[ "$Trash" -eq "1" ]]
 					then
-						shred -uvz ./STATS/CLEAN.access.log &> /dev/null && wait
+						mv "$crapdir"/STATS/CLEAN.access.log "$TrashPath" &> /dev/null && wait
+				elif [[ "$Shred" -eq "1" ]]
+					then
+						shred -uvz "$crapdir"/STATS/CLEAN.access.log &> /dev/null && wait
 					else
-						rm ./STATS/CLEAN.access.log &> /dev/null && wait
+						mv "$crapdir"/STATS/CLEAN.access.log ~/.local/share/Trash &> /dev/null && wait
 					fi
 			fi
-		ls -1 ./STATS/*.crapstats &> /dev/null 2>&1
+		ls -1 "$crapdir"/STATS/*.crapstats &> /dev/null 2>&1
 		if [ "$?" = "0" ]
 			then
-				if [[ "$Shred" -eq "1" ]]
+				if [[ "$Trash" -eq "1" ]]
 					then
-						shred -uvz ./STATS/*.crapstats &> /dev/null && wait
+						mv "$crapdir"/STATS/*.crapstats "$TrashPath" &> /dev/null && wait
+				elif [[ "$Shred" -eq "1" ]]
+					then
+						shred -uvz "$crapdir"/STATS/*.crapstats &> /dev/null && wait
 					else
-						rm ./STATS/*.crapstats &> /dev/null && wait
+						rm "$crapdir"/STATS/*.crapstats &> /dev/null && wait
 					fi
 			fi
-		ls -1 ./STATS/.*.crap &> /dev/null 2>&1
+		ls -1 "$crapdir"/STATS/.*.crap &> /dev/null 2>&1
 		if [ "$?" = "0" ]
 			then
-				if [[ "$Shred" -eq "1" ]]
+				if [[ "$Trash" -eq "1" ]]
 					then
-						shred -uvz ./STATS/.*.crap &> /dev/null && wait
+						mv "$crapdir"/STATS/.*.crap "$TrashPath" &> /dev/null && wait
+				elif [[ "$Shred" -eq "1" ]]
+					then
+						shred -uvz "$crapdir"/STATS/.*.crap &> /dev/null && wait
 					else
-						rm ./STATS/.*.crap &> /dev/null && wait
+						rm "$crapdir"/STATS/.*.crap &> /dev/null && wait
 					fi
 			fi
-		ls -1 ./STATS/GLOBALS/.*.crap &> /dev/null 2>&1
+		ls -1 "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null 2>&1
 		if [ "$?" = "0" ]
 			then
-				if [[ "$Shred" -eq "1" ]]
+				if [[ "$Trash" -eq "1" ]]
 					then
-						shred -uvz ./STATS/GLOBALS/.*.crap &> /dev/null && wait
+						mv "$crapdir"/STATS/GLOBALS/.*.crap "$TrashPath" &> /dev/null && wait
+				elif [[ "$Shred" -eq "1" ]]
+					then
+						shred -uvz "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null && wait
 					else
-						rm ./STATS/GLOBALS/.*.crap &> /dev/null && wait
+						rm "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null && wait
 					fi
 			fi
 	else
-		while [ -e ./STATS/CLEAN.access.log ] || [ -e ./STATS/IP.crapstats ] || [ -e ./STATS/REQ.crapstats ] || [ -e ./STATS/RES.crapstats ] || [ -e ./STATS/UA.crapstats ] || [ -e ./STATS/LEV.crapstats ] || [ -e ./STATS/ERR.crapstats ] || [ -e ./STATS/.IP.crap ] || [ -e ./STATS/.REQ.crap ] || [ -e ./STATS/.RES.crap ] || [ -e ./STATS/.UA.crap ] || [ -e ./STATS/.LEV.crap ] || [ -e ./STATS/.ERR.crap ]
+		while [ -e "$crapdir"/STATS/CLEAN.access.log ] || [ -e "$crapdir"/STATS/IP.crapstats ] || [ -e "$crapdir"/STATS/REQ.crapstats ] || [ -e "$crapdir"/STATS/RES.crapstats ] || [ -e "$crapdir"/STATS/UA.crapstats ] || [ -e "$crapdir"/STATS/LEV.crapstats ] || [ -e "$crapdir"/STATS/ERR.crapstats ] || [ -e "$crapdir"/STATS/.IP.crap ] || [ -e "$crapdir"/STATS/.REQ.crap ] || [ -e "$crapdir"/STATS/.RES.crap ] || [ -e "$crapdir"/STATS/.UA.crap ] || [ -e "$crapdir"/STATS/.LEV.crap ] || [ -e "$crapdir"/STATS/.ERR.crap ]
 			do
 				crapstat=0 && craptemp=0
 				printf "!!! $(tput setaf 3)WARNING$(tput sgr0) !!!\n"
 				printf "Conflict files detected:\n"
-				if [ -e ./STATS/CLEAN.access.log ]
+				if [ -e "$crapdir"/STATS/CLEAN.access.log ]
 					then
 						crapstat=1
-						echo "- $(tput setaf 3)./STATS/CLEAN.access.log$(tput sgr0)"
+						echo "- $(tput setaf 3)"$crapdir"/STATS/CLEAN.access.log$(tput sgr0)"
 					fi
-				if [ -e ./STATS/IP.crapstats ] || [ -e ./STATS/REQ.crapstats ] || [ -e ./STATS/RES.crapstats ] || [ -e ./STATS/UA.crapstats ] || [ -e ./STATS/LEV.crapstats ] || [ -e ./STATS/ERR.crapstats ]
+				if [ -e "$crapdir"/STATS/IP.crapstats ] || [ -e "$crapdir"/STATS/REQ.crapstats ] || [ -e "$crapdir"/STATS/RES.crapstats ] || [ -e "$crapdir"/STATS/UA.crapstats ] || [ -e "$crapdir"/STATS/LEV.crapstats ] || [ -e "$crapdir"/STATS/ERR.crapstats ]
 					then
-						for stat in ./STATS/*.crapstats
+						for stat in "$crapdir"/STATS/*.crapstats
 							do
 								crapstat=1
 								echo "- $(tput setaf 3)$stat$(tput sgr0)"
 							done
 					fi
-				ls -1 ./STATS/.*.crap &> /dev/null 2>&1
+				ls -1 "$crapdir"/STATS/.*.crap &> /dev/null 2>&1
 				if [ "$?" = "0" ]
 					then
 						craptemp=1
 					fi
-				ls -1 ./STATS/GLOBALS/.*.crap &> /dev/null 2>&1
+				ls -1 "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null 2>&1
 				if [ "$?" = "0" ]
 					then
 						craptemp=1
@@ -279,62 +329,75 @@ if [[ "$AutoDelete" -eq "1" ]]
 					fi
 				printf "\nEVERY DELETED FILE WILL BE LOST FOREVER AND NOT RECOVERABLE!\nDelete listed files? [Y/n] : "
 				read delete
-				case "$delete" in
-					Y)
-						printf "\nRemoving conflict files ..."
-						if [ -e ./STATS/CLEAN.access.log ]
-							then
-								if [[ "$Shred" -eq "1" ]]
-									then
-										shred -uvz ./STATS/CLEAN.access.log &> /dev/null && wait
-									else
-										rm ./STATS/CLEAN.access.log &> /dev/null && wait
-									fi
-							fi
-						ls -1 ./STATS/*.crapstats &> /dev/null 2>&1
-						if [ "$?" = "0" ]
-							then
-								if [[ "$Shred" -eq "1" ]]
-									then
-										shred -uvz ./STATS/*.crapstats &> /dev/null && wait
-									else
-										rm ./STATS/*.crapstats &> /dev/null && wait
-									fi
-							fi
-						ls -1 ./STATS/.*.crap &> /dev/null 2>&1
-						if [ "$?" = "0" ]
-							then
-								if [[ "$Shred" -eq "1" ]]
-									then
-										shred -uvz ./STATS/.*.crap &> /dev/null && wait
-									else
-										rm ./STATS/.*.crap &> /dev/null && wait
-									fi
-							fi
-						ls -1 ./STATS/GLOBALS/.*.crap &> /dev/null 2>&1
-						if [ "$?" = "0" ]
-							then
-								if [[ "$Shred" -eq "1" ]]
-									then
-										shred -uvz ./STATS/GLOBALS/.*.crap &> /dev/null && wait
-									else
-										rm ./STATS/GLOBALS/.*.crap &> /dev/null && wait
-									fi
-							fi
-						printf "\nDone\n"
-						sleep 1
-						printf "\nSTARTING $(tput setaf 1)C$(tput setaf 3)R$(tput setaf 2)A$(tput setaf 6)P$(tput setaf 4)L$(tput setaf 5)O$(tput setaf 7)G$(tput sgr0)\n\n"
-						sleep 2 && wait
-						;;
-					*)
-						printf "\nCRAPLOG ABORTED\n\n"
-						exit
-						;;
-				esac
+				case "$delete"
+					in
+						"y" |"Y")
+							printf "\nRemoving conflict files ..."
+							if [ -e "$crapdir"/STATS/CLEAN.access.log ]
+								then
+									if [[ "$Trash" -eq "1" ]]
+										then
+											mv "$crapdir"/STATS/CLEAN.access.log "$TrashPath" &> /dev/null && wait
+									elif [[ "$Shred" -eq "1" ]]
+										then
+											shred -uvz "$crapdir"/STATS/CLEAN.access.log &> /dev/null && wait
+										else
+											rm "$crapdir"/STATS/CLEAN.access.log &> /dev/null && wait
+										fi
+								fi
+							ls -1 "$crapdir"/STATS/*.crapstats &> /dev/null 2>&1
+							if [ "$?" = "0" ]
+								then
+									if [[ "$Trash" -eq "1" ]]
+										then
+											mv "$crapdir"/STATS/*.crapstats "$TrashPath" &> /dev/null && wait
+									elif [[ "$Shred" -eq "1" ]]
+										then
+											shred -uvz "$crapdir"/STATS/*.crapstats &> /dev/null && wait
+										else
+											rm "$crapdir"/STATS/*.crapstats &> /dev/null && wait
+										fi
+								fi
+							ls -1 "$crapdir"/STATS/.*.crap &> /dev/null 2>&1
+							if [ "$?" = "0" ]
+								then
+									if [[ "$Trash" -eq "1" ]]
+										then
+											mv "$crapdir"/STATS/.*.crap "$TrashPath" &> /dev/null && wait
+									elif [[ "$Shred" -eq "1" ]]
+										then
+											shred -uvz "$crapdir"/STATS/.*.crap &> /dev/null && wait
+										else
+											rm "$crapdir"/STATS/.*.crap &> /dev/null && wait
+										fi
+								fi
+							ls -1 "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null 2>&1
+							if [ "$?" = "0" ]
+								then
+									if [[ "$Trash" -eq "1" ]]
+										then
+											mv "$crapdir"/STATS/GLOBALS/.*.crap "$TrashPath" &> /dev/null && wait
+									elif [[ "$Shred" -eq "1" ]]
+										then
+											shred -uvz "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null && wait
+										else
+											rm "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null && wait
+										fi
+								fi
+							printf "\nDone\n"
+							sleep 1
+							printf "\nSTARTING $(tput setaf 1)C$(tput setaf 3)R$(tput setaf 2)A$(tput setaf 6)P$(tput setaf 4)L$(tput setaf 5)O$(tput setaf 7)G$(tput sgr0)\n\n"
+							sleep 2 && wait
+							;;
+						*)
+							printf "\nCRAPLOG ABORTED\n\n"
+							exit
+							;;
+					esac
 			done;
 	fi;
 
-python3 ./crappy/Clean.py "$AccessLogs" "$CleanAccessLogs" "$ErrorLogs"
+python3 "$crapdir"/crappy/Clean.py "$AccessLogs" "$CleanAccessLogs" "$ErrorLogs"
 printf "Done\n\n"
 if [[ "$LessOutput" -eq "0" ]]
 	then
@@ -347,7 +410,7 @@ if [[ "$LessOutput" -eq "0" ]]
 		sleep 1 && wait
 	fi
 
-python3 ./crappy/Stats.py "$AccessLogs" "$ErrorLogs"
+python3 "$crapdir"/crappy/Stats.py "$AccessLogs" "$ErrorLogs"
 printf "Done\n\n"
 if [[ "$LessOutput" -eq "0" ]]
 	then
@@ -376,49 +439,49 @@ if [[ "$GlobalsAvoid" -eq "0" ]]
 	then
 		if [[ "$AccessLogs" -eq "1" ]]
 			then
-				if [ -e ./STATS/GLOBALS/GLOBAL.IP.crapstats ]
+				if [ -e "$crapdir"/STATS/GLOBALS/GLOBAL.IP.crapstats ]
 					then
-						mv ./STATS/GLOBALS/GLOBAL.IP.crapstats ./STATS/GLOBALS/.GLOBAL.IP.crap && wait
+						mv "$crapdir"/STATS/GLOBALS/GLOBAL.IP.crapstats "$crapdir"/STATS/GLOBALS/.GLOBAL.IP.crap && wait
 					else
-						touch ./STATS/GLOBALS/.GLOBAL.IP.crap && wait
+						touch "$crapdir"/STATS/GLOBALS/.GLOBAL.IP.crap && wait
 					fi
-				if [ -e ./STATS/GLOBALS/GLOBAL.REQ.crapstats ]
+				if [ -e "$crapdir"/STATS/GLOBALS/GLOBAL.REQ.crapstats ]
 					then
-						mv ./STATS/GLOBALS/GLOBAL.REQ.crapstats ./STATS/GLOBALS/.GLOBAL.REQ.crap && wait
+						mv "$crapdir"/STATS/GLOBALS/GLOBAL.REQ.crapstats "$crapdir"/STATS/GLOBALS/.GLOBAL.REQ.crap && wait
 					else
-						touch ./STATS/GLOBALS/.GLOBAL.REQ.crap && wait
+						touch "$crapdir"/STATS/GLOBALS/.GLOBAL.REQ.crap && wait
 					fi
-				if [ -e ./STATS/GLOBALS/GLOBAL.RES.crapstats ]
+				if [ -e "$crapdir"/STATS/GLOBALS/GLOBAL.RES.crapstats ]
 					then
-						mv ./STATS/GLOBALS/GLOBAL.RES.crapstats ./STATS/GLOBALS/.GLOBAL.RES.crap && wait
+						mv "$crapdir"/STATS/GLOBALS/GLOBAL.RES.crapstats "$crapdir"/STATS/GLOBALS/.GLOBAL.RES.crap && wait
 					else
-						touch ./STATS/GLOBALS/.GLOBAL.RES.crap && wait
+						touch "$crapdir"/STATS/GLOBALS/.GLOBAL.RES.crap && wait
 					fi
-				if [ -e ./STATS/GLOBALS/GLOBAL.UA.crapstats ]
+				if [ -e "$crapdir"/STATS/GLOBALS/GLOBAL.UA.crapstats ]
 					then
-						mv ./STATS/GLOBALS/GLOBAL.UA.crapstats ./STATS/GLOBALS/.GLOBAL.UA.crap && wait
+						mv "$crapdir"/STATS/GLOBALS/GLOBAL.UA.crapstats "$crapdir"/STATS/GLOBALS/.GLOBAL.UA.crap && wait
 					else
-						touch ./STATS/GLOBALS/.GLOBAL.UA.crap && wait
+						touch "$crapdir"/STATS/GLOBALS/.GLOBAL.UA.crap && wait
 					fi
 			fi
 
 		if [[ "$ErrorLogs" -eq "1" ]]
 			then
-				if [ -e ./STATS/GLOBALS/GLOBAL.LEV.crapstats ]
+				if [ -e "$crapdir"/STATS/GLOBALS/GLOBAL.LEV.crapstats ]
 					then
-						mv ./STATS/GLOBALS/GLOBAL.LEV.crapstats ./STATS/GLOBALS/.GLOBAL.LEV.crap && wait
+						mv "$crapdir"/STATS/GLOBALS/GLOBAL.LEV.crapstats "$crapdir"/STATS/GLOBALS/.GLOBAL.LEV.crap && wait
 					else
-						touch ./STATS/GLOBALS/.GLOBAL.LEV.crap && wait
+						touch "$crapdir"/STATS/GLOBALS/.GLOBAL.LEV.crap && wait
 					fi
-				if [ -e ./STATS/GLOBALS/GLOBAL.ERR.crapstats ]
+				if [ -e "$crapdir"/STATS/GLOBALS/GLOBAL.ERR.crapstats ]
 					then
-						mv ./STATS/GLOBALS/GLOBAL.ERR.crapstats ./STATS/GLOBALS/.GLOBAL.ERR.crap && wait
+						mv "$crapdir"/STATS/GLOBALS/GLOBAL.ERR.crapstats "$crapdir"/STATS/GLOBALS/.GLOBAL.ERR.crap && wait
 					else
-						touch ./STATS/GLOBALS/.GLOBAL.ERR.crap && wait
+						touch "$crapdir"/STATS/GLOBALS/.GLOBAL.ERR.crap && wait
 					fi
 			fi
 
-		python3 ./crappy/Glob.py "$AccessLogs" "$ErrorLogs"
+		python3 "$crapdir"/crappy/Glob.py "$AccessLogs" "$ErrorLogs"
 		printf "Done\n\n"
 		if [[ "$LessOutput" -eq "0" ]]
 			then
@@ -457,7 +520,7 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 				month=$(date +%m)
 				year=$(date +%Y)
 			fi
-		dir="./STATS/$year/$month/$day"
+		dir="$crapdir/STATS/$year/$month/$day"
 		printf "Preparing to move files inside $(tput setaf 14)$dir/$(tput sgr0)\n"
 		sleep 2 && wait
 		if [[ -e "$dir" ]]
@@ -478,7 +541,10 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 								sleep 1 && wait
 								if [ -e $dir/CLEAN.access.log ]
 									then
-										if [[ "$Shred" -eq "1" ]]
+										if [[ "$Trash" -eq "1" ]]
+											then
+												mv $dir/CLEAN.access.log "$TrashPath" &> /dev/null && wait
+										elif [[ "$Shred" -eq "1" ]]
 											then
 												shred -uvz $dir/CLEAN.access.log &> /dev/null && wait
 											else
@@ -501,31 +567,35 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 													fi
 												printf "\nEVERY DELETED FILE WILL BE LOST FOREVER AND NOT RECOVERABLE!\nDelete listed files? [Y/n] : "
 												read delete
-												case "$delete" in
-													Y)
-														printf "\nRemoving conflict file ..."
-														sleep 1 && wait
-														if [[ "$Shred" -eq "1" ]]
-															then
-																shred -uvz $dir/CLEAN.access.log &> /dev/null && wait
-															else
-																rm $dir/CLEAN.access.log &> /dev/null && wait
-															fi
-														printf "\nMoving CLEAN ACCESS LOGs file ..."
-														sleep 1 && wait
-														;;
-													*)
-														printf "\nCRAPLOG ABORTED\n\n"
-														exit
-														;;
-												esac
+												case "$delete"
+													in
+														"y" | "Y")
+															printf "\nRemoving conflict file ..."
+															sleep 1 && wait
+															if [[ "$Trash" -eq "1" ]]
+																then
+																	mv $dir/CLEAN.access.log "$TrashPath" &> /dev/null && wait
+															elif [[ "$Shred" -eq "1" ]]
+																then
+																	shred -uvz $dir/CLEAN.access.log &> /dev/null && wait
+																else
+																	rm $dir/CLEAN.access.log &> /dev/null && wait
+																fi
+															printf "\nMoving CLEAN ACCESS LOGs file ..."
+															sleep 1 && wait
+															;;
+														*)
+															printf "\nCRAPLOG ABORTED\n\n"
+															exit
+															;;
+													esac
 											done
 									else
 										printf "\nMoving CLEAN ACCESS LOGs file ..."
 										sleep 1 && wait
 									fi
 							fi
-						mv ./STATS/CLEAN.access.log $dir/ && wait
+						mv "$crapdir"/STATS/CLEAN.access.log $dir/ && wait
 						printf "\nDone\n"
 						sleep 1 && wait
 					fi
@@ -540,7 +610,10 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 										ls -1 $dir/ACCESS/*.crapstats &> /dev/null 2>&1
 										if [ "$?" = "0" ]
 											then
-												if [[ "$Shred" -eq "1" ]]
+												if [[ "$Trash" -eq "1" ]]
+													then
+														mv $dir/ACCESS/*.crapstats "$TrashPath" &> /dev/null && wait
+												elif [[ "$Shred" -eq "1" ]]
 													then
 														shred -uvz $dir/ACCESS/*.crapstats &> /dev/null && wait
 													else
@@ -564,24 +637,28 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 												fi
 											printf "\nEVERY DELETED FILE WILL BE LOST FOREVER AND NOT RECOVERABLE!\nDelete listed files? [Y/n] : "
 											read delete
-											case "$delete" in
-												Y)
-													printf "\nRemoving conflict files ..."
-													sleep 1 && wait
-													if [[ "$Shred" -eq "1" ]]
-														then
-															shred -uvz $dir/ACCESS/*.crapstats &> /dev/null && wait
-														else
-															rm $dir/ACCESS/*.crapstats &> /dev/null && wait
-														fi
-													printf "\nMoving ACCESS LOGs files ..."
-													sleep 1 && wait
-													;;
-												*)
-													printf "\nCRAPLOG ABORTED\n\n"
-													exit
-													;;
-											esac
+											case "$delete"
+												in
+													"y" | "Y")
+														printf "\nRemoving conflict files ..."
+														sleep 1 && wait
+														if [[ "$Trash" -eq "1" ]]
+															then
+																mv $dir/ACCESS/*.crapstats "$TrashPath" &> /dev/null && wait
+														elif [[ "$Shred" -eq "1" ]]
+															then
+																shred -uvz $dir/ACCESS/*.crapstats &> /dev/null && wait
+															else
+																rm $dir/ACCESS/*.crapstats &> /dev/null && wait
+															fi
+														printf "\nMoving ACCESS LOGs files ..."
+														sleep 1 && wait
+														;;
+													*)
+														printf "\nCRAPLOG ABORTED\n\n"
+														exit
+														;;
+												esac
 										done
 									fi
 							else
@@ -589,10 +666,10 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 								sleep 1 && wait
 								mkdir $dir/ACCESS
 							fi
-						mv ./STATS/IP.crapstats $dir/ACCESS/ && wait
-						mv ./STATS/REQ.crapstats $dir/ACCESS/ && wait
-						mv ./STATS/RES.crapstats $dir/ACCESS/ && wait
-						mv ./STATS/UA.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/IP.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/REQ.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/RES.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/UA.crapstats $dir/ACCESS/ && wait
 						printf "\nDone\n"
 						sleep 1 && wait
 					fi
@@ -607,7 +684,10 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 										ls -1 $dir/ERROR/*.crapstats &> /dev/null 2>&1
 										if [ "$?" = "0" ]
 											then
-												if [[ "$Shred" -eq "1" ]]
+												if [[ "$Trash" -eq "1" ]]
+													then
+														mv $dir/ERROR/*.crapstats "$TrashPath" &> /dev/null && wait
+												elif [[ "$Shred" -eq "1" ]]
 													then
 														shred -uvz $dir/ERROR/*.crapstats &> /dev/null && wait
 													else
@@ -631,24 +711,28 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 													fi
 												printf "\nEVERY DELETED FILE WILL BE LOST FOREVER AND NOT RECOVERABLE!\nDelete listed files? [Y/n] : "
 												read delete
-												case "$delete" in
-													Y)
-														printf "\nRemoving conflict files ..."
-														sleep 1 && wait
-														if [[ "$Shred" -eq "1" ]]
-															then
-																shred -uvz $dir/ERROR/*.crapstats &> /dev/null && wait
-															else
-																rm $dir/ERROR/*.crapstats &> /dev/null && wait
-															fi
-														printf "\nMoving ERROR LOGs files ..."
-														sleep 1 && wait
-														;;
-													*)
-														printf "\nCRAPLOG ABORTED\n\n"
-														exit
-														;;
-												esac
+												case "$delete"
+													in
+														"y" | "Y")
+															printf "\nRemoving conflict files ..."
+															sleep 1 && wait
+															if [[ "$Trash" -eq "1" ]]
+																then
+																	mv $dir/ERROR/*.crapstats "$TrashPath" &> /dev/null && wait
+															elif [[ "$Shred" -eq "1" ]]
+																then
+																	shred -uvz $dir/ERROR/*.crapstats &> /dev/null && wait
+																else
+																	rm $dir/ERROR/*.crapstats &> /dev/null && wait
+																fi
+															printf "\nMoving ERROR LOGs files ..."
+															sleep 1 && wait
+															;;
+														*)
+															printf "\nCRAPLOG ABORTED\n\n"
+															exit
+															;;
+													esac
 											done
 									fi
 							else
@@ -656,8 +740,8 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 								mkdir $dir/ERROR && wait
 								sleep 1 && wait
 							fi
-						mv ./STATS/LEV.crapstats $dir/ERROR/ && wait
-						mv ./STATS/ERR.crapstats $dir/ERROR/ && wait
+						mv "$crapdir"/STATS/LEV.crapstats $dir/ERROR/ && wait
+						mv "$crapdir"/STATS/ERR.crapstats $dir/ERROR/ && wait
 						printf "\nDone\n"
 						sleep 1 && wait
 					fi
@@ -665,34 +749,26 @@ if [[ "$GlobalsOnly" -eq "0" ]]
 			else
 				printf "Creating directory ..."
 				sleep 1 && wait
-				if [[ ! -e ./STATS/$year ]]
-					then
-						mkdir ./STATS/$year && wait
-					fi
-				if [[ ! -e ./STATS/$year/$month ]]
-					then
-						mkdir ./STATS/$year/$month && wait
-					fi
-				mkdir "$dir"
+				mkdir -p "$dir"
 				printf "\nMoving SESSION files ..."
 				sleep 1 && wait
 				if [[ "$CleanAccessLogs" -eq "1" ]]
 					then
-						mv ./STATS/CLEAN.access.log $dir/ && wait
+						mv "$crapdir"/STATS/CLEAN.access.log $dir/ && wait
 					fi
 				if [[ "$AccessLogs" -eq "1" ]]
 					then
 						mkdir "$dir/ACCESS"
-						mv ./STATS/IP.crapstats $dir/ACCESS/ && wait
-						mv ./STATS/REQ.crapstats $dir/ACCESS/ && wait
-						mv ./STATS/RES.crapstats $dir/ACCESS/ && wait
-						mv ./STATS/UA.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/IP.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/REQ.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/RES.crapstats $dir/ACCESS/ && wait
+						mv "$crapdir"/STATS/UA.crapstats $dir/ACCESS/ && wait
 					fi
 				if [[ "$ErrorLogs" -eq "1" ]]
 					then
 						mkdir "$dir/ERROR"
-						mv ./STATS/LEV.crapstats $dir/ERROR/ && wait
-						mv ./STATS/ERR.crapstats $dir/ERROR/ && wait
+						mv "$crapdir"/STATS/LEV.crapstats $dir/ERROR/ && wait
+						mv "$crapdir"/STATS/ERR.crapstats $dir/ERROR/ && wait
 					fi
 				printf "\nDone\n\n"
 				sleep 1 && wait
@@ -707,7 +783,10 @@ if [[ "$Backup" -eq 1 ]]
 				sleep 1 && wait
 				while [ -e $dir/BACKUP.tar.gz ]
 					do
-						if [[ "$Shred" -eq "1" ]]
+						if [[ "$Trash" -eq "1" ]]
+							then
+								mv $dir/BACKUP.tar.gz "$TrashPath" &> /dev/null && wait
+						elif [[ "$Shred" -eq "1" ]]
 							then
 								shred -uvz $dir/BACKUP.tar.gz &> /dev/null && wait
 							else
@@ -716,7 +795,10 @@ if [[ "$Backup" -eq 1 ]]
 					done
 				if [ -e $dir/access.log ]
 					then
-						if [[ "$Shred" -eq "1" ]]
+						if [[ "$Trash" -eq "1" ]]
+							then
+								mv $dir/access.log "$TrashPath" &> /dev/null && wait
+						elif [[ "$Shred" -eq "1" ]]
 							then
 								shred -uvz $dir/access.log &> /dev/null && wait
 							else
@@ -725,7 +807,10 @@ if [[ "$Backup" -eq 1 ]]
 					fi
 				if [ -e $dir/error.log ]
 					then
-						if [[ "$Shred" -eq "1" ]]
+						if [[ "$Trash" -eq "1" ]]
+							then
+								mv $dir/error.log "$TrashPath" &> /dev/null && wait
+						elif [[ "$Shred" -eq "1" ]]
 							then
 								shred -uvz $dir/error.log &> /dev/null && wait
 							else
@@ -763,35 +848,42 @@ if [[ "$Backup" -eq 1 ]]
 							fi
 						printf "\nEVERY DELETED FILE WILL BE LOST FOREVER AND NOT RECOVERABLE!\nDelete conflict file? [Y/n] : "
 						read delete
-						case "$delete" in
-							Y)
-								printf "\nRemoving conflict files ..."
-								sleep 1 && wait
-								if [[ "$Shred" -eq "1" ]]
-									then
-										shred -uvz $dir/BACKUP.tar.gz $dir/access.log $dir/error.log &> /dev/null && wait
-									else
-										rm $dir/BACKUP.tar.gz $dir/access.log $dir/error.log &> /dev/null && wait
-									fi
-								printf "\nCreating BACKUP archive ..."
-								sleep 1 && wait
-								;;
-							*)
-								printf "\nCRAPLOG ABORTED\n\n"
-								exit
-								;;
-						esac
+						case "$delete"
+							in
+								"y" | "Y")
+									printf "\nRemoving conflict files ..."
+									sleep 1 && wait
+									if [[ "$Trash" -eq "1" ]]
+										then
+											mv $dir/BACKUP.tar.gz $dir/access.log $dir/error.log "$TrashPath" &> /dev/null && wait
+									elif [[ "$Shred" -eq "1" ]]
+										then
+											shred -uvz $dir/BACKUP.tar.gz $dir/access.log $dir/error.log &> /dev/null && wait
+										else
+											rm $dir/BACKUP.tar.gz $dir/access.log $dir/error.log &> /dev/null && wait
+										fi
+									printf "\nCreating BACKUP archive ..."
+									sleep 1 && wait
+									;;
+								*)
+									printf "\nCRAPLOG ABORTED\n\n"
+									exit
+									;;
+							esac
 					done
 			fi
 		cd "$dir"
 		cp /var/log/apache2/access.log.1 access.log && wait
 		cp /var/log/apache2/error.log.1 error.log && wait
 		tar -czf BACKUP.tar.gz access.log error.log &> /dev/null && wait
-		if [[ "$Shred" -eq "1" ]]
+		if [[ "$Trash" -eq "1" ]]
 			then
-				shred -uvz ./access.log ./error.log &> /dev/null && wait
+				mv "$crapdir"/access.log "$crapdir"/error.log "$TrashPath" &> /dev/null && wait
+		elif [[ "$Shred" -eq "1" ]]
+			then
+				shred -uvz "$crapdir"/access.log "$crapdir"/error.log &> /dev/null && wait
 			else
-				rm ./access.log ./error.log &> /dev/null && wait
+				rm "$crapdir"/access.log "$crapdir"/error.log &> /dev/null && wait
 			fi
 		cd ../../../.. && wait
 		printf "\nDone\n\n"
@@ -802,7 +894,10 @@ if [[ "$Backup" -eq 1 ]]
 					then
 						printf "Removing ORIGINAL files ..."
 						sleep 1 && wait
-						if [[ "$Shred" -eq "1" ]]
+						if [[ "$Trash" -eq "1" ]]
+							then
+								mv /var/log/apache2/access.log.1 /var/log/apache2/error.log.1 "$TrashPath" &> /dev/null && wait
+						elif [[ "$Shred" -eq "1" ]]
 							then
 								shred -uvz /var/log/apache2/access.log.1 /var/log/apache2/error.log.1 &> /dev/null && wait
 							else
@@ -817,22 +912,26 @@ if [[ "$Backup" -eq 1 ]]
 							fi
 						printf "EVERY DELETED FILE WILL BE LOST FOREVER AND NOT RECOVERABLE!\nDelete ORIGINAL files? [Y/n] : "
 						read delete
-						case "$delete" in
-							Y)
-								printf "\nRemoving original files ..."
-								sleep 1 && wait
-								if [[ "$Shred" -eq "1" ]]
-									then
-										shred -uvz /var/log/apache2/access.log.1 /var/log/apache2/error.log.1 &> /dev/null && wait
-									else
-										rm /var/log/apache2/access.log.1 /var/log/apache2/error.log.1 &> /dev/null && wait
-									fi
-								;;
-							*)
-								printf "\nCRAPLOG ABORTED\n\n"
-								exit
-								;;
-						esac;
+						case "$delete"
+							in
+								"y" | "Y")
+									printf "\nRemoving original files ..."
+									sleep 1 && wait
+									if [[ "$Trash" -eq "1" ]]
+										then
+											mv /var/log/apache2/access.log.1 /var/log/apache2/error.log.1 "$TrashPath" &> /dev/null && wait
+									elif [[ "$Shred" -eq "1" ]]
+										then
+											shred -uvz /var/log/apache2/access.log.1 /var/log/apache2/error.log.1 &> /dev/null && wait
+										else
+											rm /var/log/apache2/access.log.1 /var/log/apache2/error.log.1 &> /dev/null && wait
+										fi
+									;;
+								*)
+									printf "\nCRAPLOG ABORTED\n\n"
+									exit
+									;;
+							esac;
 					fi
 				
 				printf "\nDone\n\n"
@@ -841,45 +940,51 @@ if [[ "$Backup" -eq 1 ]]
 	fi
 
 printf "Removing temporary files ..."
-if [[ "$Shred" -eq "1" ]]
+if [[ "$Trash" -eq "1" ]]
 	then
-		shred -uvz ./STATS/.*.crap ./STATS/GLOBALS/.*.crap &> /dev/null && wait
+		mv "$crapdir"/STATS/.*.crap "$crapdir"/STATS/GLOBALS/.*.crap "$TrashPath" &> /dev/null && wait
+elif [[ "$Shred" -eq "1" ]]
+	then
+		shred -uvz "$crapdir"/STATS/.*.crap "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null && wait
 	else
-		rm ./STATS/.*.crap ./STATS/GLOBALS/.*.crap &> /dev/null && wait
+		rm "$crapdir"/STATS/.*.crap "$crapdir"/STATS/GLOBALS/.*.crap &> /dev/null && wait
 	fi
 if [[ "$GlobalsOnly" -eq 1 ]]
 	then
-		if [[ "$Shred" -eq "1" ]]
+		if [[ "$Trash" -eq "1" ]]
 			then
-				shred -uvz ./STATS/*.crapstats &> /dev/null && wait
+				mv "$crapdir"/STATS/*.crapstats "$TrashPath" &> /dev/null && wait
+		elif [[ "$Shred" -eq "1" ]]
+			then
+				shred -uvz "$crapdir"/STATS/*.crapstats &> /dev/null && wait
 			else
-				rm ./STATS/*.crapstats &> /dev/null && wait
+				rm "$crapdir"/STATS/*.crapstats &> /dev/null && wait
 			fi
 	fi
 
-LastGlobalsBackup=$(cat ./STATS/GLOBALS/.BACKUPS/.last_time)
+LastGlobalsBackup=$(cat "$crapdir"/STATS/GLOBALS/.BACKUPS/.last_time)
 if [[ "$LastGlobalsBackup" -lt "7" ]]
 	then
-		echo "$(($LastGlobalsBackup + 1))" > ./STATS/GLOBALS/.BACKUPS/.last_time && wait
+		echo "$(($LastGlobalsBackup + 1))" > "$crapdir"/STATS/GLOBALS/.BACKUPS/.last_time && wait
 	else
-		if [[ "$( ls ./STATS/GLOBALS/.BACKUPS/ | wc -l )" -ge "7" ]]
+		if [[ "$( ls "$crapdir"/STATS/GLOBALS/.BACKUPS/ | wc -l )" -ge "7" ]]
 			then
-				mkdir ./STATS/GLOBALS/.BACKUPS/TMP &> /dev/null && wait
-				cp ./STATS/GLOBALS/*.crapstats ./STATS/GLOBALS/.BACKUPS/TMP/ &> /dev/null && wait
-				rm -r ./STATS/GLOBALS/.BACKUPS/1 &> /dev/null && wait
-				mv ./STATS/GLOBALS/.BACKUPS/2 ./STATS/GLOBALS/.BACKUPS/1 &> /dev/null && wait
-				mv ./STATS/GLOBALS/.BACKUPS/3 ./STATS/GLOBALS/.BACKUPS/2 &> /dev/null && wait
-				mv ./STATS/GLOBALS/.BACKUPS/4 ./STATS/GLOBALS/.BACKUPS/3 &> /dev/null && wait
-				mv ./STATS/GLOBALS/.BACKUPS/5 ./STATS/GLOBALS/.BACKUPS/4 &> /dev/null && wait
-				mv ./STATS/GLOBALS/.BACKUPS/6 ./STATS/GLOBALS/.BACKUPS/5 &> /dev/null && wait
-				mv ./STATS/GLOBALS/.BACKUPS/7 ./STATS/GLOBALS/.BACKUPS/6 &> /dev/null && wait
-				mv ./STATS/GLOBALS/.BACKUPS/TMP ./STATS/GLOBALS/.BACKUPS/7 &> /dev/null && wait
+				mkdir "$crapdir"/STATS/GLOBALS/.BACKUPS/TMP &> /dev/null && wait
+				cp "$crapdir"/STATS/GLOBALS/*.crapstats "$crapdir"/STATS/GLOBALS/.BACKUPS/TMP/ &> /dev/null && wait
+				rm -r "$crapdir"/STATS/GLOBALS/.BACKUPS/1 &> /dev/null && wait
+				mv "$crapdir"/STATS/GLOBALS/.BACKUPS/2 "$crapdir"/STATS/GLOBALS/.BACKUPS/1 &> /dev/null && wait
+				mv "$crapdir"/STATS/GLOBALS/.BACKUPS/3 "$crapdir"/STATS/GLOBALS/.BACKUPS/2 &> /dev/null && wait
+				mv "$crapdir"/STATS/GLOBALS/.BACKUPS/4 "$crapdir"/STATS/GLOBALS/.BACKUPS/3 &> /dev/null && wait
+				mv "$crapdir"/STATS/GLOBALS/.BACKUPS/5 "$crapdir"/STATS/GLOBALS/.BACKUPS/4 &> /dev/null && wait
+				mv "$crapdir"/STATS/GLOBALS/.BACKUPS/6 "$crapdir"/STATS/GLOBALS/.BACKUPS/5 &> /dev/null && wait
+				mv "$crapdir"/STATS/GLOBALS/.BACKUPS/7 "$crapdir"/STATS/GLOBALS/.BACKUPS/6 &> /dev/null && wait
+				mv "$crapdir"/STATS/GLOBALS/.BACKUPS/TMP "$crapdir"/STATS/GLOBALS/.BACKUPS/7 &> /dev/null && wait
 			else
-				dir=$(( $( ls ./STATS/GLOBALS/.BACKUPS/ | wc -l ) + 1 ))
-				mkdir ./STATS/GLOBALS/.BACKUPS/$dir &> /dev/null && wait
-				cp ./STATS/GLOBALS/*.crapstats ./STATS/GLOBALS/.BACKUPS/$dir/ &> /dev/null && wait
+				dir=$(( $( ls "$crapdir"/STATS/GLOBALS/.BACKUPS/ | wc -l ) + 1 ))
+				mkdir "$crapdir"/STATS/GLOBALS/.BACKUPS/$dir &> /dev/null && wait
+				cp "$crapdir"/STATS/GLOBALS/*.crapstats "$crapdir"/STATS/GLOBALS/.BACKUPS/$dir/ &> /dev/null && wait
 			fi
-		echo "0" > ./STATS/GLOBALS/.BACKUPS/.last_time && wait
+		echo "0" > "$crapdir"/STATS/GLOBALS/.BACKUPS/.last_time && wait
 	fi
 
 printf "\nDone\n\n\n"
