@@ -33,21 +33,16 @@ From inside craplog's folder, run:<br>
 <br>
 <b>--avoid-globals</b> <i>---></i> avoid updating GLOBAL statistics with the processed file/s<br>
 <br>
-<b>--auto-delete</b> <i>---></i> automatically deletes every conflict file found (!CAUTION!)<br>
-<br>
-<b>--shred</b> <i>---></i> uses 'shred' to delete files instead of 'remove'<br>
-<br>
 <b>-b</b> / <b>--backup</b> <i>---></i> creates a BACKUP.tar.gz archive of both ACCESS and ERROR log files inside SESSION's stats folder<br>
 <br>
 <b>--backup+delete</b> <i>---></i> creates a BACKUP.tar.gz archive and delete both access.log.1 and error.log.1 original files (!CAUTION!)<br>
 <br>
+<b>--auto-delete</b> <i>---></i> automatically deletes every conflict file found (!CAUTION!)<br>
 <br>
-<b>IMPORTANT NOTE</b>:<br>
-MAKE SURE TO BE INSIDE CRAPLOG'S DIRECTORY WHENEVER YOU RUN IT, or it will use your actual path as base path and will create files and folders in that point.<br>
-DON'T DO, for example:<br>
-<code>/path/to/craplog/craplog.sh</code><br>
-INSTEAD, DO:<br>
-<code>cd /path/to/craplog/ && ./craplog.sh</code><br>
+<b>--trash</b> <i>---></i> move files to Trash instead of 'remove'<br>
+<br>
+<b>--shred</b> <i>---></i> uses 'shred' to delete files instead of 'remove'<br>
+<br>
 <br>
 <br><hr><br>
 <br>
@@ -147,8 +142,8 @@ Statistics' structure is the same for both SESSION and GLOBALS:<br>
 <i>- CRAPLOG's complete functionalities: makes a clean access logs file, creates statisics of both access.log.1 and error.log.1 files, uses them to update globals and creates a backup of the original files</i><br>
 <code>./craplog.sh -c -e -b</code><br>
 <br>
-<i>- Takes both access logs and error logs files as input, but only updates global statistics. Also auto-deletes every conflict file it finds</i><br>
-<code>./craplog.sh -e --only-globals --auto-delete</code><br>
+<i>- Takes both access logs and error logs files as input, but only updates global statistics. Also auto-deletes every conflict file it finds, moving them to trash</i><br>
+<code>./craplog.sh -e --only-globals --auto-delete --trash</code><br>
 <br>
 <i>- Also creates statisics of error logs file, but avoids updating globals</i><br>
 <code>./craplog.sh -e --avoid-globals</code><br>
