@@ -1,10 +1,6 @@
 #!/usr/bin/python3
 
-import os
-import os.path
-import sys
-import time
-import collections
+import sys, time
 from collections import Counter
 
 AccessLogs = int(sys.argv[1])
@@ -21,7 +17,7 @@ if AccessLogs == 1:
 
 	CheckList = []
 	IPlist = IPlist.split()
-	count = collections.Counter(IPlist)
+	count = Counter(IPlist)
 	IPlist = (sorted(IPlist, key=lambda x: (count[x], x), reverse=True))
 
 	file = open("./STATS/IP.crapstats", "a")
@@ -41,7 +37,7 @@ if AccessLogs == 1:
 
 	CheckList = []
 	REQlist = REQlist.split("\n")
-	count = collections.Counter(REQlist)
+	count = Counter(REQlist)
 	REQlist = (sorted(REQlist, key=lambda x: (count[x], x), reverse=True))
 
 	file = open("./STATS/REQ.crapstats", "a")
@@ -79,7 +75,7 @@ if AccessLogs == 1:
 		res = str(res[:3])
 		RESlist_tmp.append(res)
 
-	count = collections.Counter(RESlist_tmp)
+	count = Counter(RESlist_tmp)
 	RESlist = sorted(RESlist_tmp, key=count.get, reverse=True)
 	res = ""
 
@@ -101,7 +97,7 @@ if AccessLogs == 1:
 	CheckList = []
 	UAlist = UAlist.split("\n")
 
-	count = collections.Counter(UAlist)
+	count = Counter(UAlist)
 	UAlist = (sorted(UAlist, key=lambda x: (count[x], x), reverse=True))
 
 	file = open("./STATS/UA.crapstats", "a")
@@ -130,7 +126,7 @@ if ErrorLogs == 1:
 
 	CheckList = []
 	LEVlist = LEVlist.split('\n')
-	count = collections.Counter(LEVlist)
+	count = Counter(LEVlist)
 	LEVlist = (sorted(LEVlist, key=lambda x: (count[x], x), reverse=True))
 
 	file = open("./STATS/LEV.crapstats", "a")
@@ -150,7 +146,7 @@ if ErrorLogs == 1:
 	CheckList = []
 	ERRlist = ERRlist.split('\n')
 
-	count = collections.Counter(ERRlist)
+	count = Counter(ERRlist)
 	ERRlist = (sorted(ERRlist, key=lambda x: (count[x], x), reverse=True))
 
 	file = open("./STATS/ERR.crapstats", "a")
