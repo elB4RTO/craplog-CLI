@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 
-import os
-import os.path
 import sys
 import time
 
 AccessLogs = int(sys.argv[1])
 CleanAccessLogs = int(sys.argv[2])
 
+
 if AccessLogs == 1:
+
 	if CleanAccessLogs == 1:
 		print ("Cleaning & Scraping ACCESS LOGs ...")
 	else:
