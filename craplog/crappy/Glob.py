@@ -1,11 +1,6 @@
 #!/usr/bin/python3
 
-import os
-import os.path
-import sys
-import time
-import collections
-from collections import Counter
+import sys, time
 
 AccessLogs = int(sys.argv[1])
 
