@@ -1,4 +1,4 @@
-# craplog-CLI
+# craplog-fullCLI
 A tool that scrapes Apache2 logs to create both Single-Session and Global statistics
 
 /<br>
@@ -7,24 +7,28 @@ CRAPLOG is a tool that takes Apache2 logs in their default form, scrapes them an
 It's meant to be ran daily.<br>
 <br>
 <br>
-Tired of the command-line? Switch to <a href="https://github.com/elBarto-tools/craplog-GUI">craplog GUI</a><br>
+<img src="https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/full_CLI.png">
+<br>
+<br>
+Tired of the command-line? Switch to <a href="https://github.com/elB4RTO/craplog-GUI">craplog GUI</a><br>
+<br>
+<br>
+<br>
+<i>NOTE</i>:<br>
+In order to run it, please give execution permission to executable files.<br>
+From inside craplog's folder, run:<br>
+<code>chmod +x ./craplog.sh ./crappy/*.py</code><br>
 <br>
 <br>
 <br>
 <b>USAGE</b>:<br>
 <br>
-./craplog.sh <i>[ARGUMENTS]</i><br>
-<br>
-<i>NOTE</i>:<br>
-In order to run it, please give execution permission to executable files.<br>
-From inside craplog's folder, run:<br>
-<code>chmod +x ./craplog.sh ./crappy/Clean.py ./crappy/Stats.py ./crappy/Glob.py</code><br>
+./craplog.sh <i>[OPTIONS]</i><br>
 <br>
 <br>
+<b>OPTIONS</b>:<br>
 <br>
-<b>ARGUMENTS</b>:<br>
-<br>
-<b>-h</b> / <b>--help</b> <i>---></i> prints help screen and exits<br>
+<b>-h</b> / <b>--help</b> <i>---></i> prints an help screen and exits<br>
 <br>
 <b>-c</b> / <b>--clean</b> <i>---></i> creates a CLEAN.access.log file (see below for details)<br>
 <br>
