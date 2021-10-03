@@ -10,7 +10,7 @@ It's meant to be ran daily.<br>
 <img src="https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/full_CLI.png">
 <br>
 <br>
-Tired of passing command-line options? Try the <a href="https://github.com/elB4RTO/craplog-GUI">GUI aided</a> version<br>
+Tired of passing command-line options? Try the <a href="https://github.com/elB4RTO/craplog-GUI">GUI aided</a> version or directly modify the initial lines of the file named "<i>craplog.sh</i>" to fit your needs<br>
 <br>
 <br>
 <br>
