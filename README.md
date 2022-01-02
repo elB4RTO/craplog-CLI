@@ -10,7 +10,8 @@ It's meant to be ran daily.<br>
 <img src="https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/full_CLI.png">
 <br>
 <br>
-Tired of passing command-line options? Try the <a href="https://github.com/elB4RTO/craplog-GUI">GUI aided</a> version or directly modify the initial lines of the file named "<i>craplog.sh</i>" to fit your needs<br>
+Tired of passing command-line options but still want to work on a terminal? Try the <a href="https://github.com/elB4RTO/craplog-GUIaidedCLI">GUI aided</a> version or directly modify the initial lines of the file named "<i>craplog.sh</i>" to fit your needs<br><br>
+Tired of terminals and in search for a more graphical way of doing this? Try the <a href="https://github.com/elB4RTO/craplog-fullGUI">full GUI</a> version<br>
 <br>
 <br>
 <br>
@@ -23,9 +24,9 @@ Tired of passing command-line options? Try the <a href="https://github.com/elB4R
 <br>
 <br>
 <i>NOTE</i>:<br>
-In order to run it, please give execution permission to executable files.<br>
+In order to run it, please give execution permission to <i>craplog.sh</i><br>
 From inside craplog's folder, run:<br>
-<code>chmod +x ./craplog.sh ./crappy/*.py</code><br>
+<code>chmod +x ./craplog.sh</code><br>
 <br>
 <br>
 <br>
