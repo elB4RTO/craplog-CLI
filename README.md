@@ -14,6 +14,14 @@ Tired of passing command-line options? Try the <a href="https://github.com/elB4R
 <br>
 <br>
 <br>
+<b>DEPENDENCIES</b>:<br>
+- <br>
+
+<b>OTHER DEPENDENCIES</b>:<br>
+- <i>sys</i>, <i>time</i>, <i>collections</i>
+<br>
+<br>
+<br>
 <i>NOTE</i>:<br>
 In order to run it, please give execution permission to executable files.<br>
 From inside craplog's folder, run:<br>
