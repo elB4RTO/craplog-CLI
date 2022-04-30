@@ -7,7 +7,7 @@ CRAPLOG is a tool that takes Apache2 logs in their default form, scrapes them an
 It's meant to be ran daily.<br>
 <br>
 <br>
-<img src="https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/full_CLI.png">
+<img src="https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/full_CLI.png"><br>
 <br>
 <br>
 Tired of passing command-line options but still want to work on a terminal? Try the <a href="https://github.com/elB4RTO/craplog-GUIaidedCLI">GUI aided</a> version or directly modify the initial lines of the file named "<i>craplog.sh</i>" to fit your needs<br><br>
@@ -58,7 +58,6 @@ From inside craplog's folder, run:<br>
 <b>--trash</b> <i>---></i> move files to Trash instead of 'remove'<br>
 <br>
 <b>--shred</b> <i>---></i> uses 'shred' to delete files instead of 'remove'<br>
-<br>
 <br>
 <br><hr><br>
 <br>
