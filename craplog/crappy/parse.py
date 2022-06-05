@@ -47,6 +47,7 @@ def parseAccess(
     Parse access logs lines
     """
     for line in log_lines:
+        craplog.logs_size += len(line)
         # check line standards
         if line[-1] != '"':
             continue
@@ -64,9 +65,10 @@ def parseAccess(
             date = processDate( date )
             if date[5:7] == "00":
                 craplog.printJobFailed()
-                exit("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"
-                    %( ip_date[3].strip("[ ]") )
+                print("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"\
+                    %( ip_date[3].strip("[ ]") )\
                     .format(**craplog.text_colors))
+                craplog.exitAborted()
             # retrieve fields
             req = line_split[1].strip()
             res = line_split[2].strip()[:3].strip()
@@ -86,9 +88,10 @@ def parseAccess(
             elif field == "RES": item = res
             else:
                 craplog.printJobFailed()
-                exit("\n{red}Error{white}[{grey}access_field{white}]{red}>{default} unexpected field found: {orange}%s{default}\n"
-                    %( field )
+                print("\n{red}Error{white}[{grey}access_field{white}]{red}>{default} unexpected field found: {orange}%s{default}\n"\
+                    %( field )\
                     .format(**craplog.text_colors))
+                craplog.exitAborted()
             # add the field section if not present
             if craplog.collection['access'][date].get( field ) is None:
                 craplog.collection['access'][date].update({ field : {} })
@@ -109,6 +112,7 @@ def parseErrors(
     Parse access logs lines
     """
     for line in log_lines:
+        craplog.logs_size += len(line)
         # check line standards
         if line[0] != '[':
             continue
@@ -135,9 +139,10 @@ def parseErrors(
             date = processDate( date )
             if date[5:7] == "00":
                 craplog.printJobFailed()
-                exit("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"
-                    %( line_split[0].strip("[ ]") )
+                print("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"\
+                    %( line_split[0].strip("[ ]") )\
                     .format(**craplog.text_colors))
+                craplog.exitAborted()
             # retrieve fields
             lev = line_split[1].strip("[ ]")
         except:
