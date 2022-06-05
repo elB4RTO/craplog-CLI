@@ -40,6 +40,9 @@ def help( color_set ) -> str :
                  {bold}--help{default}  ¦
                          ¦
                          ¦
+             {bold}--examples{default}  ¦  print usage examples
+                         ¦
+                         ¦
                      {bold}-l{default}  ¦  less output on screen
                  {bold}--less{default}  ¦
                          ¦
@@ -93,7 +96,7 @@ def help( color_set ) -> str :
                          ¦
                          ¦
          {bold}--trash{default} {italic}<path>{default}  ¦  move files to Trash instead of remove
-                         ¦  {italic}<path>{default} is optional: if omitted, the default will be used
+                         ¦  {italic}<path>{default} is optional: if omitted, default will be used
                          ¦
                          ¦
                 {bold}--shred{default}  ¦  use shred on files instead of remove
@@ -119,12 +122,52 @@ def help( color_set ) -> str :
               {bold}-W{default} {italic}<list>{default}  ¦  log lines from these IPs won't be considered
   {bold}--ip-whitelist{default} {italic}<list>{default}  ¦  {italic}<list>{default}: whitespace-separated IPs
                          ¦  about the match:
-                         ¦    - a whitelisted IP can be a complete address or a slice of it (from the start)
-                         ¦    - the match is checked starting from the beginning of the logged IP
-                         ¦    - a match is successful when the entire sequence is contained in the logged IP
+                         ¦    - a whitelisted IP can be a complete address
+                         ¦      or a slice of it (like the NET-ID)
+                         ¦    - the match is successful when the logged IP
+                         ¦      starts with /or/ is equal to a whitelisted IP
                          ¦
 {white}-------------------------------------------------------------------------------{default}
 """.format(**color_set).replace("¦", "{white}¦{default}".format(**color_set))
+
+
+def examples( color_set ) -> str :
+    return """\
+  {orange}Examples{default}
+{white}-------------------------------------------------------------------------------{default}
+
+   - {green}use default log files (*.log.1) as input, including errors. store the
+     original files as a tar.gz compressed archive and move files to trash if
+     needed (instead of complete deletion).
+     global statistics will updated by default.{default}
+     
+       {italic}craplog{default} {bold}-e -bT --trash{default}
+
+
+   - {green}use defined access and/or error logs files from an alternative logs path.
+     automatically merge sessions having the same date if needed.{default}
+   
+       {italic}craplog{default} {bold}-e -P {default}/your/path {bold}-F {default}file.log.2 file.log.3.gz {bold}--auto-merge{default}
+
+
+   - {green}use default log files for both access and error logs. use a whitelist for
+     ips and select which access fields to parse.{default}
+   
+       {italic}craplog{default} {bold}-e -W {default}::1 192.168. {bold}-A {default}REQ RES{default}
+
+
+   - {green}print more informations on screen, including performance details.
+     use the default access logs file but only update globals, not sessions.{default}
+   
+       {italic}craplog{default} {bold}-m -p --only-globals{default}
+
+
+   - {green}print less informations on screen, without using colors. use the default
+     access and error logs files, but do not updatie globals. make a backup
+     copy of the original files used and delete them (by shredding) when done.{default}
+   
+       {italic}craplog{default} {bold}-l --no-colors -e --avoid-globals -b -dO --shred{default}
+""".format(**color_set)
 
 
 def craplog( color_set ) -> str :
@@ -134,6 +177,16 @@ def craplog( color_set ) -> str :
    {red}C    {default}{bold}  {orange}RRRR {default}{bold}  {grass}AAAAA{default}{bold}  {cyan}PPPP {default}{bold}  {blue}L    {default}{bold}  {purple}O   O{default}{bold}  {white}G  GG{default}{bold}
    {red}C    {default}{bold}  {orange}R  R {default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {blue}L    {default}{bold}  {purple}O   O{default}{bold}  {white}G   G{default}{bold}
    {red} CCCC{default}{bold}  {orange}R   R{default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {blue}LLLLL{default}{bold}  {purple}OOOOO{default}{bold}  {white}GGGGG{default}\
+""".format(**color_set)
+
+
+def fin( color_set ) -> str :
+    return """{bold}\
+   {yellow}FFFFF{default}{bold}  {cyan}II{default}{bold}  {green}N   N{default}{bold}
+   {yellow}F    {default}{bold}  {cyan}II{default}{bold}  {green}NN  N{default}{bold}
+   {yellow}FFF  {default}{bold}  {cyan}II{default}{bold}  {green}N N N{default}{bold}
+   {yellow}F    {default}{bold}  {cyan}II{default}{bold}  {green}N  NN{default}{bold}
+   {yellow}F    {default}{bold}  {cyan}II{default}{bold}  {green}N   N{default}\
 """.format(**color_set)
 
 
