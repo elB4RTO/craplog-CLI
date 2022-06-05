@@ -31,18 +31,18 @@ def defineLogType(
         logs_type = "error"
     else:
         craplog.printJobFailed()
-        print("\n{red}Error{white}[{grey}logs{white}]{red}>{default} something is wrong with the logs in: {orange}%s{default}"
-             %( name )
+        print("\n{red}Error{white}[{grey}logs{white}]{red}>{default} something is wrong with the logs in: {orange}%s{default}"\
+             %( name )\
              .format(craplog.text_colors))
         if craplog.more_output is True:
             print("""\
              number of randomly examined lines : %s
              number of lines identified as {bold}access{default} logs  : {bold}%s{default}
              number of lines identified as {bold}error{default} logs   : {bold}%s{default}
-             number of lines identified as {bold}{italic}unknown{default} type : {bold}%s{default}"""
-                %( n, a, e, u )
+             number of lines identified as {bold}{italic}unknown{default} type : {bold}%s{default}"""\
+                %( n, a, e, u )\
                 .format(craplog.text_colors))
-        exit("\n")
+        craplog.exitAborted()
     return logs_type
 
 
@@ -60,11 +60,27 @@ def collectLogLines( craplog ) -> dict :
         try:
             # try reading as gzipped file
             with gzip.open(path,'r') as log_file:
-                log_lines = log_file.read().strip().split('\n')
+                log_lines = log_file.read().strip()
         except:
-            # try reading as text file
-            with open(path,'r') as log_file:
-                log_lines = log_file.read().strip().split('\n')
+            try:
+                # try reading as text file
+                with open(path,'r') as log_file:
+                    log_lines = log_file.read().strip()
+            except:
+                # failed to read
+                craplog.printJobFailed()
+                print("\n{red}Error{white}[{grey}input_file{white}]{red}>{default} unable to open/read file: {green}%s/{orange}%s{default}"\
+                     %( craplog.logs_path, file_name )\
+                     .format(craplog.text_colors))
+                if craplog.more_output is True:
+                    print("                   failed as both text file and gzipped file")
+                print()
+                craplog.exitAborted()
+        
+        # sum the size and split in lines
+        craplog.logs_size += len(log_lines)
+        log_lines = log_lines.split('\n')
+        craplog.logs_size -= len(log_lines) # remove new-lines size
         # check random lines to define the logs type
         log_type = defineLogType( file_name, log_lines )
         if (log_type == "access" and craplog.access_logs is False)\
@@ -75,7 +91,5 @@ def collectLogLines( craplog ) -> dict :
             line = line.strip()
             if len(line) > 0:
                 data[log_type].append(line)
-                # sum data size
-                craplog.total_size += len(line)
     return data
 
