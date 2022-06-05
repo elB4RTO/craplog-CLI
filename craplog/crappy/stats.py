@@ -2,260 +2,7 @@
 import os
 from time import perf_counter as timer
 
-
-def chooseAction(
-    craplog: object
-) -> int :
-    """
-    Choice form
-    """
-    choice = 0
-    time_gap = timer()
-    while True:
-        if craplog.less_output is False:
-            print("Available choices:")
-            print("  - {grey}[{bold}d{grey}]{default}   {bold}delete{default} the conflict accordingly to the settings"
-                .format(**craplog.text_colors))
-            print("  - {grey}[{bold}r{grey}]{default}   {bold}rename{default} the conflict with a trailing '{italic}.copy{default}'"
-                .format(**craplog.text_colors))
-            print("  - {grey}[{bold}q{grey}]{default}   abort the process and {bold}quit{default} craplog"
-                .format(**craplog.text_colors))
-        proceed = input("Your choice? {white}[{yellow}d{grey}/{azul}r{grey}/{rose}q{white}] :{default} "
-            .format(**craplog.text_colors)).strip()
-        if proceed in ["q","Q","quit","QUIT"]:
-            choice = 0
-        elif proceed in ["d","D","del","DEL","delete","DELETE"]:
-            choice = 1
-        elif proceed in ["r","R","rename","RENAME"]:
-            choice = 2
-        else:
-            print("\n{yellow}Warning{white}[{grey}choice{white}]{red}>{default} not a valid choice: {bold}%s{default}\n"
-                .format(**craplog.text_colors))
-    # set the time elapsed during user's decision as user-time
-    craplog.user_time += timer() - time_gap()
-    return choice
-
-
-def conflictFolder(
-    craplog: object,
-    path: str,
-    parent_path: str,
-    item_name: str
-) -> int :
-    """
-    Ask the user what to do with the conflict
-    """
-    print("{orange}Warning{white}[{grey}conflict{white}]{red}>{default} a folder is in conflict with the process: {green}%s/{orange}%s{default}"
-        %( parent_path, item_name )
-        .format(**craplog.text_colors))
-    if craplog.more_output is True:
-        print("""\
-                the entry was supposed to be a file, but it was found to be a folder
-                if you haven't made any changes, please report this issue""")
-    print()
-    return chooseAction( craplog )
-
-
-def conflictFile(
-    craplog: object,
-    path: str,
-    parent_path: str,
-    item_name: str
-) -> int :
-    """
-    Ask the user what to do with the conflict
-    """
-    print("{orange}Warning{white}[{grey}conflict{white}]{red}>{default} a file is in conflict with the process: {green}%s/{orange}%s{default}"
-        %( parent_path, item_name )
-        .format(**craplog.text_colors))
-    if craplog.more_output is True:
-        print("""\
-                the entry was supposed to be a folder, but it was found to be a file
-                if you haven't made any changes, please report this issue""")
-    print()
-    return chooseAction( craplog )
-
-
-def checkFolder(
-    craplog: object,
-    path:    str,
-    parent_path: str,
-    item_name:   str
-) -> bool :
-    """
-    Check a crapstats folder
-    """
-    def failed():
-        nonlocal checks_passed, craplog
-        if checks_passed is True:
-            checks_passed = False
-            craplog.printJobFailed()
-            craplog.undoChanges()
-    # checking
-    checks_passed = True
-    if os.path.exists( path ):
-        # already exists
-        if os.path.isdir( path ):
-            # is a directory
-            if os.access( path, os.R_OK ) is False:
-                failed()
-                print("\n{red}Error{white}[{grey}permissions{white}]{red}>{default} directory is not readable: {green}%s/{orange}%s{default}"
-                    %( parent_path, item_name )
-                    .format(**craplog.colors))
-                if craplog.more_output is True:
-                    print("""\
-                    craplog doesn't have permissions to read from files inside this folder
-                    please make the directory readable and retry""")
-                print()
-            if os.access( sessions_path, os.W_OK ) is False:
-                failed()
-                print("\n{red}Error{white}[{grey}permissions{white}]{red}>{default} directory is not writable: {green}%s/{orange}%s{default}"
-                    %( parent_path, item_name )
-                    .format(**craplog.colors))
-                if craplog.more_output is True:
-                    print("""\
-                    craplog doesn't have permissions to write on files inside this folder
-                    please make the directory writable and retry""")
-                print()
-        else:
-            # not a directory
-            if os.path.isfile( path ):
-                choice = 0
-                if craplog.auto_delete is True:
-                    choice = 1
-                else:
-                    choice = conflictFile()
-                if choice == 1:
-                    # delete the file and make a dir
-                    craplog.removeEntry( path )
-                elif choice == 2:
-                    # rename the file and make a dir
-                    try:
-                        new_path = path
-                        while True:
-                            new_path += ".copy"
-                            if os.path.exists( new_path ) is False:
-                                break
-                        os.rename( path, new_path )
-                    except:
-                        failed()
-                        print("\n{red}Error{white}[{grey}file{white}]{red}>{default} unable to rename file: {green}%s/{orange}%s{default}"
-                            %( parent_path, item_name )
-                            .format(**craplog.colors))
-                        if craplog.more_output is True:
-                            print("               the error is most-likely caused by a lack of permissions")
-                            print("               please proceed manually and retry")
-                        print()
-                else:
-                    failed()
-                    exit("{bold}%s {red}ABORTED{default}\n"
-                        %( craplog.TXT_craplog )
-                        .format(**craplog.text_colors))
-            else:
-                # unknown type
-                failed()
-                print("\n{red}Error{white}[{grey}type{white}]{red}>{default} the entry is not a directory, nor a file: {green}%s/{orange}%s{default}"
-                    %( parent_path, item_name )
-                    .format(**craplog.colors))
-                if craplog.more_output is True:
-                    print("             ok, that was unexpected")
-                    print("             please manually check it and consider reporting this issue")
-                print()
-    else:
-        # does not exists, yet, make it
-        os.mkdir( path )
-        craplog.undo_paths.append( path )
-    return checks_passed
-
-
-def checkFile(
-    craplog: object,
-    path:    str,
-    parent_path: str,
-    item_name:   str
-) -> bool :
-    """
-    Check a crapstats file
-    """
-    def failed():
-        nonlocal checks_passed, craplog
-        if checks_passed is True:
-            checks_passed = False
-            craplog.printJobFailed()
-            craplog.undoChanges()
-    # checking
-    if os.path.exists( path ):
-        # already exists
-        if os.path.isfile( path ):
-            # is a file
-            if os.access( path, os.R_OK ) is False:
-                failed()
-                print("\n{red}Error{white}[{grey}permissions{white}]{red}>{default} file is not readable: {green}%s/{orange}%s{default}"
-                    %( parent_path, item_name )
-                    .format(**craplog.colors))
-                if craplog.more_output is True:
-                    print("""\
-                    craplog doesn't have permissions to read from this file
-                    please make the file readable and retry""")
-                print()
-            if os.access( sessions_path, os.W_OK ) is False:
-                failed()
-                print("\n{red}Error{white}[{grey}permissions{white}]{red}>{default} file is not writable: {green}%s/{orange}%s{default}"
-                    %( parent_path, item_name )
-                    .format(**craplog.colors))
-                if craplog.more_output is True:
-                    print("""\
-                    craplog doesn't have permissions to write in this file
-                    please make the file writable and retry""")
-                print()
-        else:
-            # not a file
-            if os.path.isdir( path ):
-                choice = 0
-                if craplog.auto_delete is True:
-                    choice = 1
-                else:
-                    choice = conflictFolder()
-                if choice == 1:
-                    # delete the dir
-                    craplog.removeEntry( path )
-                elif choice == 2:
-                    # rename the file and make a dir
-                    try:
-                        new_path = path
-                        while True:
-                            new_path += ".copy"
-                            if os.path.exists( new_path ) is False:
-                                break
-                        os.rename( path, new_path )
-                    except:
-                        failed()
-                        print("\n{red}Error{white}[{grey}file{white}]{red}>{default} unable to rename file: {green}%s/{orange}%s{default}"
-                            %( parent_path, item_name )
-                            .format(**craplog.colors))
-                        if craplog.more_output is True:
-                            print("               the error is most-likely caused by a lack of permissions")
-                            print("               please proceed manually and retry")
-                        print()
-                else:
-                    failed()
-                    exit("{bold}%s {red}ABORTED{default}\n"
-                        %( craplog.TXT_craplog )
-                        .format(**craplog.text_colors))
-            else:
-                # unknown type
-                failed()
-                print("\n{red}Error{white}[{grey}type{white}]{red}>{default} the entry is not a file, nor a directory: {green}%s/{orange}%s{default}"
-                    %( parent_path, item_name )
-                    .format(**craplog.colors))
-                if craplog.more_output is True:
-                    print("             ok, that was unexpected")
-                    print("             please manually check it and consider reporting this issue")
-                print()
-    else:
-        # does not exists, yet, it will be created later in any case
-        pass
-    return checks_passed
+from check import checkFolder, checkFile
 
 
 def sortStatistics(
@@ -263,7 +10,7 @@ def sortStatistics(
     counts: list
 ):
     """
-    Sort twin arrays by decrescent order
+    Sort twin arrays (items & items' count) by decrescent order
     """
     length = len(counts)
     for i in range(length):
@@ -296,12 +43,12 @@ def saveStatistics(
         successful = False
         craplog.printJobFailed()
         craplog.undoChanges()
-        print("\n{red}Error{white}[{grey}write{white}]{red}>{default} failed to write on file: {green}%s/{orange}%s{default}\n"
-            %( path[:path.rfind('/')], path[:path.rfind('/')+1] )
+        print("\n{red}Error{white}[{grey}write{white}]{red}>{default} failed to write on file: {green}%s/{orange}%s{default}\n"\
+            %( path[:path.rfind('/')], path[:path.rfind('/')+1] )\
             .format(**craplog.colors))
         if craplog.more_output is True:
-            print("              craplog doesn't have permissions to write in this file")
-            print("              please make it readable and retry")
+            print("              the error is most-likely caused by a lack of permissions")
+            print("              please add read/write permissions to the whole crapstats folder and retry")
         print()
     return successful
 
@@ -313,25 +60,29 @@ def mergeStatistics(
     craplog: object
 ) -> bool :
     """
-    Read merge old and new statistics
+    Read+merge old+new statistics
     """
     successful = True
     try:
         # try read the file
         with open( path, 'r' ) as f:
             # write statistics on file
-            old_stats = f.read().strip().split('\n')
+            old_stats = f.read().strip()
+            # sum the size and split in lines
+            craplog.parsed_size += len(old_stats)
+            old_stats = old_stats.split('\n')
+            craplog.parsed_size -= len(old_stats) # remove new-lines
     except:
         # failed to read
         successful = False
         craplog.printJobFailed()
         craplog.undoChanges()
-        print("\n{red}Error{white}[{grey}read{white}]{red}>{default} failed to read from file: {green}%s/{orange}%s{default}"
-            %( path[:path.rfind('/')], path[:path.rfind('/')+1] )
+        print("\n{red}Error{white}[{grey}read{white}]{red}>{default} failed to read from file: {green}%s/{orange}%s{default}"\
+            %( path[:path.rfind('/')], path[:path.rfind('/')+1] )\
             .format(**craplog.colors))
         if craplog.more_output is True:
-            print("             craplog doesn't have permissions to read from this file")
-            print("             please make it readable and retry")
+            print("             the error is most-likely caused by a lack of permissions")
+            print("             please add read/write permissions to the whole crapstats folder and retry")
         print()
     else:
         # successfully read, now merge
@@ -342,8 +93,8 @@ def mergeStatistics(
                 successful = False
                 craplog.printJobFailed()
                 craplog.undoChanges()
-                print("\n{red}Error{white}[{grey}statistics{white}]{red}>{default} malformed line found: {orange}%s{default}"
-                    %( stat.strip() )
+                print("\n{red}Error{white}[{grey}statistics{white}]{red}>{default} malformed line found: {orange}%s{default}"\
+                    %( stat.strip() )\
                     .format(**craplog.colors))
                 if craplog.more_output is True:
                     print("                   this line doesn't respect craplog's standards")
@@ -355,17 +106,35 @@ def mergeStatistics(
             old_count = stat[:s].strip()
             old_item  = stat[s+1:].strip()
             try:
+                # assume the item is already in the list
                 i = items.index( old_item )
-                counts[i] += old_count
+                counts[i] += int(old_count)
             except:
+                # add the item as new
                 items.append( old_item )
-                counts.append( old_count )
-        # make a copy of the old file
-        bak_path = "%s.bak" %( path )
-        os.rename( path, bak_path )
-        craplog.undo_paths.append( bak_path )
-        # save on file
-        successful = saveStatistics( path, items, counts, craplog )
+                counts.append( int(old_count) )
+        if successful is True:
+            # make a copy of the old file
+            try:
+                bak_path = "%s.bak" %( path )
+                os.rename( path, bak_path )
+                craplog.undo_paths.append( bak_path )
+            except:
+                # failed to make a backup copy for safety
+                successful = False
+                craplog.printJobFailed()
+                craplog.undoChanges()
+                print("\n{red}Error{white}[{grey}safety_backup{white}]{red}>{default} failed to rename file as backup: {green}%s/{orange}%s{grey}.bak{default}"\
+                    %( path[:path.rfind('/')], path[:path.rfind('/')+1] )\
+                    .format(**craplog.colors))
+                if craplog.more_output is True:
+                    print("""\
+                          the error is most-likely caused by a lack of permissions
+                          please add read/write permissions to the whole crapstats folder and retry""")
+                print()
+            if successful is True:
+                # save on file
+                successful = saveStatistics( path, items, counts, craplog )
     finally:
         # whatever happened, return the result
         return successful
@@ -388,14 +157,18 @@ def storeSessions(
     item_name   = "sessions"
     path        = "%s/%s" %( parent_path, item_name )
     # check sessions main folder
-    checks_passed = checkFolder( craplog, path, parent_path, item_name )
+    checks_passed = checkFolder(
+        craplog, "stats_folder" path, parent_path, item_name,
+        True, True, True, True, True )
     if checks_passed is True:
         for log_type, dates in craplog.collection.items():
             # check every log type (access/error)
             parent_path = "%s/sessions" %( craplog.statpath )
             item_name   = log_type
             path        = "%s/%s" %( parent_path, item_name )
-            checks_passed = checkFolder( craplog, path, parent_path, item_name )
+            checks_passed = checkFolder(
+                craplog, "stats_folder" path, parent_path, item_name,
+                True, True, True, True, True )
             if checks_passed is False:
                 break
             for date, fields in dates.items():
@@ -406,13 +179,19 @@ def storeSessions(
                 parent_path = "%s/sessions/%s" %( craplog.statpath, log_type )
                 item_name   = year
                 path        = "%s/%s" %( parent_path, item_name )
-                checks_passed = checkFolder( craplog, path, parent_path, item_name )
+                checks_passed = checkFolder(
+                    craplog, "stats_folder" path, parent_path, item_name,
+                    True, True, True, True, True )
                 if checks_passed is True:
                     buildPath( month )
-                    checks_passed = checkFolder( craplog, path, parent_path, item_name )
+                    checks_passed = checkFolder(
+                        craplog, "stats_folder" path, parent_path, item_name,
+                        True, True, True, True, True )
                 if checks_passed is True:
                     buildPath( day )
-                    checks_passed = checkFolder( craplog, path, parent_path, item_name )
+                    checks_passed = checkFolder(
+                        craplog, "stats_folder" path, parent_path, item_name,
+                        True, True, True, True, True )
                 if checks_passed is False:
                     break
                 for field, data in fields.items():
@@ -420,7 +199,9 @@ def storeSessions(
                     parent_path = "%s/sessions/%s/%s/%s/%s" %( craplog.statpath, log_type, year, month, day )
                     item_name   = "%s.crapstat" %(field)
                     path        = "%s/%s" %( parent_path, item_name )
-                    checks_passed = checkFile( craplog, path, parent_path, item_name )
+                    checks_passed = checkFile(
+                        craplog, "stats_file" path, parent_path, item_name,
+                        True, True, True, True, True )
                     if checks_passed is True:
                         counts = []
                         items  = []
@@ -444,7 +225,7 @@ def storeSessions(
                 break
     # exit if an error occured
     if checks_passed is False:
-        exit()
+        craplog.exitAborted()
 
 
 def updateGlobals(
@@ -465,14 +246,18 @@ def updateGlobals(
     item_name   = "globals"
     path        = "%s/%s" %( parent_path, item_name )
     # check globals main folder
-    checks_passed = checkFolder( craplog, path, parent_path, item_name )
+    checks_passed = checkFolder(
+        craplog, "stats_folder" path, parent_path, item_name,
+        True, True, True, True, True )
     if checks_passed is True:
         for log_type, dates in craplog.collection.items():
             # check every log type (access/error)
             parent_path = "%s/globals" %( craplog.statpath )
             item_name   = log_type
             path        = "%s/%s" %( parent_path, item_name )
-            checks_passed = checkFolder( craplog, path, parent_path, item_name )
+            checks_passed = checkFolder(
+                craplog, "stats_folder" path, parent_path, item_name,
+                True, True, True, True, True )
             if checks_passed is False:
                 break
             global_collection = {}
@@ -521,5 +306,5 @@ def updateGlobals(
                 break
     # exit if an error occured
     if checks_passed is False:
-        exit()
+        craplog.exitAborted()
 
