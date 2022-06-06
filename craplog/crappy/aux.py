@@ -182,11 +182,11 @@ def craplog( color_set ) -> str :
 
 def fin( color_set ) -> str :
     return """{bold}\
-   {yellow}FFFFF{default}{bold}  {cyan}II{default}{bold}  {green}N   N{default}{bold}
-   {yellow}F    {default}{bold}  {cyan}II{default}{bold}  {green}NN  N{default}{bold}
-   {yellow}FFF  {default}{bold}  {cyan}II{default}{bold}  {green}N N N{default}{bold}
-   {yellow}F    {default}{bold}  {cyan}II{default}{bold}  {green}N  NN{default}{bold}
-   {yellow}F    {default}{bold}  {cyan}II{default}{bold}  {green}N   N{default}\
+   {orange}FFFFF{default}{bold}  {grass}II{default}{bold}  {cyan}N   N{default}{bold}
+   {orange}F    {default}{bold}  {grass}II{default}{bold}  {cyan}NN  N{default}{bold}
+   {orange}FFF  {default}{bold}  {grass}II{default}{bold}  {cyan}N N N{default}{bold}
+   {orange}F    {default}{bold}  {grass}II{default}{bold}  {cyan}N  NN{default}{bold}
+   {orange}F    {default}{bold}  {grass}II{default}{bold}  {cyan}N   N{default}\
 """.format(**color_set)
 
 
@@ -197,7 +197,9 @@ def colors() -> dict :
              'black'   : "\033[30m",
              'grey'    : "\033[90m",
              'white'   : "\033[37m",
+             'paradise': "\033[97m",
              'purple'  : "\033[35m",
+             'pink'    : "\033[95m",
              'blue'    : "\033[34m",
              'azul'    : "\033[94m",
              'cyan'    : "\033[36m",
@@ -206,7 +208,7 @@ def colors() -> dict :
              'red'     : "\033[31m",
              'rose'    : "\033[91m",
              'orange'  : "\033[33m",
-             'yellow'  : "\033[33m" }
+             'yellow'  : "\033[93m" }
 
 
 def no_colors() -> dict :
@@ -216,7 +218,9 @@ def no_colors() -> dict :
              'black'   : "",
              'grey'    : "",
              'white'   : "",
+             'paradise': "",
              'purple'  : "",
+             'pink'    : "",
              'blue'    : "",
              'azul'    : "",
              'cyan'    : "",
