@@ -1,5 +1,4 @@
 
-
 def processDate(
     date_: str
 ) -> str :
@@ -46,8 +45,7 @@ def parseAccess(
     """
     Parse access logs lines
     """
-    for line in log_lines:
-        craplog.logs_size += len(line)
+    for line in lines:
         # check line standards
         if line[-1] != '"':
             continue
@@ -66,8 +64,8 @@ def parseAccess(
             if date[5:7] == "00":
                 craplog.printJobFailed()
                 print("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"\
-                    %( ip_date[3].strip("[ ]") )\
-                    .format(**craplog.text_colors))
+                    .format(**craplog.text_colors)\
+                    %( ip_date[3].strip("[ ]") ))
                 craplog.exitAborted()
             # retrieve fields
             req = line_split[1].strip()
@@ -89,8 +87,8 @@ def parseAccess(
             else:
                 craplog.printJobFailed()
                 print("\n{red}Error{white}[{grey}access_field{white}]{red}>{default} unexpected field found: {orange}%s{default}\n"\
-                    %( field )\
-                    .format(**craplog.text_colors))
+                    .format(**craplog.text_colors)\
+                    %( field ))
                 craplog.exitAborted()
             # add the field section if not present
             if craplog.collection['access'][date].get( field ) is None:
@@ -111,8 +109,7 @@ def parseErrors(
     """
     Parse access logs lines
     """
-    for line in log_lines:
-        craplog.logs_size += len(line)
+    for line in lines:
         # check line standards
         if line[0] != '[':
             continue
@@ -140,8 +137,8 @@ def parseErrors(
             if date[5:7] == "00":
                 craplog.printJobFailed()
                 print("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"\
-                    %( line_split[0].strip("[ ]") )\
-                    .format(**craplog.text_colors))
+                    .format(**craplog.text_colors)\
+                    %( line_split[0].strip("[ ]") ))
                 craplog.exitAborted()
             # retrieve fields
             lev = line_split[1].strip("[ ]")
@@ -174,20 +171,21 @@ def parseLogLines(
     """
     Parse log lines
     """
-    craplog.parsed_size = 0
-    craplog.access_size = 0
-    craplog.errors_size = 0
     # parse every log type
     for log_type, log_lines in data.items():
         if len(log_lines) > 0:
+            craplog.printCaret( log_type )
             # insert the log-type dict if not present yet
             if craplog.collection.get( log_type ) is None:
                 craplog.collection.update({ log_type : {} })
             # parse every line
             if log_type == "access":
+                craplog.access_lines += len(log_lines)
                 parseAccess( craplog, log_lines )
             elif log_type == "error":
-                parseAccess( craplog, log_lines )
+                craplog.errors_lines += len(log_lines)
+                parseErrors( craplog, log_lines )
+            craplog.restoreCaret()
     # sum parsed data
-    craplog.parsed_size = sum(craplog.access_size, craplog.errors_size)
+    craplog.parsed_size = craplog.access_size + craplog.errors_size
 
