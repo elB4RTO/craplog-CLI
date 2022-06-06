@@ -6,19 +6,16 @@ from datetime import date
 import tarfile
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from check import checkFolder
+from crappy.check import checkFolder
 
 def newName(
-    path: str,
-    isfile: bool=True
+    path:   str,
+    suffix: str
 ) -> str :
     """
     Return the first available name
     """
     number = 1
-    suffix = ".zip"
-    if isfile is False:
-        suffix = ""
     found = False
     while found is False:
         new_path = "%s/originals.%s%s" %( path, number, suffix )
@@ -39,6 +36,7 @@ def backupFiles(
     os.mkdir( path )
     path += "/"
     for log_file in craplog.log_files:
+        craplog.printCaret( log_file )
         file_path = "%s/%s" %( craplog.logs_path, log_file )
         return_code = subprocess.run(
             ["cp", file_path, path],
@@ -47,6 +45,7 @@ def backupFiles(
             stderr=subprocess.STDOUT)
         if return_code == 1:
             raise Exception(IOError)
+        craplog.restoreCaret()
 
 
 def backupTarGz(
@@ -58,8 +57,15 @@ def backupTarGz(
     """
     with tarfile.open( path, 'w:gz' ) as tz:
         for log_file in craplog.log_files:
+            craplog.printCaret(
+                "%s {white}->{azul} tar.gz"\
+                    .format(**craplog.text_colors)\
+                    %(log_file) )
             file_path = "%s/%s" %( craplog.logs_path, log_file )
-            tz.add( file_path )
+            tz.add(
+                file_path,
+                arcname=log_file )
+            craplog.restoreCaret()
 
 
 def backupZip(
@@ -73,19 +79,27 @@ def backupZip(
         # try storing with compression
         with ZipFile( path, 'w' ) as z:
             for log_file in craplog.log_files:
+                craplog.printCaret(
+                    "%s {white}->{azul} zip"\
+                        .format(**craplog.text_colors)\
+                        %(log_file) )
                 file_path = "%s/%s" %( craplog.logs_path, log_file )
                 z.write(
                     file_path,
                     arcname=log_file,
                     compress_type=ZIP_DEFLATED,
                     compresslevel=9 )
+                craplog.restoreCaret()
     except:
         # try storing normally
+        craplog.restoreCaret()
         with ZipFile( path, 'w' ) as z:
             for log_file in craplog.log_files:
+                craplog.printCaret( log_file )
                 z.write(
                     file_path,
                     arcname=log_file )
+                craplog.restoreCaret()
 
 
 def backupOriginals(
@@ -101,60 +115,63 @@ def backupOriginals(
             craplog.printJobFailed()
     
     checks_passed = True
-    date = str( date.today() )
+    backup_date = str( date.today() )
     path = "%s/backups" %( craplog.statpath )
     craplog.proceed = checkFolder(
-        craplog, "backups_folder" path,
+        craplog, "backups_folder", path,
         r=True, w=True, create=True, resolve=True )
     if craplog.proceed is True:
-        path += "/%s" %( date[:4] )
+        path += "/%s" %( backup_date[:4] )
         craplog.proceed = checkFolder(
-            craplog, "backups_folder" path,
+            craplog, "backups_folder", path,
             r=True, w=True, create=True, resolve=True )
         if craplog.proceed is True:
-            path += "/%s" %( date[5:7] )
+            path += "/%s" %( backup_date[5:7] )
             craplog.proceed = checkFolder(
-                craplog, "backups_folder" path,
+                craplog, "backups_folder", path,
                 r=True, w=True, create=True, resolve=True )
             if craplog.proceed is True:
-                path += "/%s" %( date[8:] )
+                path += "/%s" %( backup_date[8:] )
                 craplog.proceed = checkFolder(
-                    craplog, "backups_folder" path,
+                    craplog, "backups_folder", path,
                     r=True, w=True, create=True, resolve=True )
     
     if craplog.proceed is True:
         successful = True
-        if craplog.backup_tar is True:
+        if craplog.archive_tar is True:
             try:
                 # as tar.gz
-                path += newName( path )
+                path += "/%s" %( newName( path, ".tar.gz" ) )
                 backupTarGz( craplog, path )
             except:
                 successful = False
                 method = "a tar.gz archive"
-        elif craplog.backup_zip is True:
+                craplog.restoreCaret()
+        elif craplog.archive_zip is True:
             try:
                 # as zip
-                path += newName( path )
+                path += "/%s" %( newName( path, ".zip" ) )
                 backupZip( craplog, path )
             except:
                 successful = False
                 method = "a zip archive"
+                craplog.restoreCaret()
         else:
             try:
                 # as files inside a folder
-                path += newName( path, isfile=False )
+                path += "/%s" %( newName( path, "" ) )
                 backupFiles( craplog, path )
             except:
                 successful = False
                 method = "files copies"
+                craplog.restoreCaret()
         if successful is False:
             craplog.proceed = False
             print("\n{red}Error{white}[{grey}backup{white}]{red}>{default} failed to backup as %s: {green}%s/{orange}%s{default}"\
-                %( method, path[:path.rfind('/')], path[path.rfind('/')+1:] )\
-                .format(**craplog.colors))
+                .format(**craplog.colors)\
+                %( method, path[:path.rfind('/')], path[path.rfind('/')+1:] ))
             if craplog.more_output is True:
-                print("               the error is most-likely caused by a lack of permissions"
+                print("               the error is most-likely caused by a lack of permissions")
                 print("               there's no reason to undo everything now")
                 print("               please intervene manually and check permissions")
             print()
@@ -167,41 +184,45 @@ def backupGlobals(
     """
     Backup global statistics (in case of fire)
     """
+    success = True
     undoes = []
     remove = []
     err_msg = ""
     err_msg_more = ""
     globals_path = "%s/globals" %( craplog.statpath )
     backups_path = "%s/.backups" %( globals_path )
-    path = "%s/4" %( backups_path )
-    if os.path.exists( path ):
-        return_code = subprocess.run(
-            ["rm", "-r", path],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT)
-        if return_code == 1:
-            success = False
-            err_msg = "unable to remove the directory: {green}%s/{orange}%s{default}"\
-                %( path[:path.rfind('/')], path[path.rfind('/')+1:] )\
-                .format(**craplog.text_colors))
-            err_msg_more = "                       and manually remove this entry"
-    for n in reversed(range(1,4)):
-        path = "%s/%s" %( backups_path, n )
-        new_path = "%s/%s/" %( backups_path, n+1 )
-        if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
+    success = checkFolder( craplog, "globals_backup", backups_path, r=True, w=True, create=True, resolve=True )
+    if success is True:
+        path = "%s/4" %( backups_path )
+        if os.path.exists( path ):
             return_code = subprocess.run(
-                ["mv", path, new_path],
+                ["rm", "-r", path],
                 check=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT)
             if return_code == 1:
-                undoes.append(new_path[:-1])
                 success = False
-                err_msg = "unable to rename the directory: {green}%s/{orange}%s{default}"\
-                    %( path[:path.rfind('/')], path[path.rfind('/')+1:] )\
-                    .format(**craplog.text_colors))
-                break
+                err_msg = "unable to remove the directory: {green}%s/{orange}%s{default}"\
+                    .format(**craplog.text_colors)\
+                    %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
+                err_msg_more = "                       and manually remove this entry"
+        if success is True:
+            for n in reversed(range(1,4)):
+                path = "%s/%s" %( backups_path, n )
+                new_path = "%s/%s/" %( backups_path, n+1 )
+                if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
+                    return_code = subprocess.run(
+                        ["mv", path, new_path],
+                        check=True,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.STDOUT)
+                    if return_code == 1:
+                        undoes.append(new_path[:-1])
+                        success = False
+                        err_msg = "unable to rename the directory: {green}%s/{orange}%s{default}"\
+                            .format(**craplog.text_colors)\
+                            %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
+                        break
     # check the new dir existence, make it if needed
     if success is True:
         try:
@@ -211,8 +232,8 @@ def backupGlobals(
             # error creating directory
             success = False
             err_msg = "unable to create the directory: {green}%s/{orange}%s{default}"\
-                %( path[:path.rfind('/')], path[path.rfind('/')+1:] )\
-                .format(**craplog.text_colors))
+                .format(**craplog.text_colors)\
+                %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
         if success is True:
             new_path = "%s/1/" %( backups_path )
             for log_type in ["access","error"]:
@@ -230,16 +251,17 @@ def backupGlobals(
     # remove the last dir
     if success is True:
         path = "%s/4" %( backups_path )
-        return_code = subprocess.run(
-            ["rm", "-r", path],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT)
-        if return_code == 1:
-            success = False
-            err_msg = "unable to remove the directory: {green}%s/{orange}%s{default}"\
-                %( path[:path.rfind('/')], path[path.rfind('/')+1:] )\
-                .format(**craplog.text_colors))
+        if os.path.exists( path ):
+            return_code = subprocess.run(
+                ["rm", "-r", path],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT)
+            if return_code == 1:
+                success = False
+                err_msg = "unable to remove the directory: {green}%s/{orange}%s{default}"\
+                    .format(**craplog.text_colors)\
+                    %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
     # failed
     if success is False:
         if craplog.proceed is True:
@@ -248,8 +270,8 @@ def backupGlobals(
             craplog.printJobFailed()
         # print the error message
         print("\n{red}Error{white}[{grey}globals_backup{white}]{red}>{default} %s"\
-            %( err_msg )\
-            .format(**craplog.text_colors))
+            .format(**craplog.text_colors)\
+            %( err_msg ))
         if craplog.more_output is True:
             print("                       the error is most-likely caused by a lack of permissions")
             print("                       please add read/write permissions to the whole crapstats folder")
@@ -266,8 +288,8 @@ def backupGlobals(
             if return_code == 1:
                 success = False
                 print("\n{red}Error{white}[{grey}globals_backup{white}]{red}>{default} unable to remove the directory: {green}%s/{orange}%s{default}"\
-                    %( path[:path.rfind('/')], path[path.rfind('/')+1:] )\
-                    .format(**craplog.text_colors))
+                    .format(**craplog.text_colors)\
+                    %( path[:path.rfind('/')], path[path.rfind('/')+1:] ))
                 if craplog.more_output is True:
                     print("                       the error is most-likely caused by a lack of permissions")
                     print("                       please add read/write permissions to the whole crapstats folder")
@@ -285,8 +307,8 @@ def backupGlobals(
             if return_code == 1:
                 success = False
                 print("\n{red}Error{white}[{grey}globals_backups{white}]{red}>{default} unable to rename the directory: {green}%s/{orange}%s{default}"\
-                    %( path[:path.rfind('/')], path[path.rfind('/')+1:] )\
-                    .format(**craplog.text_colors))
+                    .format(**craplog.text_colors)\
+                    %( path[:path.rfind('/')], path[path.rfind('/')+1:] ))
                 print("                       {bold}before{default} to run craplog again, please manually {bold}rename{default} this entry {bold}as{default}: '{bold}%s{default}'"\
                     %( int(path[-1:])-1 )\
                     .format(**craplog.text_colors))
