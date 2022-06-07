@@ -53,11 +53,15 @@ def parseAccess(
             # initial split
             line_split = line.split('"')
             ip_date    = line_split[0].split(' ')
-            ip  = ip_date[0].strip()
+            ip = ip_date[0].strip()
             # check for matches in the whitelist
+            whitelisted = False
             for whitelisted_ip in craplog.ip_whitelist:
                 if ip.startswith( whitelisted_ip ):
-                    continue
+                    whitelisted = True
+                    break
+            if whitelisted is True:
+                continue
             # retrieve the date
             date = ip_date[3].strip("[ ]").split(':')[0]
             date = processDate( date )
@@ -123,9 +127,13 @@ def parseErrors(
                 # found, client log
                 ip = ip[f+8:].split(':')[0].strip()
                 # check for matches in the whitelist
+                whitelisted = False
                 for whitelisted_ip in craplog.ip_whitelist:
                     if ip.startswith( whitelisted_ip ):
-                        continue
+                        whitelisted = True
+                        break
+                if whitelisted is True:
+                    continue
                 err = line_split[4].strip()
             else:
                 # server log
