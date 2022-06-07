@@ -454,6 +454,15 @@ def makeInitialChecks( craplog ):
         print("\n{red}Error{white}[{grey}missing_arguments{white}]{red}>{default} you must set at least one file name after {cyan}--log-files{default}\n"\
             .format(**craplog.text_colors))
     for file_name in craplog.log_files:
+        if file_name.find(".log.") < 0:
+            checks_passed = False
+            print("\n{red}Error{white}[{grey}invalid_name{white}]{red}>{default} you have inserted an invalid file name: {orange}%s{default}"\
+                .format(**craplog.text_colors)\
+                %( file_name ))
+            if craplog.more_output is True:
+                print("                     files not containing '.log.' in their name won't be used")
+                print("                     please refer to the README.md for more informations")
+            break
         file_path = "%s/%s" %( craplog.logs_path, file_name )
         if checkFile( craplog, "log_file", file_path, r=True ) is False:
             checks_passed = False
