@@ -490,10 +490,10 @@ class Craplog(object):
                     .format(**self.text_colors)\
                     %( (self.access_size+self.errors_size) / 1048576 ))
             if self.more_output is True:
-                print("{grey}  ┞┄{pink}total number of used lines{white}:{paradise} %d {default}"\
+                print("{grey}  ┠┄{pink}total number of used lines{white}:{paradise} %d {default}"\
                     .format(**self.text_colors)\
                     %( (self.access_lines+self.errors_lines) ))
-                print("{grey}  └─┬┄{pink}used access logs size{white}:{paradise} %.2f {white}MB{default}"\
+                print("{grey}  ┖─┬┄{pink}used access logs size{white}:{paradise} %.2f {white}MB{default}"\
                     .format(**self.text_colors)\
                     %( self.access_size / 1048576 ))
                 print("{grey}    │ └┄{pink}number of access lines{white}:{paradise} %d {default}"\
@@ -950,6 +950,8 @@ class Craplog(object):
                 self.printJobDone()
             # next preventive output
             self.printJob("Finalizing")
+        else:
+            print()
         
         # finalize changes
         self.proceed = True
