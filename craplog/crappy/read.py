@@ -1,6 +1,62 @@
 
+import os
 import gzip
 from random import choice, randint
+from time import perf_counter as timer
+
+
+def checkSize(
+    craplog: object,
+    path: str,
+    file_name: str
+) -> bool :
+    """
+    Check the size of a file before to read and warn in case of big files
+    """
+    if craplog.max_file_size > 0\
+    and (os.path.getsize( path ) / 1048576) > craplog.max_file_size:
+        # file over max allowed dimensions, emit a warning
+        if craplog.more_output is True:
+            print("\n")
+        elif craplog.less_output is True:
+            print()
+        print("{warn}Warning{white}[{grey}file_size{white}]{warn}>{default} a file's size exceeds the max allowed size: {grass}%s/{yellow}%s{default}"\
+            .format(**craplog.text_colors)\
+            %( path[:-len(file_name)-1], file_name ))
+        if craplog.more_output is True:
+            print("""\
+                    the size of the file is: {yellow}%.2f MB{default}
+                    the warning limit is actually set at: {green}%.2f MB{default}
+                    you can temporary change it using {cyan}--max-size {italic}<size>{default}"""\
+                .format(**craplog.text_colors)\
+                %( (os.path.getsize( path ) / 1048576), craplog.max_file_size ))
+        if craplog.less_output is False:
+            print()
+        time_gap = timer()
+        choice = False
+        while True:
+            proceed = input("Do you really want to use this file? {white}[{grass}y{grey}/{red}n{white}] :{default} "\
+                .format(**craplog.text_colors)).strip().lower()
+            if proceed in ["y","yes"]:
+                choice = True
+                break
+            elif proceed in ["n","no"]:
+                choice = False
+                break
+            else:
+                # leave this normal yellow, it's secondary and doesn't need real attention
+                print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}\n"\
+                    .format(**craplog.text_colors)
+                    %( proceed ))
+        if craplog.less_output is False:
+            print()
+        if choice is True:
+            craplog.reprintJob()
+        # set the time elapsed during user's decision as user-time
+        craplog.user_time += timer() - time_gap
+        return choice
+    else:
+        return True
 
 
 def defineLogType(
@@ -8,6 +64,9 @@ def defineLogType(
     name:  str,
     lines: list
 ) -> str :
+    """
+    Define the type of the logs in a file
+    """
     logs_type = ""
     a = e = u = 0
     i = 0
@@ -31,7 +90,7 @@ def defineLogType(
         logs_type = "error"
     else:
         craplog.printJobFailed()
-        print("\n{red}Error{white}[{grey}logs{white}]{red}>{default} something is wrong with the logs in: {orange}%s{default}"\
+        print("\n{err}Error{white}[{grey}logs{white}]{red}>{default} something is wrong with the logs in: {rose}%s{default}"\
              .format(craplog.text_colors)\
              %( name ))
         if craplog.more_output is True:
@@ -59,6 +118,9 @@ def collectLogLines(
     for file_name in craplog.log_files:
         craplog.printCaret( file_name )
         path = "%s/%s" %( craplog.logs_path, file_name )
+        if checkSize( craplog, path, file_name ) is False:
+            # file too big
+            craplog.exitAborted()
         log_lines = ""
         try:
             # try reading as gzipped file
@@ -72,7 +134,7 @@ def collectLogLines(
             except:
                 # failed to read
                 craplog.printJobFailed()
-                print("\n{red}Error{white}[{grey}input_file{white}]{red}>{default} unable to open/read file: {green}%s/{orange}%s{default}"\
+                print("\n{err}Error{white}[{grey}input_file{white}]{red}>{default} unable to open/read file: {grass}%s/{rose}%s{default}"\
                      .format(craplog.text_colors)\
                      %( craplog.logs_path, file_name ))
                 if craplog.more_output is True:
