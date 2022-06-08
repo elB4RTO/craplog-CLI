@@ -43,9 +43,9 @@ def saveStatistics(
         successful = False
         craplog.printJobFailed()
         craplog.undoChanges()
-        print("\n{red}Error{white}[{grey}write{white}]{red}>{default} failed to write on file: {green}%s/{orange}%s{default}\n"\
-            .format(**craplog.colors)\
-            %( path[:path.rfind('/')], path[:path.rfind('/')+1] ))
+        print("\n{err}Error{white}[{grey}write{white}]{red}>{default} failed to write on file: {grass}%s/{rose}%s{default}"\
+            .format(**craplog.text_colors)\
+            %( path[:path.rfind('/')], path[path.rfind('/')+1:] ))
         if craplog.more_output is True:
             print("              the error is most-likely caused by a lack of permissions")
             print("              please add read/write permissions to the whole crapstats folder and retry")
@@ -73,8 +73,8 @@ def mergeStatistics(
         successful = False
         craplog.printJobFailed()
         craplog.undoChanges()
-        print("\n{red}Error{white}[{grey}read{white}]{red}>{default} failed to read from file: {green}%s/{orange}%s{default}"\
-            .format(**craplog.colors)\
+        print("\n{err}Error{white}[{grey}read{white}]{red}>{default} failed to read from file: {grass}%s/{rose}%s{default}"\
+            .format(**craplog.text_colors)\
             %( path[:path.rfind('/')], path[:path.rfind('/')+1] ))
         if craplog.more_output is True:
             print("             the error is most-likely caused by a lack of permissions")
@@ -90,8 +90,8 @@ def mergeStatistics(
                 successful = False
                 craplog.printJobFailed()
                 craplog.undoChanges()
-                print("\n{red}Error{white}[{grey}statistics{white}]{red}>{default} malformed line found: {orange}%s{default}"\
-                    .format(**craplog.colors)\
+                print("\n{err}Error{white}[{grey}statistics{white}]{red}>{default} malformed line found: {rose}%s{default}"\
+                    .format(**craplog.text_colors)\
                     %( stat.strip() ))
                 if craplog.more_output is True:
                     print("                   this line doesn't respect craplog's standards")
@@ -124,8 +124,8 @@ def mergeStatistics(
                 successful = False
                 craplog.printJobFailed()
                 craplog.undoChanges()
-                print("\n{red}Error{white}[{grey}safety_backup{white}]{red}>{default} failed to rename file as backup: {green}%s/{orange}%s{grey}.bak{default}"\
-                    .format(**craplog.colors)\
+                print("\n{err}Error{white}[{grey}safety_backup{white}]{red}>{default} failed to rename file as backup: {grass}%s/{rose}%s{grey}.bak{default}"\
+                    .format(**craplog.text_colors)\
                     %( path[:path.rfind('/')], path[:path.rfind('/')+1] ))
                 if craplog.more_output is True:
                     print("""\
@@ -174,15 +174,16 @@ def storeSessions(
                 break
             for date, fields in dates.items():
                 # check every date (year,month,day)
-                year  = date[:4]
-                month = date[5:7]
-                day   = date[8:]
-                parent_path = "%s/sessions/%s" %( craplog.statpath, log_type )
-                item_name   = year
-                path        = "%s/%s" %( parent_path, item_name )
-                checks_passed = checkFolder(
-                    craplog, "stats_folder", path, parent_path, item_name,
-                    True, True, True, True, True )
+                if checks_passed is True:
+                    year  = date[:4]
+                    month = date[5:7]
+                    day   = date[8:]
+                    parent_path = "%s/sessions/%s" %( craplog.statpath, log_type )
+                    item_name   = year
+                    path        = "%s/%s" %( parent_path, item_name )
+                    checks_passed = checkFolder(
+                        craplog, "stats_folder", path, parent_path, item_name,
+                        True, True, True, True, True )
                 if checks_passed is True:
                     buildPath( month )
                     checks_passed = checkFolder(
@@ -262,12 +263,13 @@ def updateGlobals(
         caret_return = 0
         for log_type, dates in craplog.collection.items():
             # check every log type (access/error)
-            parent_path = "%s/globals" %( craplog.statpath )
-            item_name   = log_type
-            path        = "%s/%s" %( parent_path, item_name )
-            checks_passed = checkFolder(
-                craplog, "stats_folder", path, parent_path, item_name,
-                True, True, True, True, True )
+            if checks_passed is True:
+                parent_path = "%s/globals" %( craplog.statpath )
+                item_name   = log_type
+                path        = "%s/%s" %( parent_path, item_name )
+                checks_passed = checkFolder(
+                    craplog, "stats_folder", path, parent_path, item_name,
+                    True, True, True, True, True )
             if checks_passed is False:
                 break
             global_collection = {}
