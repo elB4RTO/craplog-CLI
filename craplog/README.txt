@@ -47,11 +47,16 @@
            --auto-merge  ¦  auto-merge sessions with the same date
                          ¦
                          ¦
+      --max-size <size>  ¦  emit a warning if a file's size exceeds this limit
+                         ¦  the <size> is in MB, if set to 0 means unlimited
+                         ¦
+                         ¦
                      -e  ¦  make statistics of error logs too
                --errors  ¦
                          ¦
                          ¦
-          --only-errors  ¦  use only error logs (don't parse access logs)
+                    -eO  ¦  use only error logs (don't parse access logs)
+          --only-errors  ¦
                          ¦
                          ¦
                     -gO  ¦  only update globals (don't store session statistics)
@@ -122,11 +127,18 @@
      
        craplog -e -bT --trash
 
+   - AS THE PREVIOUS BUT ONLY PARSE ERRORS, AVOIDING ACCESS LOGS.
+     STORE THE ORIGINAL FILES AS A zip COMPRESSED ARCHIVE, WITHOUT DELETING THEM.
+     SHRED FILES IF NEEDED (INSTEAD OF NORMAL DELETION).
+     GLOBAL STATISTICS WILL UPDATED BY DEFAULT.
+     
+       craplog -eO -bZ --shred
+
 
    - USE DEFINED ACCESS AND/OR ERROR LOGS FILES FROM AN ALTERNATIVE LOGS PATH.
      AUTOMATICALLY MERGE SESSIONS HAVING THE SAME DATE IF NEEDED.
    
-       craplog -e -P /your/path -F file.log.2 file.log.3.gz --auto-merge
+       craplog -e -P /your/logs/path -F file.log.2 file.log.3.gz --auto-merge
 
 
    - USE DEFAULT LOG FILES FOR BOTH ACCESS AND ERROR LOGS. USE A WHITELIST FOR
@@ -137,15 +149,16 @@
 
    - PRINT MORE INFORMATIONS ON SCREEN, INCLUDING PERFORMANCE DETAILS.
      USE THE DEFAULT ACCESS LOGS FILE BUT ONLY UPDATE GLOBALS, NOT SESSIONS.
+     SET THE WARNING LEVEL FOR LOG FILES SIZE AT 20 MB.
    
-       craplog -m -p --only-globals
+       craplog -m -p -gO --max-size 20
 
 
-   - PRINT LESS INFORMATIONS ON SCREEN, WITHOUT USING COLORS. USE THE DEFAULT
-     ACCESS AND ERROR LOGS FILES, BUT DO NOT UPDATIE GLOBALS. MAKE A BACKUP
-     COPY OF THE ORIGINAL FILES USED AND DELETE THEM (BY SHREDDING) WHEN DONE.
+   - PRINT LESS INFORMATIONS ON SCREEN, WITH PERFORMANCES BUT WITHOUT USING COLORS.
+     USE THE DEFAULT ACCESS AND ERROR LOGS FILES, BUT DO NOT UPDATIE GLOBALS.
+     MAKE A BACKUP COPY OF THE ORIGINAL FILES USED AND DELETE THEM WHEN DONE.
    
-       craplog -l --no-colors -e --avoid-globals -b -dO --shred
+       craplog -l --no-colors -e -gA -b -dO
   
   
 --------------------------------------------------------------------------------
