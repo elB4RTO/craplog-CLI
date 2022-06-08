@@ -64,11 +64,16 @@ def help( color_set ) -> str :
            {bold}--auto-merge{default}  ¦  auto-merge sessions with the same date
                          ¦
                          ¦
+      {bold}--max-size{default} {italic}<size>{default}  ¦  emit a warning if a file's size exceeds this limit
+                         ¦  the {italic}<size>{default} is in MB, if set to 0 means unlimited
+                         ¦
+                         ¦
                      {bold}-e{default}  ¦  make statistics of error logs too
                {bold}--errors{default}  ¦
                          ¦
                          ¦
-          {bold}--only-errors{default}  ¦  use only error logs (don't parse access logs)
+                    {bold}-eO{default}  ¦  use only error logs (don't parse access logs)
+          {bold}--only-errors{default}  ¦
                          ¦
                          ¦
                     {bold}-gO{default}  ¦  only update globals (don't store session statistics)
@@ -136,37 +141,45 @@ def examples( color_set ) -> str :
   {orange}Examples{default}
 {white}-------------------------------------------------------------------------------{default}
 
-   - {green}use default log files (*.log.1) as input, including errors. store the
-     original files as a tar.gz compressed archive and move files to trash if
-     needed (instead of complete deletion).
-     global statistics will updated by default.{default}
+   - {green}Use default log files (*.log.1) as input, including errors. Store the
+     original files as a tar.gz compressed archive, without deleting them.
+     Move files to trash if needed (instead of complete deletion).
+     Global statistics will updated by default.{default}
      
        {italic}craplog{default} {bold}-e -bT --trash{default}
 
+   - {green}As the previous but only parse errors, avoiding access logs.
+     Store the original files as a zip compressed archive, without deleting them.
+     Shred files if needed (instead of normal deletion).
+     Global statistics will updated by default.{default}
+     
+       {italic}craplog{default} {bold}-eO -bZ --shred{default}
 
-   - {green}use defined access and/or error logs files from an alternative logs path.
-     automatically merge sessions having the same date if needed.{default}
+
+   - {green}Use defined access and/or error logs files from an alternative logs path.
+     Automatically merge sessions having the same date if needed.{default}
    
-       {italic}craplog{default} {bold}-e -P {default}/your/path {bold}-F {default}file.log.2 file.log.3.gz {bold}--auto-merge{default}
+       {italic}craplog{default} {bold}-e -P {default}/your/logs/path {bold}-F {default}file.log.2 file.log.3.gz {bold}--auto-merge{default}
 
 
-   - {green}use default log files for both access and error logs. use a whitelist for
-     ips and select which access fields to parse.{default}
+   - {green}Use default log files for both access and error logs. Use a whitelist for
+     IPs and select which access fields to parse.{default}
    
        {italic}craplog{default} {bold}-e -W {default}::1 192.168. {bold}-A {default}REQ RES{default}
 
 
-   - {green}print more informations on screen, including performance details.
-     use the default access logs file but only update globals, not sessions.{default}
+   - {green}Print more informations on screen, including performance details.
+     Use the default access logs file but only update globals, not sessions.
+     Set the warning level for log files size at 20 MB.{default}
    
-       {italic}craplog{default} {bold}-m -p --only-globals{default}
+       {italic}craplog{default} {bold}-m -p -gO --max-size 20{default}
 
 
-   - {green}print less informations on screen, without using colors. use the default
-     access and error logs files, but do not updatie globals. make a backup
-     copy of the original files used and delete them (by shredding) when done.{default}
+   - {green}Print less informations on screen, with performances but without using colors.
+     Use the default access and error logs files, but do not updatie globals.
+     Make a backup copy of the original files used and delete them when done.{default}
    
-       {italic}craplog{default} {bold}-l --no-colors -e --avoid-globals -b -dO --shred{default}
+       {italic}craplog{default} {bold}-l -p --no-colors -e -gA -b -dO{default}
 """.format(**color_set)
 
 
@@ -208,7 +221,9 @@ def colors() -> dict :
              'red'     : "\033[31m",
              'rose'    : "\033[91m",
              'orange'  : "\033[33m",
-             'yellow'  : "\033[93m" }
+             'yellow'  : "\033[93m",
+             'err'     : "\033[1;31m",
+             'warn'    : "\033[1;33m" }
 
 
 def no_colors() -> dict :
@@ -229,4 +244,6 @@ def no_colors() -> dict :
              'red'     : "",
              'rose'    : "",
              'orange'  : "",
-             'yellow'  : "" }
+             'yellow'  : "",
+             'err'     : "",
+             'warn'    : "" }
