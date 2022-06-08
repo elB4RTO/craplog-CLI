@@ -108,12 +108,6 @@ def backupOriginals(
     """
     Main function to call for backups
     """
-    def failed():
-        nonlocal craplog
-        if craplog.proceed is True:
-            craplog.proceed = False
-            craplog.printJobFailed()
-    
     checks_passed = True
     backup_date = str( date.today() )
     path = "%s/backups" %( craplog.statpath )
@@ -166,9 +160,9 @@ def backupOriginals(
                 method = "files copies"
                 craplog.restoreCaret()
         if successful is False:
-            craplog.proceed = False
-            print("\n{red}Error{white}[{grey}backup{white}]{red}>{default} failed to backup as %s: {green}%s/{orange}%s{default}"\
-                .format(**craplog.colors)\
+            craplog.printJobFailed()
+            print("\n{err}Error{white}[{grey}backup{white}]{red}>{default} failed to backup as %s: {grass}%s/{rose}%s{default}"\
+                .format(**craplog.text_colors)\
                 %( method, path[:path.rfind('/')], path[path.rfind('/')+1:] ))
             if craplog.more_output is True:
                 print("               the error is most-likely caused by a lack of permissions")
@@ -202,7 +196,7 @@ def backupGlobals(
                 stderr=subprocess.STDOUT)
             if return_code == 1:
                 success = False
-                err_msg = "unable to remove the directory: {green}%s/{orange}%s{default}"\
+                err_msg = "unable to remove the directory: {grass}%s/{rose}%s{default}"\
                     .format(**craplog.text_colors)\
                     %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
                 err_msg_more = "                       and manually remove this entry"
@@ -219,7 +213,7 @@ def backupGlobals(
                     if return_code == 1:
                         undoes.append(new_path[:-1])
                         success = False
-                        err_msg = "unable to rename the directory: {green}%s/{orange}%s{default}"\
+                        err_msg = "unable to rename the directory: {grass}%s/{rose}%s{default}"\
                             .format(**craplog.text_colors)\
                             %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
                         break
@@ -231,7 +225,7 @@ def backupGlobals(
         except:
             # error creating directory
             success = False
-            err_msg = "unable to create the directory: {green}%s/{orange}%s{default}"\
+            err_msg = "unable to create the directory: {grass}%s/{rose}%s{default}"\
                 .format(**craplog.text_colors)\
                 %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
         if success is True:
@@ -259,17 +253,14 @@ def backupGlobals(
                 stderr=subprocess.STDOUT)
             if return_code == 1:
                 success = False
-                err_msg = "unable to remove the directory: {green}%s/{orange}%s{default}"\
+                err_msg = "unable to remove the directory: {grass}%s/{rose}%s{default}"\
                     .format(**craplog.text_colors)\
                     %( path[:path.rfind('/')], path[path.rfind('/')+1:] )
     # failed
     if success is False:
-        if craplog.proceed is True:
-            # prevent printing "Failed" twice
-            craplog.proceed = False
-            craplog.printJobFailed()
+        craplog.printJobFailed()
         # print the error message
-        print("\n{red}Error{white}[{grey}globals_backup{white}]{red}>{default} %s"\
+        print("\n{err}Error{white}[{grey}globals_backup{white}]{red}>{default} %s"\
             .format(**craplog.text_colors)\
             %( err_msg ))
         if craplog.more_output is True:
@@ -287,7 +278,7 @@ def backupGlobals(
                 stderr=subprocess.STDOUT)
             if return_code == 1:
                 success = False
-                print("\n{red}Error{white}[{grey}globals_backup{white}]{red}>{default} unable to remove the directory: {green}%s/{orange}%s{default}"\
+                print("\n{err}Error{white}[{grey}globals_backup{white}]{red}>{default} unable to remove the directory: {grass}%s/{rose}%s{default}"\
                     .format(**craplog.text_colors)\
                     %( path[:path.rfind('/')], path[path.rfind('/')+1:] ))
                 if craplog.more_output is True:
@@ -306,7 +297,7 @@ def backupGlobals(
                     stderr=subprocess.STDOUT)
             if return_code == 1:
                 success = False
-                print("\n{red}Error{white}[{grey}globals_backups{white}]{red}>{default} unable to rename the directory: {green}%s/{orange}%s{default}"\
+                print("\n{err}Error{white}[{grey}globals_backups{white}]{red}>{default} unable to rename the directory: {grass}%s/{rose}%s{default}"\
                     .format(**craplog.text_colors)\
                     %( path[:path.rfind('/')], path[path.rfind('/')+1:] ))
                 print("                       {bold}before{default} to run craplog again, please manually {bold}rename{default} this entry {bold}as{default}: '{bold}%s{default}'"\
