@@ -48,6 +48,7 @@ def parseAccess(
     for line in lines:
         # check line standards
         if line[-1] != '"':
+            craplog.access_lines -= 1
             continue
         try:
             # initial split
@@ -61,13 +62,15 @@ def parseAccess(
                     whitelisted = True
                     break
             if whitelisted is True:
+                craplog.whitelist_size += len(line)
+                craplog.whitelist_lines += 1
                 continue
             # retrieve the date
             date = ip_date[3].strip("[ ]").split(':')[0]
             date = processDate( date )
             if date[5:7] == "00":
                 craplog.printJobFailed()
-                print("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"\
+                print("\n{err}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {rose}%s{default}\n"\
                     .format(**craplog.text_colors)\
                     %( ip_date[3].strip("[ ]") ))
                 craplog.exitAborted()
@@ -90,7 +93,7 @@ def parseAccess(
             elif field == "RES": item = res
             else:
                 craplog.printJobFailed()
-                print("\n{red}Error{white}[{grey}access_field{white}]{red}>{default} unexpected field found: {orange}%s{default}\n"\
+                print("\n{err}Error{white}[{grey}access_field{white}]{red}>{default} unexpected field found: {rose}%s{default}\n"\
                     .format(**craplog.text_colors)\
                     %( field ))
                 craplog.exitAborted()
@@ -116,6 +119,7 @@ def parseErrors(
     for line in lines:
         # check line standards
         if line[0] != '[':
+            craplog.errors_lines -= 1
             continue
         try:
             # initial split
@@ -144,7 +148,7 @@ def parseErrors(
             date = processDate( date )
             if date[5:7] == "00":
                 craplog.printJobFailed()
-                print("\n{red}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {orange}%s{default}\n"\
+                print("\n{err}Error{white}[{grey}log_date{white}]{red}>{default} unknown date found: {rose}%s{default}\n"\
                     .format(**craplog.text_colors)\
                     %( line_split[0].strip("[ ]") ))
                 craplog.exitAborted()
