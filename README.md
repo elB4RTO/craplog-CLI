@@ -290,9 +290,9 @@ May be higher or lower depending on the complexity of the logs, the complexity o
 Usually, if Craplog is taking more than 10 seconds to parse 10 MB of data, it means you've probably been tested in some way (better to check).<br><br>
 
 ![performance diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/fullCLI/perf_diff.png)<br>
-*The above image shows the difference in performances for two log files having the same number of lines and very similar dimensions.<br>
-On the left side, the parsed logs resulted from a normal webserver activity.<br>
-On the right side, the parsed logs resulted from a webserver scan (with tools like **sqlmap** and **nikto**, not nmap)*
+*The above image shows the difference in performances between two different sessions, having the same number of lines and very similar data sizes.<br>
+On the left side, the parsed logs resulted from a webserver with normal activity.<br>
+On the right side, the parsed logs resulted from a webserver which have been scanned with tools like **sqlmap** and **nikto** (not nmap)*
 
 <br>
 
