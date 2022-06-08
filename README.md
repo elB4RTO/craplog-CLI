@@ -12,12 +12,13 @@ Parse Apache2 logs to create statistics
   - [Run with installation](#run-with-installation)
 - [Usage](#usage)
   - [Arguments](#arguments)
+  - [Avoiding arguments](#avoiding-arguments)
   - [Examples](#examples)
   - [Output control](#output-control)
-- [Log files](#log-files)
-  - [Default logs files](#default-logs-files)
-  - [Default logs path](#default-logs-path)
-  - [Default logs structure](#default-logs-structure)
+- [Logs](#logs)
+  - [Log files](#log-files)
+  - [Logs path](#logs-path)
+  - [Logs structure](#logs-structure)
 - [Statistics](#statistics)
   - [Storage](#storage)
   - [Examined fields](#examined-fields)
@@ -116,6 +117,15 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 <br>
 
+### Avoiding arguments
+
+You may not want to pass arguments every time, expecially if they're complex and always the same (or just occasionally different).<br><br>
+You can directly modify Craplog by setting pre-defined initialization values to fit your needs.<br>
+Open your local copy of **craplog.py**, go to line [**100**](https://github.com/elB4RTO/craplog-fullCLI/blob/main/craplog/craplog.py#L100), read the instructions and personalize Craplog.<br><br>
+You will still be able to pass arguments to override those settings, if you want, or you can lock them and discard every argument passed to only use your settings.
+
+<br>
+
 ### Examples
 
 - Uses default log files as input, including errors (access logs are used by default). Stores a backup copy the original files as a *tar.gz* compressed archive, without deleting them. Moves files to trash if needed (instead of complete deletion). Global statistics will be updated by default.
@@ -157,7 +167,7 @@ You can control the output on screen, like: quantity of informations printed, pe
 
 <br><br>
 
-## Log files
+## Logs
 
 At the moment, it still only supports **Apache2** log files in their **default** form<br>
 Be aware that log-files usage is not tracked, be careful of not parsing the same logs twice, which will lead to altered statistics<br><br>
@@ -165,16 +175,16 @@ Archived (**gzipped**) log files can be used as well as normal files
 
 <br>
 
-### Default logs files
+### Log files
 
 If not specified, the files to be used will be **access.log.1** *and/or* **error.log.1**<br>
 
-Different file/s can be used by passing their names with `-F <names>` / `--log-files <names>`<br>
-Please note that only names have to be specified, not full paths<br>
+Different file/s can be used by passing their names with `-F <names>` / `--log-files <names>`<br><br>
+Please notice that only **file names** have to be specified, NOT full paths<br>
 
 <br>
 
-### Default logs path
+### Logs path
 
 If not specified, the default path will be **/var/log/apache2/**<br>
 
@@ -182,7 +192,9 @@ A different path can be used by passing it with `-P <path>` / `--logs-path <path
 
 <br>
 
-### Default logs structure
+### Logs' structure
+
+At the moment of writing, this is the only supported logs structure.<br><br>
 
 **access.log.1**<br>
 IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URI" "USER AGENT"<br>
@@ -260,7 +272,8 @@ As an example, if you insert "123", then only IP addresses starting with that se
 If you insert ".1", then nothing will be skipped, since no IP will ever start with a dot.<br>
 But the shortcut "::1" is used by Apache2 for internal connections and will therefore be valid to skip those lines.<br>
 
-The **default** is to only skip logs from **::1**, but different sequences can be passed with `-W <IPs>` / `--ip-whitelist <IPs>`
+The **default** is to only skip logs from **::1**, but different sequences can be passed with `-W <IPs>` / `--ip-whitelist <IPs>`<br><br>
+Please notice that using a custom list will overwrite the default one, not appending to it. When passing a custom list as argument, you should include the default *::1* in order to keep whitelisting the relative lines.
 
 
 <br><br>
