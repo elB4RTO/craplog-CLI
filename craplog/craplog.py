@@ -9,6 +9,7 @@ from time import perf_counter as timer
 
 from crappy import aux
 from crappy.check  import makeInitialChecks, checkSessionsDates
+from crappy.hashes import bringHashes, storeHashes
 from crappy.read   import collectLogLines
 from crappy.parse  import parseLogLines
 from crappy.stats  import updateGlobals, storeSessions
@@ -97,7 +98,8 @@ class Craplog(object):
         This section can be manually edited to pre-set Craplog
           and avoid having to pass arguments every time
         """
-        ###
+        ################################################################
+        #                 START OF THE EDITABLE SECTION
         #
         # USE COMMAND LINE ARGUMENTS
         # [  ]
@@ -113,7 +115,7 @@ class Craplog(object):
         # [ -m  /  --more ]
         self.more_output = False
         #
-        # SHOW HOW MUCH TIME DID THE JOB TAKE TO COMPLETE
+        # SHOW INFORMATIONS ABOUT THE PERFORMANCE
         # [ -p  /  --performance ]
         self.performance = False
         #
@@ -123,66 +125,71 @@ class Craplog(object):
         #
         # AUTOMATICALLY DELETE FILES WHEN NEEDED
         # [ --auto-delete ]
-        # USE WITH CAUTION
-        # THIS APPLIES TO: ORIGINAL LOG FILES, CONFLICT FILES/FOLDERS
+        # USE WITH CAUTION, THIS APPLIES IN EVERY CIRCUMSTANCE
+        # INCLUDES: ORIGINAL LOG FILES, CONFLICT FILES/FOLDERS
         self.auto_delete = False
         #
         # AUTOMATICALLY MERGE SESSIONS STATISTICS WITH THE SAME DATE
         # [ --auto-merge ]
-        # IF A SESSION's DATE FROM THE STORED STATISTICS
-        # EQUALS A DATE FROM THE PARSED LOGS FILES,
-        # THEN MERGE THEM WITHOUT ASKING
+        # IF SOME OF THE NEWELY PARSED LOGS HAVE THE SAME DATE OF AN
+        # ALREADY STORED SESSION, MERGE THE RELATIVE LINES
         self.auto_merge = False
         #
-        # IF AN INPUT FILE'S SIZE IS OVER THE ONE SET BELOW, EMIT A WARNING'
+        # A WARNING IS EMITTED IF THE SIZE AN INPUT FILE OVERTAKES THIS LIMIT
         # [ --max-size ]
         # IN MB (MegaBytes)
         self.max_file_size = 100.0
         #
-        # MAKE SESSION STATISTICS
+        # STORE SESSION STATISTICS OF THE PARSED DATA
         # CAN BE DISABLED PASSING [ -gO  /  --only-globals ]
         self.session_stats = True
         #
-        # UPDATE GLOBAL STATISTICS USING SESSION ONES
+        # UPDATE GLOBAL STATISTICS WITH THE PARSED DATA
         # CAN BE DISABLED PASSING [ -gA  /  --avoid-globals ]
         self.global_stats = True
         #
-        # MAKE SESSION STATISTICS FILES FROM ACCESS LOGS
+        # MAKE STATISTICS FROM ACCESS LOGS
         # [  ]
         # CAN BE DISABLED PASSING [ --only-errors ]
         self.access_logs = True
         #
-        # MAKE SESSION STATISTICS FILES FROM ERROR LOGS
+        # MAKE STATISTICS FROM ERROR LOGS
         # [ -e  /  --errors ]
         self.error_logs = False
         #
-        # MAKE A BACKUP OF THE ORIGINAL LOG FILES
+        # MAKE A BACKUP COPY OF THE ORIGINAL LOG FILES (AS THEY ARE)
         # [ -b  /  --backup ]
+        # MUST BE SET TO True IF AN ARCHIVE CHOICE IS True
         self.backup = False
         #
         # ARCHIVE THE BACKUP AS tar.gz
         # [ -bT  /  --backup-tar ]
+        # gzip COMPRESSED tar ARCHIVE
         self.archive_tar = False
         #
         # ARCHIVE THE BACKUP AS zip
         # [ -bZ  /  --backup-zip ]
+        # TRIES TO COMPRESS THE ARCHIVE WITH THE MAX COMPRESSION LEVEL
+        # STORES AS NORMAL zip IF THE PREVIOUS FAILS
         self.archive_zip = False
         #
         # DELETE THE ORIGINAL LOG FILES WHEN DONE
         # [ -dO  /  --delete-originals ]
+        # IF THE PROCESS FAILS BEFORE THE DELETE STEP, DELETION WILL BE SKIPPED
+        # AFTER THE DELETE STEP, THE PROCESS WILL NO MORE BE REVERSIBLE
         self.delete = False
         #
-        # MOVE FILES TO TRASH INSTEAD OF COMPLETELY REMOVE
+        # MOVE FILES TO TRASH INSTEAD OF COMPLETELY REMOVING THEM
         # [ --trash ]
         # DOESN'T APPLY TO CONFLICT FILES, WHICH WILL BE REMOVED (OR SHREDED)
         self.trash = False
         #
         # THE DIRECTORY USED AS TRASH BY YOUR SYSTEM
-        # CAN BE PASSED FOLLOWING THE [ --trash ] OPTION
+        # CAN BE PASSED FOLLOWING THE [ --trash <path> ] OPTION
         # DEFAULT TO: ~/.local/share/Trash/files/
         self.trash_path = "~/.local/share/Trash/files/"
         #
-        # SHRED FILES INSTEAD OF SIMPLE REMOVE
+        # SHRED FILES INSTEAD OF SIMPLY REMOVING THEM
         # [ --shred ]
         self.shred = False
         #
@@ -199,7 +206,7 @@ class Craplog(object):
         # - ' ' (WITHESPACE) HAVE TO BE USED AS SEPARATOR BETWEEN NAMES
         self.log_files = ["access.log.1"]
         #
-        # TRUE ONLY WHEN USING A CUSTOM LIST OF FILES FROM ARGUMENTS
+        # True ONLY WHEN USING A CUSTOM LIST OF FILES !-> FROM ARGUMENTS <-!
         # [  ]
         self.file_selection = False
         #
@@ -219,12 +226,15 @@ class Craplog(object):
         # - ' ' (WITHESPACE) HAVE TO BE USED AS SEPARATOR
         self.ip_whitelist = ["::1"]
         #
-        ###
+        #                 END OF THE EDITABLE SECTION
+        ################################################################
         #
-        # THE FOLLOWING VARIABLE SHOULD REMAIN AS THEY ARE
+        #
+        # DO NOT MODIFY THE FOLLOWING VARIABLES
         self.collection = {}
         self.undo_paths = []
         self.undo_fails = []
+        self.hashes     = []
         self.aborted = False
         self.proceed = True
         self.elapsed_time = 0.
@@ -245,8 +255,9 @@ class Craplog(object):
         """
         Bring message strings
         """
+        self.last_job     = ""
         self.caret_return = 0
-        self.text_colors = aux.colors()
+        self.text_colors  = aux.colors()
         if self.use_colors is False:
             self.text_colors = aux.no_colors()
         self.MSG_elbarto  = aux.elbarto()
@@ -379,44 +390,27 @@ class Craplog(object):
         """
         Print the welcome message
         """
-        print("Use {cyan}craplog --help{default} to view an help screen"\
-            .format(**self.text_colors))
-        if self.auto_delete is self.auto_merge is True:
-            print("{yellow}Auto-Delete{default} and {yellow}Auto-Merge{default} are {bold}ON{default}"\
+        if self.less_output is False:
+            print("\n%s\n" %( self.MSG_craplog ))
+            if self.more_output is True:
+                print("Use {cyan}craplog --help{default} to view an help screen"\
                 .format(**self.text_colors))
+            if self.auto_delete is self.auto_merge is True:
+                print("{yellow}Auto-Delete{default} and {yellow}Auto-Merge{default} are {bold}ON{default}"\
+                    .format(**self.text_colors))
+            else:
+                if self.auto_delete is True:
+                    print("{yellow}Auto-Delete{default} is {bold}ON{default}"\
+                        .format(**self.text_colors))
+                if self.auto_merge is True:
+                    print("{yellow}Auto-Merge{default} is {bold}ON{default}"\
+                        .format(**self.text_colors))
+            print()
+            sleep(1)
         else:
-            if self.auto_delete is True:
-                print("{yellow}Auto-Delete{default} is {bold}ON{default}"\
-                    .format(**self.text_colors))
-            if self.auto_merge is True:
-                print("{yellow}Auto-Merge{default} is {bold}ON{default}"\
-                    .format(**self.text_colors))
-        self.start_time += 1
-        print()
-        sleep(1)
-
-
-    def restoreCaret(self):
-        """
-        Restore the caret to the previous position
-        """
-        if self.more_output is True:
-            print("%s%s%s"\
-                %( "\b"*self.caret_return, " "*self.caret_return, "\b"*self.caret_return ),
-                end="", flush=True )
-        self.caret_return = 0
-
-
-    def printCaret(self, message: str ):
-        """
-        Print the message and update the caret for a restore
-        """
-        if self.more_output is True:
-            print("{yellow}%s{default}"\
+            print("{bold}%s"\
                 .format(**self.text_colors)\
-                %( message ),
-                end="", flush=True )
-            self.caret_return = len(message)
+                %( self.TXT_craplog ))
 
 
     def printJob(self, message: str ):
@@ -437,6 +431,17 @@ class Craplog(object):
         print(self.last_job, end="", flush=True)
 
 
+    def printJobHalted(self):
+        """
+        Print the job has been halted
+        """
+        if self.last_job != "":
+            self.restoreCaret()
+            print("{orange}Halted{default}"\
+                .format(**self.text_colors),
+                end="", flush=True )
+
+
     def printJobDone(self):
         """
         Print the job is done
@@ -452,13 +457,39 @@ class Craplog(object):
         """
         if self.proceed is True:
             self.proceed = False
-            if self.last_job != "":
+            if self.caret_return != 0:
                 self.restoreCaret()
                 print("{rose}Failed{default}"\
                     .format(**self.text_colors))
                 self.printElapsedTime()
                 self.timer_gap = timer()
                 self.last_job = ""
+            if len(self.undo_pahts) > 0:
+                self.undoChanges()
+                
+
+
+    def printCaret(self, message: str ):
+        """
+        Print the message and update the caret for a restore
+        """
+        if self.more_output is True:
+            print("{yellow}%s{default}"\
+                .format(**self.text_colors)\
+                %( message ),
+                end="", flush=True )
+            self.caret_return = len(message)
+
+
+    def restoreCaret(self):
+        """
+        Restore the caret to the previous position
+        """
+        if self.more_output is True:
+            print("%s%s%s"\
+                %( "\b"*self.caret_return, " "*self.caret_return, "\b"*self.caret_return ),
+                end="", flush=True )
+        self.caret_return = 0
 
 
     def printAborted(self):
@@ -710,7 +741,6 @@ class Craplog(object):
         try:
             os.rename( path, new_path )
         except:
-            self.proceed = False
             parent = path[:path.rfind('/')]
             entry  = path[len(parent)+1:]
             if os.path.isdir( path ):
@@ -753,6 +783,7 @@ class Craplog(object):
         """
         if self.less_output is False:
             self.last_job = "Un-doing changes"
+            self.caret_return = 0
             print("{bold}{rose}Un-doing changes {default}{paradise}...{default} "\
                 .format(**self.text_colors), end="", flush=True)
             self.time_gap = timer()
@@ -762,7 +793,8 @@ class Craplog(object):
             if path.endswith(".bak"):
                 # delete the new file
                 old_path = path[:-4]
-                self.removeEntry( old_path )
+                if os.path.exists( old_path ):
+                    self.removeEntry( old_path )
                 if self.proceed is False:
                     self.undo_fails['remove'].append( old_path )
                     self.undo_fails['restore'].append( path )
@@ -801,24 +833,28 @@ class Craplog(object):
                         .format(**self.text_colors)\
                         %( path[:path.rfind('/')], col2, path[path.rfind('/')+1:] ))
             print()
-            print("{bold}{rose}Changes to the crapstats has been discarded{default}"\
-                .format(**self.text_colors))
+            if self.stage == 1:
+                # only during the crapstats stage
+                print("{bold}{rose}Changes to the crapstats has been discarded{default}"\
+                    .format(**self.text_colors))
             if len(self.undo_fails['remove']) > 0:
                 print("Please manually remove the files in the remove list before to run craplog again")
                 if self.more_output is True:
-                    print("  These files contains the new stats (which failed) and must be deleted")
+                    print("  These files are the result of the process (which failed) and must be deleted")
             if len(self.undo_fails['restore']) > 0:
                 print("Please manually restore the files in the restore list before to run craplog again")
                 if self.more_output is True:
-                    print("  These files are copies of the previous stats and thus must be restored")
+                    print("  These files are copies of the previous files and thus must be restored")
                 if self.less_output is False:
                     print("  You can restore a file by deleting the trailing '{bold}.bak{default}' extension")
         else:
             # "successfully" failed
             if self.less_output is False:
-                self.undo_paths.clear()
                 self.printJobDone()
                 self.printElapsedTime()
+        # in any case, clear the lists
+        self.undo_paths.clear()
+        self.undo_fails.clear()
 
 
     def finalizeChanges(self):
@@ -834,7 +870,6 @@ class Craplog(object):
                     self.undo_fails['remove'].append( path )
                     self.proceed = True
         if  len(self.undo_fails['remove']) > 0:
-            self.proceed = False
             printJobFailed()
             # print failures
             for action, paths in self.undo_fails.items():
@@ -877,23 +912,27 @@ class Craplog(object):
         """
         Make Craplog do its job
         """
+        # welcome message
+        self.welcomeMessage()
         # CRAPLOG
-        if self.less_output is False:
-            print("\n%s\n" %( self.MSG_craplog ))
-        else:
-            print("{bold}%s"\
-                .format(**self.text_colors)\
-                %( self.TXT_craplog ))
+        self.stage = 0
         self.start_time = timer()
+        
+        if self.more_output is True:
+            self.printJob("Initializing craplog")
+        self.time_gap = timer()
         # get craplog's path
         self.crappath = os.path.abspath(__file__)
         self.crappath = self.crappath[:self.crappath.rfind('/')]
         self.statpath = "%s/crapstats" %(self.crappath[:self.crappath.rfind('/')])
         # make initial checkings
         makeInitialChecks( self )
-        # welcome message
-        if self.less_output is False:
-            self.welcomeMessage()
+        # retrieve usage-control hashes
+        bringHashes( self )
+        if self.more_output is True:
+            self.printJobDone()
+            self.printElapsedTime()
+            print()
         
         if self.less_output is True:
             # preventive output
@@ -902,9 +941,20 @@ class Craplog(object):
         # read logs files
         if self.more_output is True:
             self.printJob("Reading logs")
-            self.time_gap = timer()
+        self.time_gap = timer()
         logs_data = collectLogLines( self )
         if self.more_output is True:
+            self.printJobDone()
+            self.printElapsedTime()
+        
+        # store usage hashes of log files
+        self.proceed = True
+        if self.more_output is True:
+            self.printJob("Saving usage-hashes")
+        self.time_gap = timer()
+        storeHashes( self )
+        if self.proceed is True\
+        and self.more_output is True:
             self.printJobDone()
             self.printElapsedTime()
 
@@ -926,7 +976,7 @@ class Craplog(object):
             checkSessionsDates( self )
 
         # from now on a failure will un-do any modification to the crapstats
-        self.undo_paths = []
+        self.stage = 1
         
         if self.less_output is True:
             # next preventive output
@@ -953,6 +1003,17 @@ class Craplog(object):
             if self.less_output is False:
                 self.printJobDone()
                 self.printElapsedTime()
+        
+        # finalize changes
+        self.proceed = True
+        if self.more_output is True:
+            self.printJob("Finalizing changes")
+        self.time_gap = timer()
+        self.finalizeChanges()
+        if self.proceed is True\
+        and self.more_output is True:
+            self.printJobDone()
+            self.printElapsedTime()
 
         if self.less_output is True:
             # continuation of the preventive output
@@ -965,8 +1026,9 @@ class Craplog(object):
             print()
         
         # 'proceed' will be used from now on
-        # code won't "undo & abort" on failures anymore
-        self.proceed = True
+        # failures will only un-do further modifications
+        self.undo_paths.clear()
+        self.stage = 2
         
         # make a backup copy of the original logs used
         if self.backup is True:
@@ -1007,17 +1069,6 @@ class Craplog(object):
         elif self.backup is True\
           or self.delete is True:
             print()
-        
-        # finalize changes
-        self.proceed = True
-        if self.less_output is False:
-            self.printJob("Finalizing crapstats changes")
-        self.time_gap = timer()
-        self.finalizeChanges()
-        if self.proceed is True\
-        and self.less_output is False:
-            self.printJobDone()
-            self.printElapsedTime()
         
         # make a backup of the globals
         if self.global_stats is True:
@@ -1062,15 +1113,28 @@ class Craplog(object):
 # RUN CRAPLOG
 if __name__ == "__main__":
     craplog = Craplog( sys.argv )
+    failed = False
     try:
         craplog.main()
-    except:
+    except (KeyboardInterrupt):
+        failed = True
         if craplog.aborted is False:
-            try:
-                craplog.undoChanges()
-            except:
-                pass
-            finally:
-                craplog.exitAborted()
+            print()
+            if craplog.more_output is True:
+                print()
+    except:
+        failed = True
     finally:
+        if failed is True:
+            if craplog.aborted is False:
+                try:
+                    # failing succesfully
+                    if len(craplog.undo_paths) > 0:
+                        craplog.undoChanges()
+                except:
+                    # complete failure
+                    pass
+                finally:
+                    craplog.exitAborted()
+        # successful
         del craplog
