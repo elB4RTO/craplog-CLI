@@ -4,6 +4,85 @@ import gzip
 from random import choice, randint
 from time import perf_counter as timer
 
+from crappy.hashes import digestFile
+
+
+def choiceDialog(
+    craplog: object,
+    question: str
+) -> bool :
+    """
+    Dialog for a binary choice to make
+    """
+    time_gap = timer()
+    choice = False
+    while True:
+        proceed = input("%s? {white}[{grass}y{grey}/{red}n{white}] :{default} "\
+            .format(**craplog.text_colors)
+            %(question)
+            ).strip().lower()
+        if proceed in ["y","yes"]:
+            choice = True
+            break
+        elif proceed in ["n","no"]:
+            choice = False
+            break
+        else:
+            # leave this normal yellow, it's secondary and doesn't need real attention
+            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}\n"\
+                .format(**craplog.text_colors)
+                %( proceed ))
+    # set the time elapsed during user's decision as user-time
+    craplog.user_time += timer() - time_gap
+    return choice
+
+
+def checkUsage(
+    craplog: object,
+    path: str,
+    file_name: str
+) -> bool :
+    """
+    Hash a file with sha1 to check a possible previous usage
+    """
+    file_hash = digestFile( craplog, path )
+    # check the present of the hash
+    if file_hash in craplog.hashes:
+        # file hash found, emit a warning
+        craplog.printJobHalted()
+        if craplog.more_output is True:
+            print("\n")
+        elif craplog.less_output is True:
+            print()
+        print("{warn}Warning{white}[{grey}file_usage{white}]{warn}>{default} this file has probably been used already: {grass}%s/{yellow}%s{default}"\
+            .format(**craplog.text_colors)\
+            %( path[:-len(file_name)-1], file_name ))
+        if craplog.more_output is True:
+            print("""\
+                    file hash (sha256): {yellow}%s{default}
+                    craplog keeps track of files usage by storing their unique checksum
+                    it's close to impossible for two files to have the same hash
+                    please continue only if you're REALLY sure"""\
+                .format(**craplog.text_colors)\
+                %( file_hash ))
+        if craplog.less_output is False:
+            print()
+        choice = choiceDialog( craplog, "Do you really want to use this file" )
+        # reprint the last job if needed
+        if craplog.less_output is False:
+            print()
+        if choice is True:
+            craplog.hashes.append( file_hash )
+            if craplog.less_output is True\
+            or craplog.more_output is True:
+                craplog.reprintJob()
+        return choice
+    else:
+        # hash not found, append and continue
+        craplog.hashes.append( file_hash )
+        return True
+            
+
 
 def checkSize(
     craplog: object,
@@ -16,6 +95,7 @@ def checkSize(
     if craplog.max_file_size > 0\
     and (os.path.getsize( path ) / 1048576) > craplog.max_file_size:
         # file over max allowed dimensions, emit a warning
+        craplog.printJobHalted()
         if craplog.more_output is True:
             print("\n")
         elif craplog.less_output is True:
@@ -32,28 +112,12 @@ def checkSize(
                 %( (os.path.getsize( path ) / 1048576), craplog.max_file_size ))
         if craplog.less_output is False:
             print()
-        time_gap = timer()
-        choice = False
-        while True:
-            proceed = input("Do you really want to use this file? {white}[{grass}y{grey}/{red}n{white}] :{default} "\
-                .format(**craplog.text_colors)).strip().lower()
-            if proceed in ["y","yes"]:
-                choice = True
-                break
-            elif proceed in ["n","no"]:
-                choice = False
-                break
-            else:
-                # leave this normal yellow, it's secondary and doesn't need real attention
-                print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}\n"\
-                    .format(**craplog.text_colors)
-                    %( proceed ))
+        choice = choiceDialog( craplog, "Do you really want to use this file" )
+        # reprint the last job if needed
         if craplog.less_output is False:
             print()
         if choice is True:
             craplog.reprintJob()
-        # set the time elapsed during user's decision as user-time
-        craplog.user_time += timer() - time_gap
         return choice
     else:
         return True
@@ -101,6 +165,7 @@ def defineLogType(
              number of lines identified as {bold}{italic}unknown{default} type : {bold}%s{default}"""\
                 .format(craplog.text_colors)\
                 %( n, a, e, u ))
+        print()
         craplog.exitAborted()
     return logs_type
 
@@ -118,6 +183,10 @@ def collectLogLines(
     for file_name in craplog.log_files:
         craplog.printCaret( file_name )
         path = "%s/%s" %( craplog.logs_path, file_name )
+        if checkUsage( craplog, path, file_name ) is False:
+            # file already used
+            craplog.printJobFailed()
+            craplog.exitAborted()
         if checkSize( craplog, path, file_name ) is False:
             # file too big
             craplog.exitAborted()
