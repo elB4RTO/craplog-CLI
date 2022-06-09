@@ -42,7 +42,6 @@ def saveStatistics(
     except:
         successful = False
         craplog.printJobFailed()
-        craplog.undoChanges()
         print("\n{err}Error{white}[{grey}write{white}]{red}>{default} failed to write on file: {grass}%s/{rose}%s{default}"\
             .format(**craplog.text_colors)\
             %( path[:path.rfind('/')], path[path.rfind('/')+1:] ))
@@ -72,7 +71,6 @@ def mergeStatistics(
         # failed to read
         successful = False
         craplog.printJobFailed()
-        craplog.undoChanges()
         print("\n{err}Error{white}[{grey}read{white}]{red}>{default} failed to read from file: {grass}%s/{rose}%s{default}"\
             .format(**craplog.text_colors)\
             %( path[:path.rfind('/')], path[:path.rfind('/')+1] ))
@@ -89,7 +87,6 @@ def mergeStatistics(
             if s < 0:
                 successful = False
                 craplog.printJobFailed()
-                craplog.undoChanges()
                 print("\n{err}Error{white}[{grey}statistics{white}]{red}>{default} malformed line found: {rose}%s{default}"\
                     .format(**craplog.text_colors)\
                     %( stat.strip() ))
@@ -123,7 +120,6 @@ def mergeStatistics(
                 # failed to make a backup copy for safety
                 successful = False
                 craplog.printJobFailed()
-                craplog.undoChanges()
                 print("\n{err}Error{white}[{grey}safety_backup{white}]{red}>{default} failed to rename file as backup: {grass}%s/{rose}%s{grey}.bak{default}"\
                     .format(**craplog.text_colors)\
                     %( path[:path.rfind('/')], path[:path.rfind('/')+1] ))
@@ -159,7 +155,7 @@ def storeSessions(
     # check sessions main folder
     checks_passed = checkFolder(
         craplog, "stats_folder", path, parent_path, item_name,
-        True, True, True, True, True )
+        True, True, True, True )
     if checks_passed is True:
         caret_return = 0
         for log_type, dates in craplog.collection.items():
@@ -169,7 +165,7 @@ def storeSessions(
             path        = "%s/%s" %( parent_path, item_name )
             checks_passed = checkFolder(
                 craplog, "stats_folder", path, parent_path, item_name,
-                True, True, True, True, True )
+                True, True, True, True )
             if checks_passed is False:
                 break
             for date, fields in dates.items():
@@ -183,17 +179,17 @@ def storeSessions(
                     path        = "%s/%s" %( parent_path, item_name )
                     checks_passed = checkFolder(
                         craplog, "stats_folder", path, parent_path, item_name,
-                        True, True, True, True, True )
+                        True, True, True, True )
                 if checks_passed is True:
                     buildPath( month )
                     checks_passed = checkFolder(
                         craplog, "stats_folder", path, parent_path, item_name,
-                        True, True, True, True, True )
+                        True, True, True, True )
                 if checks_passed is True:
                     buildPath( day )
                     checks_passed = checkFolder(
                         craplog, "stats_folder", path, parent_path, item_name,
-                        True, True, True, True, True )
+                        True, True, True, True )
                 if checks_passed is False:
                     break
                 for field, data in fields.items():
@@ -203,7 +199,7 @@ def storeSessions(
                     path        = "%s/%s" %( parent_path, item_name )
                     checks_passed = checkFile(
                         craplog, "stats_file", path, parent_path, item_name,
-                        True, True, True, True, True )
+                        True, True, True, True )
                     if checks_passed is True:
                         # print the field in use if needed
                         craplog.printCaret( field )
@@ -244,13 +240,6 @@ def updateGlobals(
     """
     Update global statistics
     """
-    def failed():
-        nonlocal checks_passed, craplog
-        if checks_passed is True:
-            checks_passed = False
-            craplog.printJobFailed()
-            craplog.undoChanges()
-
     checks_passed = True
     parent_path = craplog.statpath
     item_name   = "globals"
@@ -258,7 +247,7 @@ def updateGlobals(
     # check globals main folder
     checks_passed = checkFolder(
         craplog, "stats_folder", path, parent_path, item_name,
-        True, True, True, True, True )
+        True, True, True, True )
     if checks_passed is True:
         caret_return = 0
         for log_type, dates in craplog.collection.items():
@@ -269,7 +258,7 @@ def updateGlobals(
                 path        = "%s/%s" %( parent_path, item_name )
                 checks_passed = checkFolder(
                     craplog, "stats_folder", path, parent_path, item_name,
-                    True, True, True, True, True )
+                    True, True, True, True )
             if checks_passed is False:
                 break
             global_collection = {}
