@@ -16,6 +16,7 @@ Parse Apache2 logs to create statistics
   - [Examples](#examples)
   - [Output control](#output-control)
 - [Logs](#logs)
+  - [Usage control](#usage-control)
   - [Log files](#log-files)
   - [Logs path](#logs-path)
   - [Logs structure](#logs-structure)
@@ -41,7 +42,7 @@ Craplog is a tool that takes Apache2 logs in their default form, parses them and
 
 <br>
 
-Welcome to the command line version
+Welcome to the **command line** version
 
 ![screenshot](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/fullCLI/craplog.png)
 
@@ -66,7 +67,7 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 - Open a terminal inside "*craplog-fullCLI-main/craplog*"
   <br>*or*<br>
   `cd craplog-fullCLI/craplog/`<br><br>
-- Run craplog using python's environment (you must be in the *craplog/craplog* folder):
+- Run craplog using python's environment:
   <br>`python3 craplog.py --help`<br><br>
 
 <br>
@@ -119,9 +120,11 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 ### Avoiding arguments
 
-You may not want to pass arguments every time, expecially if they're complex and always the same (or just occasionally different).<br><br>
+You may not want to pass arguments every time, expecially if they're complex and always the same (or just occasionally different).
+
 You can directly modify Craplog by setting pre-defined initialization values to fit your needs.<br>
-Open your local copy of **craplog.py**, go to line [**100**](https://github.com/elB4RTO/craplog-fullCLI/blob/main/craplog/craplog.py#L100), read the instructions and personalize Craplog.<br><br>
+Open your local copy of **craplog.py**, go to line [**100**](https://github.com/elB4RTO/craplog-fullCLI/blob/main/craplog/craplog.py#L100), read the instructions and personalize Craplog.
+
 You will still be able to pass arguments to override those settings, if you want, or you can lock them and discard every argument passed to only use your settings.
 
 <br>
@@ -169,24 +172,35 @@ You can control the output on screen, like: quantity of informations printed, pe
 
 ## Logs
 
-At the moment, it still only supports **Apache2** log files in their **default** form<br>
-Be aware that log-files usage is not tracked, be careful of not parsing the same logs twice, which will lead to altered statistics<br><br>
-Archived (**gzipped**) log files can be used as well as normal files
+At the moment, it still only supports **Apache2** log files in their **default** form.
+
+Archived (**gzipped**) log files can be used as well as normal files.
+
+<br>
+
+### Usage control
+This version of Craplog keeps track of the log files which have been used.
+
+When a file is parsed succesfully, its **sha256** checksum is stored.<br>
+The stored checksums will be checked every time a file is given as input, to help preventing parsing the same files twice.
+
+Hasheswill be stored in **craplog/crapstats/.hashes**
 
 <br>
 
 ### Log files
 
-If not specified, the files to be used will be **access.log.1** *and/or* **error.log.1**<br>
+If not specified, the files to be used will be **access.log.1** *and/or* **error.log.1**
 
-Different file/s can be used by passing their names with `-F <names>` / `--log-files <names>`<br><br>
-Please notice that only **file names** have to be specified, NOT full paths<br>
+Different file/s can be used by passing their names with `-F <names>` / `--log-files <names>`
+
+Please notice that only **file names** have to be specified, NOT full paths.
 
 <br>
 
 ### Logs path
 
-If not specified, the default path will be **/var/log/apache2/**<br>
+If not specified, the default path will be **/var/log/apache2/**
 
 A different path can be used by passing it with `-P <path>` / `--logs-path <path>`
 
@@ -196,14 +210,19 @@ A different path can be used by passing it with `-P <path>` / `--logs-path <path
 
 At the moment of writing, this is the only supported logs structure.<br><br>
 
-**access.log.1**<br>
-IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URI" "USER AGENT"<br>
+#### access.log.*
+
+IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URI" "USER AGENT"
+
 *123.123.123.123 - - [01/01/2000:00:10:20 +0000] "GET /style.css HTTP/1.1" 200 321 "/index.php" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Firefox/86.0"*
 
+<br>
 
-**error.log.1**<br>
-[DATE TIME] [LOG LEVEL] [PID] ERROR REPORT<br>
-*[Mon Jan 01 10:20:30.456789 2000] [headers:trace2] [pid 12345] mod_headers.c(874): AH01502: headers: ap_headers_output_filter()*
+#### error.log.*
+
+[DATE TIME] [LOG LEVEL] [PID] ERROR REPORT
+
+*[Mon Jan 01 10:20:30.456789 2000] [headers:trace2] [pid 12345] [client 123.123.123.123:45678] AH00128: File does not exist: /var/www/html/domain/readme.txt*
 
 <br><br>
 
@@ -212,7 +231,7 @@ IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URI" "USER AGENT"<br>
 ### Storage
 
 Statistics will be stored in Craplog's main folder: **craplog/crapstats**<br>
-Please refer to the [statistics viewer tool](#statistics-viewer) to view your crapstats
+Please refer to the [statistics viewer tool](#statistics-viewer) to view your crapstats.
 
 <br>
 
@@ -230,7 +249,7 @@ Four fields can be examined while parsing **access** logs:
 <br>You can select which fields to use by passing them with `-A <fields>` / `--access-fields <fields>`<br>
 Available fields choices are: **IP**, **UA**, **REQ**, **RES**<br>
 
-You can avoid parsing access logs by passing `-eO` / `--only-errors`<br>
+You can avoid parsing access logs by passing `-eO` / `--only-errors`
 
 <br>
 
@@ -241,38 +260,42 @@ While parsing **error** logs, only two fields will be used:
 - Log level
 - Error report
 
-<br>By default error logs won't be used, but you can parse them by passing `-e` / `--error-logs`<br>
+<br>By default error logs won't be used, but you can parse them by passing `-e` / `--error-logs`
 
 <br>
 
 ### Sessions statistics
 
-**Sessions** are made by grouping statistics depending on the **date** of the single lines and will be stored consequently: new content will be made if that date is not present in the *crapstats* yet, or it will be merged if the date already exists.<br><br>
-Olny '**\*.log.\***' files will be considered valid as input. This is because these files (usually) contain the full logs stack of an entire (*past*) day.<br>
-Running it against a *today*'s file (which is not complete yet) may lead to re-running it in the future on the same file, parsing the same lines twice<br>
+**Sessions** are made by grouping statistics depending on the **date** of the single lines and will be stored consequently: new content will be made if that date is not present in the *crapstats* yet, or it will be merged if the date already exists.
 
-You can avoid storing sessions by passing `-gO` / `--only-globals`<br>
+Olny '**\*.log.\***' files will be considered valid as input. This is because these files (usually) contain the full logs stack of an entire (*past*) day.<br>
+Running it against a *today*'s file (which is not complete yet) may lead to re-running it in the future on the same file, parsing the same lines twice.
+
+You can avoid storing sessions by passing `-gO` / `--only-globals`
 
 <br>
 
 ### Global statistics
 
 Additionally, **global statistics** will be created and/or updated *consequently*.<br>
-These statistics are identical to the session ones, in fact they're just merged sessions, for a larger view.<br>
+These statistics are identical to the session ones, in fact they're just merged sessions, for a larger view.
 
-You can avoid updating globals by passing `-gA` / `--avoid-globals`<br>
+You can avoid updating globals by passing `-gA` / `--avoid-globals`
 
 <br>
 
 ### Whitelist
 
-You can add IP addresses to this list (may them be full *IPs*, only the *net-ID* part or just a portion of your choice), in order to skip the relative lines by whitelisting (or blacklisting..?) them, in both **access** and **error** logs.<br><br>
-Please notice that the given sequence must be the **starting part**: it's not possible (at the moment, and more likely also in future versions) to skip IPs ending or just containing that sequence.<br><br>
+You can add IP addresses to this list (may them be full *IPs*, only the *net-ID* part or just a portion of your choice), in order to skip the relative lines by whitelisting (or blacklisting..?) them, in both **access** and **error** logs.
+
+Please notice that the given sequence must be the **starting part**: it's not possible (at the moment, and more likely also in future versions) to skip IPs ending or just containing that sequence.
+
 As an example, if you insert "123", then only IP addresses starting with that sequence will be skipped.<br>
 If you insert ".1", then nothing will be skipped, since no IP will ever start with a dot.<br>
-But the shortcut "::1" is used by Apache2 for internal connections and will therefore be valid to skip those lines.<br>
+But the shortcut "::1" is used by Apache2 for internal connections and will therefore be valid to skip those lines.
 
-The **default** is to only skip logs from **::1**, but different sequences can be passed with `-W <IPs>` / `--ip-whitelist <IPs>`<br><br>
+The **default** is to only skip logs from **::1**, but different sequences can be passed with `-W <IPs>` / `--ip-whitelist <IPs>`
+
 Please notice that using a custom list will overwrite the default one, not appending to it. When passing a custom list as argument, you should include the default *::1* in order to keep whitelisting the relative lines.
 
 
@@ -303,20 +326,25 @@ May be higher or lower depending on the complexity of the logs, the complexity o
 Usually, if Craplog is taking more than 10 seconds to parse 10 MB of data, it means you've probably been tested in some way (better to check).<br><br>
 
 ![performance diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/fullCLI/perf_diff.png)<br>
-*The above image shows the difference in performances between two different sessions, having the same number of lines and very similar data sizes.<br>
+*Normal vs Scanned*<br><br>
+
+The above image shows the difference in performances between two different sessions, having the same number of lines and very similar data sizes.<br>
 On the left side, the parsed logs resulted from a webserver with normal activity.<br>
-On the right side, the parsed logs resulted from a webserver which have been scanned with tools like **sqlmap** and **nikto** (not nmap)*
+On the right side, the parsed logs resulted from a webserver which have been scanned with tools like **sqlmap** and **nikto** (not nmap)
 
 <br>
 
 ### Backups
 
 Craplog will automatically make backups of **global statistics** files (in case of fire).<br>
-If something goes wrong and you lose your actual globals, you can recover them (at least the last backup taken).<br><br>
+If something goes wrong and you lose your actual globals, you can recover them (at least the last backup taken).
+
 Move inside the folder you choose to store statistics in, open the "**globals**" folder, show hidden files and open the folder named "**.backups**'.<br>
 The complete path should look like **/&lt;your_path&gt;/craplog/crapstats/globals/.backups/**<br>
-Here you will find the last 3 backups taken. Folder named '3' is always the oldest and '1' the newest.<br><br>
-A new backup is made every time you run Craplog *successfully* over globals.<br><br>
+Here you will find the last 3 backups taken. Folder named '3' is always the oldest and '1' the newest.
+
+A new backup is made every time you run Craplog *successfully* over globals.
+
 Please notice that SESSION statistics will **not** be backed-up
 
 <br><br>
