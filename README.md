@@ -123,7 +123,7 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 You may not want to pass arguments every time, expecially if they're complex and always the same (or just occasionally different).
 
 You can directly modify Craplog by setting pre-defined initialization values to fit your needs.<br>
-Open your local copy of **craplog.py**, go to line [**100**](https://github.com/elB4RTO/craplog-fullCLI/blob/main/craplog/craplog.py#L100), read the instructions and personalize Craplog.
+Open your local copy of **craplog.py**, go to line [**101**](https://github.com/elB4RTO/craplog-fullCLI/blob/main/craplog/craplog.py#L101), read the instructions and personalize Craplog.
 
 You will still be able to pass arguments to override those settings, if you want, or you can lock them and discard every argument passed to only use your settings.
 
