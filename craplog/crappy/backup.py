@@ -185,7 +185,9 @@ def backupGlobals(
     err_msg_more = ""
     globals_path = "%s/globals" %( craplog.statpath )
     backups_path = "%s/.backups" %( globals_path )
-    success = checkFolder( craplog, "globals_backup", backups_path, r=True, w=True, create=True, resolve=True )
+    success = checkFolder(
+        craplog, "globals_backup", backups_path,
+        r=True, w=True, create=True, resolve=True )
     if success is True:
         path = "%s/4" %( backups_path )
         if os.path.exists( path ):
