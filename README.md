@@ -1,4 +1,4 @@
-# craplog-fullCLI
+# craplog-CLI
 Parse Apache2 logs to create statistics
 
 <br>
@@ -44,7 +44,7 @@ Craplog is a tool that takes Apache2 logs in their default form, parses them and
 
 Welcome to the **command line** version
 
-![screenshot](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/fullCLI/craplog.png)
+![screenshot](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/craplog.png)
 
 <br>
 
@@ -63,10 +63,10 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 - Download and unzip this repo
   <br>*or*<br>
-  `git clone https://github.com/elB4RTO/craplog-fullCLI`<br><br>
-- Open a terminal inside "*craplog-fullCLI-main/craplog*"
+  `git clone https://github.com/elB4RTO/craplog-CLI`<br><br>
+- Open a terminal inside "*craplog-CLI-main/craplog*"
   <br>*or*<br>
-  `cd craplog-fullCLI/craplog/`<br><br>
+  `cd craplog-CLI/craplog/`<br><br>
 - Run craplog using python's environment:
   <br>`python3 craplog.py --help`<br><br>
 
@@ -76,10 +76,10 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 - Download and unzip this repo
   <br>*or*<br>
-  `git clone https://github.com/elB4RTO/craplog-fullCLI`<br><br>
-- Open a terminal inside "*craplog-fullCLI-main*"
+  `git clone https://github.com/elB4RTO/craplog-CLI`<br><br>
+- Open a terminal inside "*craplog-CLI-main*"
   <br>*or*<br>
-  `cd craplog-fullCLI/`<br><br>
+  `cd craplog-CLI/`<br><br>
 - Run the installation script:
   <br>`chmod +x ./install.sh && exec ./install.sh`<br><br>
 - You can now run craplog from terminal, as any other application (you don't need to be in craplog's folder):
@@ -123,7 +123,7 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 You may not want to pass arguments every time, expecially if they're complex and always the same (or just occasionally different).
 
 You can directly modify Craplog by setting pre-defined initialization values to fit your needs.<br>
-Open your local copy of **craplog.py**, go to line [**101**](https://github.com/elB4RTO/craplog-fullCLI/blob/main/craplog/craplog.py#L101), read the instructions and personalize Craplog.
+Open your local copy of **craplog.py**, go to line [**101**](https://github.com/elB4RTO/craplog-CLI/blob/main/craplog/craplog.py#L101), read the instructions and personalize Craplog.
 
 You will still be able to pass arguments to override those settings, if you want, or you can lock them and discard every argument passed to only use your settings.
 
@@ -165,7 +165,7 @@ You will still be able to pass arguments to override those settings, if you want
 
 You can control the output on screen, like: quantity of informations printed, performance details and the use of colors.<br><br>
 
-![output diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/fullCLI/output_diff.png)
+![output diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/output_diff.png)
 *Normal output vs Less output*
 
 <br><br>
@@ -325,7 +325,7 @@ Please notice that using a custom list will overwrite the default one, not appen
 May be higher or lower depending on the complexity of the logs, the complexity of the stored statistics (in case of merge), your hardware and the workload of your system during the execution.<br>
 Usually, if Craplog is taking more than 10 seconds to parse 10 MB of data, it means you've probably been tested in some way (better to check).<br><br>
 
-![performance diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/fullCLI/perf_diff.png)<br>
+![performance diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/perf_diff.png)<br>
 *Normal vs Scanned*<br><br>
 
 The above image shows the difference in performances between two different sessions, having the same number of lines and very similar data sizes.<br>
@@ -353,6 +353,6 @@ Please notice that SESSION statistics will **not** be backed-up
 
 CRAPLOG is under development
 
-If you have suggestions about how to improve it please open an ![issue](https://github.com/elB4RTO/craplog-fullCLI/issues) or make a ![pull request](https://github.com/elB4RTO/craplog-fullCLI/pulls)
+If you have suggestions about how to improve it please open an ![issue](https://github.com/elB4RTO/craplog-CLI/issues) or make a ![pull request](https://github.com/elB4RTO/craplog-CLI/pulls)
 
 If you're not running Apache, but you like this tool: same as the above (bring a sample of a log file)
