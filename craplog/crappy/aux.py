@@ -148,6 +148,7 @@ def examples( color_set ) -> str :
      
        {italic}craplog{default} {bold}-e -bT --trash{default}
 
+
    - {green}As the previous but only parse errors, avoiding access logs.
      Store the original files as a zip compressed archive, without deleting them.
      Shred files if needed (instead of normal deletion).
@@ -185,11 +186,11 @@ def examples( color_set ) -> str :
 
 def craplog( color_set ) -> str :
     return """{bold}\
-   {red} CCCC{default}{bold}  {orange}RRRR {default}{bold}  {grass}AAAAA{default}{bold}  {cyan}PPPP {default}{bold}  {blue}L    {default}{bold}  {purple}OOOOO{default}{bold}  {white}GGGGG{default}{bold}
-   {red}C    {default}{bold}  {orange}R   R{default}{bold}  {grass}A   A{default}{bold}  {cyan}P   P{default}{bold}  {blue}L    {default}{bold}  {purple}O   O{default}{bold}  {white}G    {default}{bold}
-   {red}C    {default}{bold}  {orange}RRRR {default}{bold}  {grass}AAAAA{default}{bold}  {cyan}PPPP {default}{bold}  {blue}L    {default}{bold}  {purple}O   O{default}{bold}  {white}G  GG{default}{bold}
-   {red}C    {default}{bold}  {orange}R  R {default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {blue}L    {default}{bold}  {purple}O   O{default}{bold}  {white}G   G{default}{bold}
-   {red} CCCC{default}{bold}  {orange}R   R{default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {blue}LLLLL{default}{bold}  {purple}OOOOO{default}{bold}  {white}GGGGG{default}\
+   {red} CCCC{default}{bold}  {orange}RRRR {default}{bold}  {grass}AAAAA{default}{bold}  {cyan}PPPP {default}{bold}  {white}L    {default}{bold}  {white}OOOOO{default}{bold}  {white}GGGGG{default}{bold}
+   {red}C    {default}{bold}  {orange}R   R{default}{bold}  {grass}A   A{default}{bold}  {cyan}P   P{default}{bold}  {white}L    {default}{bold}  {white}O   O{default}{bold}  {white}G    {default}{bold}
+   {red}C    {default}{bold}  {orange}RRRR {default}{bold}  {grass}AAAAA{default}{bold}  {cyan}PPPP {default}{bold}  {white}L    {default}{bold}  {white}O   O{default}{bold}  {white}G  GG{default}{bold}
+   {red}C    {default}{bold}  {orange}R  R {default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {white}L    {default}{bold}  {white}O   O{default}{bold}  {white}G   G{default}{bold}
+   {red} CCCC{default}{bold}  {orange}R   R{default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {white}LLLLL{default}{bold}  {white}OOOOO{default}{bold}  {white}GGGGG{default}\
 """.format(**color_set)
 
 
