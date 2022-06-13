@@ -29,7 +29,7 @@ def choiceDialog(
             break
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
-            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}\n"\
+            print("\n{warn}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}\n"\
                 .format(**craplog.text_colors)
                 %( proceed ))
     # set the time elapsed during user's decision as user-time
