@@ -102,13 +102,11 @@ class CommandLine( UIobj ):
             # help mode
             pass # 2 COMPLETE !!!
         # arrow up
-        elif key == curses.KEY_UP\
-          or key == 259:
+        elif key == curses.KEY_UP:
             # one step behind in commands history
             self.fromHistory( -1 )
         # arrow down
-        elif key == curses.KEY_DOWN\
-          or key == 258:
+        elif key == curses.KEY_DOWN:
             # one step forward in commands history
             self.fromHistory( +1 )
         # backspace
@@ -186,4 +184,5 @@ class CommandLine( UIobj ):
             self.history.append( self.command )
         self.history_index = len(self.history)
         self.clear()
+
 
