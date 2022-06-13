@@ -26,6 +26,7 @@ class Craplog(object):
         Craplog's initializer
         """
         # variables from args
+        self.use_configs:    bool
         self.use_arguments:  bool
         self.less_output:    bool
         self.more_output:    bool
@@ -100,6 +101,18 @@ class Craplog(object):
         """
         ################################################################
         #                 START OF THE EDITABLE SECTION
+        #
+        # HIERARCHY FOR APPLYING SETTINGS:
+        #  - HARDCODED VARIABLES (THESE ONES)
+        #  - CONFIGURATIONS FILE
+        #  - COMMAND LINE ARGUMENTS
+        # THE ELEMENTS ON TOP ARE REPLACED BY THE ONES WHICH FOLLOW THEM,
+        # IF HARDCODED VARIABLES ARE SET TO DO SO
+        #
+        # READ THE CONFIGURATIONS FILE AND LOAD THE SETTING
+        # [  ]
+        # IF SET TO 'False' MEANS THAT THE SAVED CONFIGS WILL BE IGNORED
+        self.use_configs = True
         #
         # USE COMMAND LINE ARGUMENTS
         # [  ]
@@ -266,7 +279,7 @@ class Craplog(object):
         self.MSG_examples = aux.examples( self.text_colors )
         self.MSG_craplog  = aux.craplog( self.text_colors )
         self.MSG_fin      = aux.fin( self.text_colors )
-        self.TXT_craplog  = "{red}C{orange}R{grass}A{cyan}P{blue}L{purple}O{white}G{default}".format(**self.text_colors)
+        self.TXT_craplog  = "{red}C{orange}R{grass}A{cyan}P{white}LOG{default}".format(**self.text_colors)
         self.TXT_fin      = "{orange}F{grass}I{cyan}N{default}".format(**self.text_colors)
 
 
@@ -499,7 +512,7 @@ class Craplog(object):
         self.aborted = True
         if self.less_output is False:
             print()
-        print("{bold}{red}CRAPLOG ABORTED{default}"\
+        print("{err}CRAPLOG ABORTED{default}"\
             .format(**self.text_colors))
         if self.less_output is False:
             print()
@@ -513,7 +526,7 @@ class Craplog(object):
         self.finalCleanUp()
         if self.less_output is False:
             print()
-        print("{bold}{red}CRAPLOG ABORTED{default}"\
+        print("{err}CRAPLOG ABORTED{default}"\
             .format(**self.text_colors))
         if self.less_output is False:
             print()
@@ -651,21 +664,21 @@ class Craplog(object):
             if self.trash is True:
                 return_code = subprocess.run(
                     ["mv", path, self.trash_path],
-                    check=True,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.STDOUT)
+                    .returncode
             elif self.shred is True:
                 return_code = subprocess.run(
                     ["shred", "-uvz", path],
-                    check=True,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.STDOUT)
+                    .returncode
             else:
                 return_code = subprocess.run(
                     ["rm", path],
-                    check=True,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.STDOUT)
+                    .returncode
 
             if return_code == 1:
                 self.printJobFailed()
@@ -682,9 +695,9 @@ class Craplog(object):
             if self.trash is True:
                 return_code = subprocess.run(
                     ["mv", path, self.trash_path],
-                    check=True,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.STDOUT)
+                    .returncode
             else:
                 if self.shred is True:
                     # recursively rename the folder with zeroes
@@ -698,9 +711,9 @@ class Craplog(object):
                         new_path = "%s/%s" %( parent, new_name )
                         return_code = subprocess.run(
                             ["mv", path, new_path],
-                            check=True,
                             stdout=subprocess.DEVNULL,
                             stderr=subprocess.STDOUT)
+                            .returncode
                         if return_code != 0:
                             break
                     path = new_path
@@ -708,9 +721,9 @@ class Craplog(object):
                     # delete the folder
                     return_code = subprocess.run(
                         ["rmdir", path],
-                        check=True,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.STDOUT)
+                        .returncode
 
             if return_code == 1:
                 self.printJobFailed()
