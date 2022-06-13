@@ -1,36 +1,82 @@
 
 import curses
 
-from os import walk as climb
+from os import walk as growing
 
 from crappy.elements.model import UIobj
 
 
 class Tree( UIobj ):
     """
-    Sub-Class for the CLI interface
+    Sub-Class for the TREE interface
     """
     def initContent(self, crappath:str ):
         """
-        Correctly initialize the content variable
+        Correctly initializes the content variable
         """
-        self.root_path = crappath
+        self.roots = crappath
         self.tree = {}
-        self.climbTree()
+        self.growTree()
         # the actual branch on the tree
         self.branch = {}
         # holds the actual branch's content
-        self.content = []
+        self.leafs = []
         # holds every step needed to climb-up to the actual branch
         self.steps = []
-        self.index = 0
-        self.x_pos = 0
-        self.y_pos = 0
+        # holds the steps needed to reach the actually viewed file, may differ from self.steps
+        self.selected_file_steps = []
+        # visual line index
+        self.vli     = 0
+        self.aux_vli = 0
+        self.selected = 0
+        # printable content
+        self.content = []
+        # symbols
+        self.MORE = "‥"
+        self.ROOT = "⟤"
+        self.FILE = "⧠"
+        self.DIR  = "⧈"
+        # alternative symbols
+        self.FILE_ = "□"
+        self.DIR_  = "◳"
+        # namespaces for crapstat fiels
+        self.names = {
+            'IP'  : "Clients IPs",
+            'UA'  : "User-Agents",
+            'REQ' : "Requests",
+            'RES' : "Response codes",
+            'ERR' : "Error reports",
+            'LEV' : "Error levels"
+        }
+        self.seman = {
+            'Clients IPs'    : "IP",
+            'User-Agents'    : "UA",
+            'Requests'       : "REQ",
+            'Response codes' : "RES",
+            'Error reports'  : "ERR",
+            'Error levels'   : "LEV"
+        }
+        # build the directory tree
+        self.newTree()
     
     
-    def climbTree(self):
+    def newTree(self):
         """
-        Scan the crapstats to make the directory tree
+        Re-initialize the directory tree
+        """
+        self.vli = 0
+        self.aux_vli = 0
+        self.selected = 0
+        self.selected_file_steps.clear()
+        self.growTree()
+        self.climbTree()
+        self.pickLeafs()
+        self.buildContent()
+    
+    
+    def growTree(self):
+        """
+        Scans the crapstats to make the directory tree
         """
         def cutDriedBranches( branch ):
             for k,v in branch.items():
@@ -45,11 +91,9 @@ class Tree( UIobj ):
         # dig the soil
         self.tree.clear()
         # climb the tree
-        trunk_path = "%s/crapstats" %( self.root_path )
-        trunk_len = len(trunk_path)+1
-        for path,dirs,files in climb( trunk_path ):
-            if 'CVS' in dirs:
-                dirs.remove('CVS')
+        trunk = "%s/crapstats" %( self.roots )
+        trunk_len = len(trunk)+1
+        for path,dirs,files in growing( trunk ):
             # step in the correct position
             branch = self.tree
             if len(path) > trunk_len:
@@ -60,108 +104,390 @@ class Tree( UIobj ):
                     branch = branch[ chunks[i] ]
             # append directories as dictionaries
             for dir_name in dirs:
+                if dir_name.startswith('.')\
+                or dir_name in ["CVS", "backups"]:
+                    dirs.remove( dir_name )
+                    continue
                 branch.update({ dir_name : {} })
             # append crapstat files as paths
             for file_name in files:
-                if file_name.endswith(".crapstat"):
-                    branch.update({ file_name : "%s/%s" %( path, file_name ) })
+                if not file_name.startswith('.')\
+                and file_name.endswith(".crapstat"):
+                    branch.update({ file_name[:-9] : "%s/%s" %( path, file_name ) })
         # recursively remove empty folders
         cutDriedBranches( self.tree )
     
     
-    def climb(self, steps:list ) -> dict :
+    def climbTree(self):
         """
-        Draw the tree
+        Recursively climbs the directory tree up to the actual branch
         """
-        branch = self.tree
+        self.branch = self.tree
         for step in self.steps:
-            branch = branch[ step ]
-        return branch
+            self.branch = self.branch[ step ]
+    
+    
+    def climbUp(self, step:str ):
+        """
+        One branch foreward on the tree
+        """
+        self.steps.append( step )
+        self.branch = self.branch[ step ]
+    
+    
+    def climbDown(self, steps:int ):
+        """
+        One branch backward on the tree
+        """
+        self.steps = self.steps[:-steps]
+        self.climbTree()
+    
+    
+    def pickLeafs(self):
+        """
+        Picks-up the elements in the actual branch
+        """
+        dirs  = []
+        files = []
+        self.leafs.clear()
+        for k,v in self.branch.items():
+            if type(v) is dict:
+                dirs.append(k)
+            else:
+                files.append(k)
+        for name in sorted(dirs):
+            self.leafs.append("%s %s" %( self.DIR, name ))
+        for name in sorted(files):
+            self.leafs.append("%s %s" %( self.FILE, self.names[name] ))
+    
+    
+    def buildContent(self):
+        """
+        Prepares the actual content to be ready-to-draw
+        """
+        self.content.clear()
+        # add crapstats' trunk
+        self.content.append("%s crapstats%s" %( self.ROOT, " "*(self.w-13) ))
+        # add all the previous branches
+        i = -1
+        for i in range(len(self.steps)):
+            line = " "*(i+1)
+            line += "└%s %s" %( self.DIR, self.steps[i] )
+            if len(line) < (self.w-2):
+                line += " "*( self.w-2-len(line) )
+            elif len(line) > (self.w-2):
+                line = "%s%s" %( line[:self.w-3], self.MORE )
+            self.content.append( line )
+        if i < 0:
+            i = 0
+        else:
+            i += 1
+        # add the leafs of the actual branch
+        self.pickLeafs()
+        for leaf in self.leafs:
+            line = " "*(i+1)
+            line += "├%s" %( leaf )
+            if len(line) < (self.w-2):
+                line += " "*( self.w-2-len(line) )
+            elif len(line) > (self.w-2):
+                line = "%s%s" %( line[:self.w-3], self.MORE )
+            self.content.append( line )
+        # replace the last line's symbol to be the final one
+        self.content[-1] = self.content[-1].replace("├","└")
+    
+    
+    def smartRedraw(self):
+        """
+        Just redraw the current and the next line
+        """
+        t_color = curses.color_pair(2)
+        h_color = curses.color_pair(18)
+        # redraw the actual line as non-highlighted
+        self.window.addstr(
+            self.aux_vli+1, 1,
+            self.content[self.aux_vli],
+            t_color )
+        # redraw the next line as highlighted
+        self.window.addstr(
+            self.vli+1, 1,
+            self.content[self.vli],
+            h_color )
+        # push the updates
+        self.window.noutrefresh()
+    
+    
+    def cleanContentArea(self):
+        """
+        Clears the content viewth
+        """
+        soap = " "*(self.w-2)
+        brush = len(self.steps) + len(self.leafs) + 1
+        if brush > self.h-2:
+            brush = self.h-2
+        for i in range(1,brush+1):
+            self.window.addstr(
+                i, 1,
+                soap )
+        # push the updates
+        self.window.noutrefresh()
     
     
     def drawContent(self):
         """
-        Draw the tree
+        Draws the entire content
         """
         # set the color for the content
         t_color = curses.color_pair(7)
         h_color = curses.color_pair(2)
         if self.focus is True:
             t_color = curses.color_pair(2)
-            h_color = curses.color_pair(12)
-        # define the printable content
-        
-        
-        printable = self.content
-        if len(printable) > (self.w-5):
-            printable = self.tree[len(printable)-(self.w-5):]
-        # clear the area with text
-        self.window.addstr(
-            1, 3,
-            " "*(self.w-4),
-            curses.color_pair(7) )
-        # draw the prefix
-        self.window.addstr(
-            1, 1,
-            ":", curses.color_pair(7) )
-        # draw the content
-        self.window.addstr(
-            1, 3,
-            printable, t_color )
+            h_color = curses.color_pair(18)
+        else:
+            self.setSelectVLI()
+        # print the content
+        i = 0
+        mark = self.vli
+        for line in self.content:
+            # choose the color
+            color = t_color
+            if i == mark:
+                color = h_color
+            # draw
+            i += 1
+            self.window.addstr(
+                i, 1,
+                line, color )
         # push the updates
         self.window.noutrefresh()
     
     
+    def updateVLI(self, diff:int ):
+        """
+        Updates the Visual Line Index
+        """
+        new_vli = self.vli + diff
+        if new_vli >= 0\
+        and new_vli < len(self.content):
+            self.aux_vli = self.vli
+            self.vli = new_vli
+    
+    
+    def resetVLI(self):
+        """
+        Resets the Visual Line Index
+        """
+        if self.aux_vli != self.vli != self.selected:
+            self.aux_vli = self.vli = self.selected
+            if self.focus is False:
+                self.setSelectVLI()
+    
+    
+    def setSelectVLI(self):
+        """
+        Get the appropriate Visual Line Index
+        """
+        result = True
+        if len(self.selected_file_steps) == len(self.steps)+1:
+            for x,y in zip(self.steps,self.selected_file_steps):
+                if x != y:
+                    # different branches
+                    result = False
+                    break
+        else:
+            result = False
+        # decide what to show
+        if result is True:
+            # the actual selected file is still visible in the tree
+            self.leafSelect( self.selected_file_steps[-1] )
+        else:
+            # select the last branch
+            try:
+                branch = self.steps[-1]
+            except:
+                branch = "crapstats"
+            self.backSelect( branch )
+    
+    
+    def backSelect(self, branch:str ):
+        """
+        Set the VLI to the old branch position
+        """
+        i = 0
+        if branch != "crapstats":
+            for line in self.content:
+                line = line.strip(" ├└%s%s" %( self.DIR, self.ROOT ))
+                if line == branch:
+                    break
+                i += 1
+        self.selected = self.vli + ( i - self.vli )
+        self.aux_vli = self.vli = self.selected
+    
+    
+    def branchSelect(self, branch:str ):
+        """
+        Set the VLI to the new branch position
+        """
+        i = 0
+        if branch != "crapstats":
+            for line in self.content:
+                line = line.strip(" ├└%s%s" %( self.DIR, self.ROOT ))
+                if line == branch:
+                    break
+                i += 1
+        self.selected = self.vli + ( i - self.vli )
+        self.aux_vli = self.vli = self.selected
+    
+    
+    def leafSelect(self, leaf:str ):
+        """
+        Set the VLI to the viewed leaf position
+        """
+        i = 0
+        for line in self.content:
+            line = line.strip(" ├└%s" %( self.FILE ))
+            if line == leaf:
+                break
+            i += 1
+        self.selected = self.vli + ( i - self.vli )
+        self.aux_vli = self.vli = self.selected
+    
+    
+    def select(self):
+        """
+        Select a branch/leaf to expand/view
+        """
+        item = self.content[self.vli].strip(" ├└")
+        if item == "":
+            # this shouldn't be
+            raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+        elif item.startswith( self.DIR ):
+            # expand the dir content
+            item = item.strip("%s " %(self.DIR))
+            steps_len = len(self.steps)
+            rebuild = True
+            if self.vli != steps_len:
+                self.cleanContentArea()
+                if self.vli > steps_len:
+                    self.climbUp( item )
+                else:
+                    self.climbDown( steps_len-self.vli )
+                # build the content
+                self.buildContent()
+                self.drawContent()
+        elif item.startswith( self.FILE ):
+            # view the file
+            item = item.strip("%s " %(self.FILE))
+            self.selected_file_steps = self.steps.copy() + [item]
+            self.ui.showStats( self.branch[ self.seman[ item ]] )
+        else:
+            # crapstats root
+            self.cleanContentArea()
+            self.climbDown( len(self.steps) )
+            self.buildContent()
+            self.drawContent()
+        # finally assign the new selection
+        self.selected = self.vli
+    
+    
+    def search(self, char:chr ):
+        """
+        Finds the first occurrence matching the char
+        Tries in the leafs first, tries in the branches if fails
+        """
+        found = -1
+        # search in the visualized leafs
+        i = 1
+        for leaf in self.leafs:
+            leaf = leaf.strip(" %s%s" %(self.DIR,self.FILE))
+            if leaf[0].lower() == char:
+                found = i + len(self.steps)
+                break
+            i += 1
+        if found < 0:
+            # search in the visualized branches
+            i = 0
+            for branch in ["crapstats"]+self.steps:
+                if branch[0] == char:
+                    found = i
+                    break
+                i += 1
+        # update the VLI if found any
+        if found >= 0:
+            self.aux_vli = self.vli
+            self.vli = found
+            self.smartRedraw()
+    
     
     def feed(self, key:int ):
         """
-        Manage a keyboard input
+        Manages a keyboard input
         """
+        def getBranch() -> str :
+            try:
+                branch = self.steps[-1]
+            except:
+                branch = "crapstats"
+            return branch
+            
         # help
         if key == curses.KEY_HELP:
             # help mode
             pass # 2 COMPLETE !!!
         # arrow up
-        elif key == curses.KEY_UP\
-          or key == 259:
-            # one step behind in commands history
-            self.index -= 1
+        elif key == curses.KEY_UP:
+            # one line up
+            self.updateVLI( -1 )
+            self.smartRedraw()
         # arrow down
-        elif key == curses.KEY_DOWN\
-          or key == 258:
-            # one step forward in commands history
-            self.fromHistory( +1 )
-        # backspace
-        elif key == curses.KEY_BACKSPACE\
-          or key == 127:
-            # delete the last char
-            self.canc()
-        # canc
-        elif key == curses.KEY_CANCEL\
-          or key == 330:
-            # delete the entire string
-            self.clear()
-        # canc + shift
-        elif key == 383:
-            # erase commands history and actual string
-            self.clearAll()
+        elif key == curses.KEY_DOWN:
+            # one line down     
+            self.updateVLI( +1 )
+            self.smartRedraw()
         # enter
         elif key == curses.KEY_ENTER\
           or key == 10:
-            # run the actual command
-            self.run()
+            # expand/view the selection
+            self.select()
+            self.branchSelect( getBranch() )
+            self.buildContent()
+            self.drawContent()
+        # backspace
+        elif key == curses.KEY_BACKSPACE\
+          or key == 127:
+            # one step back
+            branch = getBranch()
+            self.cleanContentArea()
+            self.climbDown( 1 )
+            self.buildContent()
+            self.backSelect( branch )
+            self.drawContent()
+        # canc
+        elif key == curses.KEY_CANCEL\
+          or key == 330:
+            # back to the crapstats root
+            self.cleanContentArea()
+            self.climbDown( len(self.steps) )
+            self.buildContent()
+            self.backSelect( "crapstats" )
+            self.drawContent()
+        # canc + shift
+        elif key == 383:
+            # re-build the tree (re-scan the crapstats)
+            self.newTree()
+            self.drawContent()
+        
         # assume everything else is text
         else:
             if key < 127:
                 # skip non-ascii chars
                 try:
                     # convert to char
-                    char = str(chr( key ))
+                    char = str(chr( key )).lower()
                     # skip invalid chars
-                    if char.isalnum()\
-                    or char.isspace()\
-                    or char == "-":
-                        self.push( char )
+                    if char.isalnum():
+                        self.search( char )
+                    elif char == ':':
+                        self.ui.switch2CLI()
                 except:
                     # failed to convert to char
                     pass
