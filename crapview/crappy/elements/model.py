@@ -6,13 +6,14 @@ class UIobj():
     """
     Class Model to hold an interface element
     """
-    def __init__(self, height, width, y, x, window=None, focus=False ):
+    def __init__(self, height, width, y, x, window=None, ui=None, focus=False ):
         self.y = y
         self.x = x
         self.h = height
         self.w = width
         self.focus = focus
         self.window = window
+        self.ui = ui
     
     def initContent(self):
         """
@@ -29,8 +30,13 @@ class UIobj():
         self.h = new_h
         self.w = new_w
         # adapt the window
-        self.window.mvwin( self.y, self.x )
         self.window.resize( self.h, self.w )
+        try:
+            self.window.mvwin( self.y, self.x )
+        except:
+            self.y -= 1
+            self.window.mvwin( self.y, self.x )
+        self.redraw()
     
     def feed(self, key:int ):
         """
@@ -42,13 +48,13 @@ class UIobj():
         """
         Returns the last drawable point on the Y axis
         """
-        return self.y + self.h-1
+        return self.y + self.h - 1
     
     def endX(self):
         """
         Returns the last drawable point on the X axis
         """
-        return self.x + self.w-1
+        return self.x + self.w - 1
     
     def drawBorder(self):
         """
@@ -91,3 +97,4 @@ class UIobj():
         self.drawBorder()
         self.drawContent()
     
+
