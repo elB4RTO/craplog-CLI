@@ -40,9 +40,9 @@ def backupFiles(
         file_path = "%s/%s" %( craplog.logs_path, log_file )
         return_code = subprocess.run(
             ["cp", file_path, path],
-            check=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT)
+            .returncode
         if return_code == 1:
             raise Exception(IOError)
         craplog.restoreCaret()
@@ -193,9 +193,9 @@ def backupGlobals(
         if os.path.exists( path ):
             return_code = subprocess.run(
                 ["rm", "-r", path],
-                check=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT)
+                .returncode
             if return_code == 1:
                 success = False
                 err_msg = "unable to remove the directory: {grass}%s/{rose}%s{default}"\
@@ -209,9 +209,9 @@ def backupGlobals(
                 if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
                     return_code = subprocess.run(
                         ["mv", path, new_path],
-                        check=True,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.STDOUT)
+                        .returncode
                     if return_code == 1:
                         undoes.append(new_path[:-1])
                         success = False
@@ -237,9 +237,9 @@ def backupGlobals(
                 if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
                     return_code = subprocess.run(
                         ["cp", "-r", path, new_path],
-                        check=True,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.STDOUT)
+                        .returncode
                     if return_code == 1:
                         undoes.append(new_path)
                         success = False
@@ -250,9 +250,9 @@ def backupGlobals(
         if os.path.exists( path ):
             return_code = subprocess.run(
                 ["rm", "-r", path],
-                check=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT)
+                .returncode
             if return_code == 1:
                 success = False
                 err_msg = "unable to remove the directory: {grass}%s/{rose}%s{default}"\
@@ -275,9 +275,9 @@ def backupGlobals(
         if len(remove) > 0:
             return_code = subprocess.run(
                 ["rm", "-r", remove[0]],
-                check=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT)
+                .returncode
             if return_code == 1:
                 success = False
                 print("\n{err}Error{white}[{grey}globals_backup{white}]{red}>{default} unable to remove the directory: {grass}%s/{rose}%s{default}"\
@@ -294,9 +294,9 @@ def backupGlobals(
                 # skip moving if failed for a previous file
                 return_code = subprocess.run(
                     ["mv", path, new_path],
-                    check=True,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.STDOUT)
+                    .returncode
             if return_code == 1:
                 success = False
                 print("\n{err}Error{white}[{grey}globals_backups{white}]{red}>{default} unable to rename the directory: {grass}%s/{rose}%s{default}"\
