@@ -82,7 +82,7 @@ def chooseAction(
                 print()
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
-            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
+            print("\n{warn}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
                 .format(**craplog.text_colors))
             if craplog.less_output is False:
                 print()
