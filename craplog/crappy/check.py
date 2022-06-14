@@ -492,6 +492,8 @@ def makeInitialChecks( craplog ):
             .format(**craplog.text_colors)\
             %(craplog.logs_path))
     else:
+        if craplog.logs_path.startswith('~/'):
+            craplog.logs_path = "%s/%s" %( os.environ['HOME'], craplog.logs_path[2:] )
         craplog.logs_path = os.path.abspath( craplog.logs_path )
     if checkFolder( craplog, "logs_folder", craplog.logs_path, r=True ) is False:
         failed()
@@ -508,7 +510,7 @@ def makeInitialChecks( craplog ):
                 failed()
                 print("\n{err}Error{white}[{grey}invalid_size{white}]{red}>{default} the max size must be greater or equal to 0\n"\
                     .format(**craplog.text_colors))
-            elif craplog.max_file_size > 10000:
+            elif craplog.max_file_size > 1000000:
                 failed()
                 print("\n{err}Error{white}[{grey}invalid_size{white}]{red}>{default} the given max size is huge: {yellow}%.2f GB{default}\n"\
                     .format(**craplog.text_colors)
