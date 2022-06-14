@@ -1,8 +1,10 @@
-#!/usr/bin/python3
 
 import os
-import sys
-import subprocess
+
+from sys import argv
+from time import sleep
+from time import perf_counter as timer
+from subprocess import run, STDOUT, DEVNULL
 
 from time import sleep
 from time import perf_counter as timer
@@ -48,6 +50,7 @@ class Craplog(object):
         self.logs_path:      str
         self.log_files:      list
         self.file_selection: bool
+        self.usage_control:  bool
         self.access_fields:  list
         self.ip_whitelist:   list
         # variables for jobs
@@ -84,10 +87,17 @@ class Craplog(object):
         self.MSG_fin:      str
         self.TXT_craplog:  str
         self.TXT_fin:      str
-
+        
+        # get craplog's path
+        self.crappath = os.path.abspath(__file__)
+        self.crappath = self.crappath[:self.crappath.rfind('/')]
+        self.statpath = "%s/crapstats" %(self.crappath[:self.crappath.rfind('/')])
         # initialize variables
         self.initVariables()
         self.initMessages()
+        # read configs if not unset
+        if self.use_configs is True:
+            self.readConfigs()
         # parse arguments if not unset
         if self.use_arguments is True:
             self.parseArguments( args )
@@ -223,6 +233,13 @@ class Craplog(object):
         # [  ]
         self.file_selection = False
         #
+        # STORE A HASH OF EVERY PARSED FILE TO AVOID PARSING THEM TWICE
+        # [  ]
+        # THE HASH ALGORITHM IS sha256
+        # PLEASE NOTICE THAT THIS CANNOT BE USED TO TRACK YOU OR YOUR FILES,
+        # THE HASH IS IRREVERSIBLE AND CAN'T THEREFORE BE USED TO HARM YOUR PRIVACY
+        self.usage_control = True
+        #
         # LIST OF FIELDS TO BE USED WHILE PARSING ACCESS LOGS' LINES
         # [ -A  /  --access-fields ]
         # WHEN PASSING ARGUMENTS:
@@ -264,14 +281,102 @@ class Craplog(object):
         self.whitelist_lines = 0
 
 
+    def readConfigs(self):
+        """
+        Read the saved configuration
+        """
+        path = "%s/crapset/craplog.conf" %(self.crappath[:self.crappath.rfind('/')])
+        with open(path,'r') as f:
+            tmp = f.read().strip().split('\n')
+        configs = []
+        for f in tmp:
+            f = f.strip()
+            if f == ""\
+            or f[0] == "#":
+                continue
+            configs.append(f)
+        # check the length
+        if len(configs) != 25:
+            self.printJobFailed()
+            print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
+                .format(**self.text_colors)\
+                %( len(configs) ))
+            if self.less_output is False:
+                print("                if you have manually edited the configurations file, please un-do the changes")
+                print("                else, please report this issue")
+            print()
+            self.exitAborted()
+        
+        # apply the configs
+        self.use_configs = bool(int(configs[0]))
+        if self.use_configs is True:
+            self.use_arguments = bool(int(configs[1]))
+            self.less_output = bool(int(configs[2]))
+            self.more_output = bool(int(configs[3]))
+            self.use_colors = bool(int(configs[4]))
+            self.performance = bool(int(configs[5]))
+            self.auto_delete = bool(int(configs[6]))
+            self.auto_merge = bool(int(configs[7]))
+            self.max_file_size = float(configs[8])
+            self.session_stats = bool(int(configs[9]))
+            self.global_stats = bool(int(configs[10]))
+            self.access_logs = bool(int(configs[11]))
+            self.error_logs = bool(int(configs[12]))
+            self.backup = bool(int(configs[13]))
+            self.archive_tar = bool(int(configs[14]))
+            self.archive_zip = bool(int(configs[15]))
+            self.delete = bool(int(configs[16]))
+            self.trash = bool(int(configs[17]))
+            self.shred = bool(int(configs[18]))
+            self.logs_path = configs[19]
+            self.log_files = configs[20].split(' ')
+            self.file_selection = bool(int(configs[21]))
+            self.usage_control = bool(int(configs[22]))
+            self.access_fields = configs[23].split(' ')
+            self.ip_whitelist = configs[24].split(' ')
+            
+            # check log files
+            tmp = [f.strip() for f in self.log_files]
+            self.log_files = []
+            for f in tmp:
+                if f != "":
+                    self.log_files.append( f )
+            # check access fields
+            tmp = [f.strip() for f in self.access_fields]
+            self.access_fields = []
+            for f in tmp:
+                if f == "":
+                    continue
+                if tmp.count( f ) > 1:
+                        self.printJobFailed()
+                        print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} you have inserted the same field twice: {rose}%s{default}\n"\
+                            .format(**self.text_colors)\
+                            %( f ))
+                        self.exitAborted()
+                elif f not in ["IP","UA","REQ","RES"]:
+                    self.printJobFailed()
+                    print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid field for access logs: {rose}%s{default}\n"\
+                        .format(**self.text_colors)\
+                        %( f ))
+                    self.exitAborted()
+                self.access_fields.append( f )
+            # check whitelist
+            tmp = [f.strip() for f in self.ip_whitelist]
+            self.ip_whitelist = []
+            for f in tmp:
+                if f != "":
+                    self.ip_whitelist.append( f )
+
+
     def initMessages(self):
         """
         Bring message strings
         """
         self.last_job     = ""
         self.caret_return = 0
-        self.text_colors  = aux.colors()
-        if self.use_colors is False:
+        if self.use_colors is True:
+            self.text_colors = aux.colors()
+        else:
             self.text_colors = aux.no_colors()
         self.MSG_elbarto  = aux.elbarto()
         self.MSG_craplogo = aux.craplogo()
@@ -287,21 +392,24 @@ class Craplog(object):
         """
         Finalize Craplog's variables (if not manually unset)
         """
-        n_args = len(sys.argv)-1
+        n_args = len(args)-1
         i = 0
         while i < n_args:
             i += 1
-            arg = sys.argv[i]
+            arg = args[i]
             if arg == "":
                 continue
             # elB4RTO
             elif arg == "-elbarto-":
                 print("\n%s\n" %( self.MSG_elbarto ))
+                exit()
             # help
             elif arg in ["help", "-h", "--help"]:
                 print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help ))
+                exit()
             elif arg == "--examples":
                 print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
                 self.less_output = True
@@ -311,6 +419,7 @@ class Craplog(object):
                 self.performance = True
             elif arg == "--no-colors":
                 self.use_colors = False
+                self.initMessages()
             # automation arguments
             elif arg == "--auto-delete":
                 self.auto_delete = True
@@ -319,12 +428,12 @@ class Craplog(object):
             # file size limit
             elif arg == "--max-size":
                 if i+1 > n_args\
-                or ( sys.argv[i+1].startswith("--")\
-                  or (sys.argv[i+1].startswith("-") and not sys.argv[i+1][1].isdigit())):
+                or ( args[i+1].startswith("--")\
+                  or (args[i+1].startswith("-") and not args[i+1][1].isdigit())):
                     self.max_file_size = None
                 else:
                     i += 1
-                    self.max_file_size = sys.argv[i]
+                    self.max_file_size = args[i]
             # job arguments
             elif arg in ["-e", "--errors"]:
                 self.error_logs = True
@@ -351,44 +460,44 @@ class Craplog(object):
             elif arg == "--trash":
                 self.trash = True
                 if  i+1 <= n_args\
-                and not sys.argv[i+1].startswith("-"):
+                and not args[i+1].startswith("-"):
                     i += 1
-                    self.trash_path = sys.argv[i]
+                    self.trash_path = args[i]
             elif arg in ["-P", "--logs-path"]:
                 if i+1 > n_args\
-                or sys.argv[i+1].startswith("-"):
+                or args[i+1].startswith("-"):
                     self.logs_path = ""
                 else:
                     i += 1
-                    self.logs_path = sys.argv[i]
+                    self.logs_path = args[i]
             elif arg in ["-F", "--log-files"]:
                 self.file_selection = True
                 self.log_files = []
                 while True:
                     if i+1 > n_args\
-                    or sys.argv[i+1].startswith("-"):
+                    or args[i+1].startswith("-"):
                         break
                     else:
                         i += 1
-                        self.log_files.append( sys.argv[i] )
+                        self.log_files.append( args[i] )
             elif arg in ["-A", "--access-fields"]:
                 self.access_fields = []
                 while True:
                     if i+1 > n_args\
-                    or sys.argv[i+1].startswith("-"):
+                    or args[i+1].startswith("-"):
                         break
                     else:
                         i += 1
-                        self.access_fields.append( sys.argv[i] )
+                        self.access_fields.append( args[i] )
             elif arg in ["-W", "--ip-whitelist"]:
                 self.ip_whitelist = []
                 while True:
                     if i+1 > n_args\
-                    or sys.argv[i+1].startswith("-"):
+                    or args[i+1].startswith("-"):
                         break
                     else:
                         i += 1
-                        self.ip_whitelist.append( sys.argv[i] )
+                        self.ip_whitelist.append( args[i] )
             else:
                 print("{err}Error{white}[{grey}argument{white}]{red}>{default} not an available option: {rose}%s{default}"\
                     .format(**self.text_colors)\
@@ -477,7 +586,7 @@ class Craplog(object):
                 self.printElapsedTime()
                 self.timer_gap = timer()
                 self.last_job = ""
-            if len(self.undo_pahts) > 0:
+            if len(self.undo_paths) > 0:
                 self.undoChanges()
                 
 
@@ -662,22 +771,22 @@ class Craplog(object):
         if os.path.isfile( path ):
             # is a file
             if self.trash is True:
-                return_code = subprocess.run(
+                return_code = run(
                     ["mv", path, self.trash_path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
                     .returncode
             elif self.shred is True:
-                return_code = subprocess.run(
+                return_code = run(
                     ["shred", "-uvz", path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
                     .returncode
             else:
-                return_code = subprocess.run(
+                return_code = run(
                     ["rm", path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
                     .returncode
 
             if return_code == 1:
@@ -693,10 +802,10 @@ class Craplog(object):
         elif os.path.isdir( path ):
             # is a folder
             if self.trash is True:
-                return_code = subprocess.run(
+                return_code = run(
                     ["mv", path, self.trash_path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
                     .returncode
             else:
                 if self.shred is True:
@@ -709,20 +818,20 @@ class Craplog(object):
                         old_path = new_path
                         new_name = "0"*(len(new_name)-1)
                         new_path = "%s/%s" %( parent, new_name )
-                        return_code = subprocess.run(
+                        return_code = run(
                             ["mv", path, new_path],
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.STDOUT)
+                            stdout=DEVNULL,
+                            stderr=STDOUT)\
                             .returncode
                         if return_code != 0:
                             break
                     path = new_path
                 if return_code == 0:
                     # delete the folder
-                    return_code = subprocess.run(
+                    return_code = run(
                         ["rmdir", path],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT)
+                        stdout=DEVNULL,
+                        stderr=STDOUT)\
                         .returncode
 
             if return_code == 1:
@@ -934,10 +1043,6 @@ class Craplog(object):
         if self.more_output is True:
             self.printJob("Initializing craplog")
         self.time_gap = timer()
-        # get craplog's path
-        self.crappath = os.path.abspath(__file__)
-        self.crappath = self.crappath[:self.crappath.rfind('/')]
-        self.statpath = "%s/crapstats" %(self.crappath[:self.crappath.rfind('/')])
         # make initial checkings
         makeInitialChecks( self )
         # retrieve usage-control hashes
@@ -1123,11 +1228,11 @@ class Craplog(object):
 
 
 
-# RUN CRAPLOG
 if __name__ == "__main__":
-    craplog = Craplog( sys.argv )
     failed = False
+    craplog = Craplog( argv )
     try:
+        # run craplog
         craplog.main()
     except (KeyboardInterrupt):
         failed = True
