@@ -59,6 +59,15 @@ class Tree( UIobj ):
         # build the directory tree
         self.newTree()
     
+    def clearAll(self ):
+        """
+        Clear the content viewth and delete data
+        """
+        self.climbDown( len(self.steps) )
+        self.newTree()
+        self.cleanContentArea()
+        self.drawContent()
+    
     
     def newTree(self):
         """
@@ -216,9 +225,9 @@ class Tree( UIobj ):
         self.window.noutrefresh()
     
     
-    def cleanContentArea(self):
+    def smartClean(self):
         """
-        Clears the content viewth
+        Cleans only the needed content
         """
         soap = " "*(self.w-2)
         brush = len(self.steps) + len(self.leafs) + 1
@@ -305,14 +314,18 @@ class Tree( UIobj ):
                 branch = self.steps[-1]
             except:
                 branch = "crapstats"
-            self.backSelect( branch )
+            self.branchSelect( branch )
     
     
-    def backSelect(self, branch:str ):
+    def backSelect(self):
         """
         Set the VLI to the old branch position
         """
         i = 0
+        try:
+            branch = self.steps[-1]
+        except:
+            branch = "crapstats"
         if branch != "crapstats":
             for line in self.content:
                 line = line.strip(" ├└%s%s" %( self.DIR, self.ROOT ))
@@ -366,7 +379,7 @@ class Tree( UIobj ):
             steps_len = len(self.steps)
             rebuild = True
             if self.vli != steps_len:
-                self.cleanContentArea()
+                self.smartClean()
                 if self.vli > steps_len:
                     self.climbUp( item )
                 else:
@@ -378,10 +391,10 @@ class Tree( UIobj ):
             # view the file
             item = item.strip("%s " %(self.FILE))
             self.selected_file_steps = self.steps.copy() + [item]
-            self.ui.showStats( self.branch[ self.seman[ item ]] )
+            self.ui.tree2view( self.branch[ self.seman[ item ]] )
         else:
             # crapstats root
-            self.cleanContentArea()
+            self.smartClean()
             self.climbDown( len(self.steps) )
             self.buildContent()
             self.drawContent()
@@ -456,25 +469,24 @@ class Tree( UIobj ):
           or key == 127:
             # one step back
             branch = getBranch()
-            self.cleanContentArea()
+            self.smartClean()
             self.climbDown( 1 )
             self.buildContent()
-            self.backSelect( branch )
+            self.branchSelect( branch )
             self.drawContent()
         # canc
         elif key == curses.KEY_CANCEL\
           or key == 330:
             # back to the crapstats root
-            self.cleanContentArea()
+            self.smartClean()
             self.climbDown( len(self.steps) )
             self.buildContent()
-            self.backSelect( "crapstats" )
+            self.branchSelect( "crapstats" )
             self.drawContent()
         # canc + shift
         elif key == 383:
             # re-build the tree (re-scan the crapstats)
-            self.newTree()
-            self.drawContent()
+            self.clearAll()
         
         # assume everything else is text
         else:
@@ -491,3 +503,62 @@ class Tree( UIobj ):
                 except:
                     # failed to convert to char
                     pass
+    
+    
+    def cliTree(self, new_tree:list ):
+        """
+        Receive a tree from the CLI and tries to apply it
+        """
+        is_leaf = False
+        apply_tree = True
+        # try from the actual branch first
+        new_steps = self.steps.copy()
+        new_branch = self.branch
+        for step in new_tree:
+            try:
+                new_branch = new_branch[ step ]
+                new_steps.append(step)
+            except:
+                try:
+                    new_leaf = step.upper()
+                    new_visual_name = self.names[new_leaf]
+                    new_leaf_path = new_branch[new_leaf]
+                    is_leaf = True
+                except:
+                    # not valid as tree
+                    apply_tree = False
+                    break
+        # try from roots if failed
+        if apply_tree is False:
+            apply_tree = True
+            new_steps.clear()
+            new_branch = self.tree
+            for step in new_tree:
+                try:
+                    new_branch = new_branch[ step ]
+                    new_steps.append(step)
+                except:
+                    try:
+                        new_leaf = step.upper()
+                        new_visual_name = self.names[new_leaf]
+                        new_leaf_path = new_branch[new_leaf]
+                        is_leaf = True
+                    except:
+                        # not valid as tree
+                        apply_tree = False
+                        break
+        # apply the new vaules if succesful
+        if apply_tree is True:
+            self.branch = new_branch
+            self.steps  = new_steps
+            if is_leaf is True:
+                self.selected_file_steps = new_steps.copy() + [new_visual_name]
+                self.leafSelect( new_visual_name )
+            else:
+                self.backSelect()
+            self.buildContent()
+            self.drawContent()
+            if is_leaf is True:
+                self.ui.tree2view( new_leaf_path )
+            else:
+                self.ui.switch2tree()
