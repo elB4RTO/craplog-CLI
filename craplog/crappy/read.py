@@ -1,6 +1,7 @@
 
-import os
 import gzip
+
+from os.path import getsize
 from random import choice, randint
 from time import perf_counter as timer
 
@@ -93,7 +94,7 @@ def checkSize(
     Check the size of a file before to read and warn in case of big files
     """
     if craplog.max_file_size > 0\
-    and (os.path.getsize( path ) / 1048576) > craplog.max_file_size:
+    and (getsize( path ) / 1048576) > craplog.max_file_size:
         # file over max allowed dimensions, emit a warning
         craplog.printJobHalted()
         if craplog.more_output is True:
@@ -109,7 +110,7 @@ def checkSize(
                     the warning limit is actually set at: {green}%.2f MB{default}
                     you can temporary change it using {cyan}--max-size {italic}<size>{default}"""\
                 .format(**craplog.text_colors)\
-                %( (os.path.getsize( path ) / 1048576), craplog.max_file_size ))
+                %( (getsize( path ) / 1048576), craplog.max_file_size ))
         if craplog.less_output is False:
             print()
         choice = choiceDialog( craplog, "Do you really want to use this file" )
@@ -183,10 +184,11 @@ def collectLogLines(
     for file_name in craplog.log_files:
         craplog.printCaret( file_name )
         path = "%s/%s" %( craplog.logs_path, file_name )
-        if checkUsage( craplog, path, file_name ) is False:
-            # file already used
-            craplog.printJobFailed()
-            craplog.exitAborted()
+        if craplog.usage_control is True:
+            if checkUsage( craplog, path, file_name ) is False:
+                # file already used
+                craplog.printJobFailed()
+                craplog.exitAborted()
         if checkSize( craplog, path, file_name ) is False:
             # file too big
             craplog.exitAborted()
