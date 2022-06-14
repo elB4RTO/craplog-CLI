@@ -30,10 +30,17 @@ class Crapup():
         self.TXT_crapup:   str
         self.TXT_fin:      str
         self.TXT_craplog:  str
-
+        
+        # get Craplog's main path
+        crappath = abspath(__file__)
+        crappath = crappath[:crappath.rfind('/')]
+        self.statpath = "%s/crapstats" %(crappath[:crappath.rfind('/')])
         # initialize variables
         self.initVariables()
         self.initMessages()
+        # read configs if not unset
+        if self.use_configs is True:
+            self.readConfigs()
         # parse arguments if not unset
         if self.use_arguments is True:
             self.parseArguments( args )
@@ -96,16 +103,55 @@ class Crapup():
         self.MSG_crapup = self.MSG_fin =\
         self.TXT_crapup = self.TXT_fin =\
         self.TXT_craplog = ""
-        self.use_colors = True
-        self.text_colors = aux.colors()
 
 
+    def readConfigs(self):
+        """
+        Read the saved configuration
+        """
+        crappath = abspath(__file__)
+        crappath = crappath[:crappath.rfind('/')]
+        self.crappath = crappath[:crappath.rfind('/')]
+        path = "%s/crapset/crapup.conf" %(self.crappath)
+        with open(path,'r') as f:
+            tmp = f.read().strip().split('\n')
+        configs = []
+        for f in tmp:
+            f = f.strip()
+            if f == ""\
+            or f[0] == "#":
+                continue
+            configs.append(f)
+        # check the length
+        if len(configs) != 6:
+            print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
+                .format(**self.text_colors)\
+                %( len(configs) ))
+            if self.less_output is False:
+                print("""
+                if you have manually edited the configurations file, please un-do the changes
+                else, please report this issue""")
+            print("\n{err}CRAPUP ABORTED{default}\n"\
+                .format(**self.text_colors))
+            exit()
+        # apply the configs
+        self.use_configs = bool(int(configs[0]))
+        if self.use_configs is True:
+            self.use_arguments: bool(int(configs[1]))
+            self.less_output: bool(int(configs[2]))
+            self.more_output: bool(int(configs[3]))
+            self.use_colors:  bool(int(configs[4]))
+            self.use_git: bool(int(configs[5]))
+    
+    
     def initMessages(self):
         """
         Bring message strings
         """
         # set-up colors
-        if self.use_colors is False:
+        if self.use_colors is True:
+            self.text_colors = aux.colors()
+        else:
             self.text_colors = aux.no_colors()
         self.MSG_elbarto  = aux.elbarto()
         self.MSG_help     = aux.help( self.text_colors )
@@ -132,11 +178,14 @@ class Crapup():
             # elB4RTO
             elif arg == "-elbarto-":
                 print("\n%s\n" %( self.MSG_elbarto ))
+                exit()
             # help
             elif arg in ["help", "-h", "--help"]:
                 print( "\n%s\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help, self.MSG_examples ))
+                exit()
             elif arg == "--examples":
                 print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
                 self.less_output = True
@@ -144,6 +193,7 @@ class Crapup():
                 self.more_output = True
             elif arg == "--no-colors":
                 self.use_colors = False
+                self.initMessages()
             # git argument
             elif arg == "--git":
                 self.git_update = True
@@ -206,11 +256,6 @@ class Crapup():
         """
         Main function to call
         """
-        # get Craplog's main path
-        crappath = abspath(__file__)
-        crappath = crappath[:crappath.rfind('/')]
-        self.crappath = crappath[:crappath.rfind('/')]
-        
         # CRAPUP
         self.welcomeMessage()
         if self.use_git is True:
@@ -225,15 +270,14 @@ class Crapup():
 
 
 if __name__ == "__main__":
-    crapup = Crapup( argv )
-    crapup.main()
-    """
-    failed = False
     try:
+        failed = False
+        # run crapup
+        crapup = Crapup( argv )
         crapup.main()
     except (KeyboardInterrupt):
         failed = True
     except:
         failed = True
     finally:
-        pass"""
+        del crapup
