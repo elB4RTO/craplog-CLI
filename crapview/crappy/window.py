@@ -50,7 +50,8 @@ class Window():
                 self.dry_run = False
             else:
                 # wait for an input
-                self.ui.feed( self.screen.getch() )
+                loop = self.ui.feed( self.screen.getch() )
             # update the screen
             curses.doupdate()
             #self.screen.refresh() # <-- DELETE IF USELESS
+        self.ui.quitting()
