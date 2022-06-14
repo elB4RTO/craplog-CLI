@@ -1,5 +1,5 @@
 
-import os
+from os.path import exists
 from hashlib import sha256
 
 from crappy.check import checkFile
@@ -44,7 +44,7 @@ def bringHashes( craplog: object ):
         craplog, "usage_hashes", path, craplog.statpath, ".hashes",
         r=True, w=True, create=True, resolve=True )
     if checks_passed is True:
-        if os.path.exists( path ):
+        if exists( path ):
             try:
                 # read the content
                 with open(path,'r') as f:
