@@ -1,6 +1,8 @@
 
 import curses
 
+from time import sleep
+
 from crappy.elements.model import UIobj
 from crappy.elements.cli import CommandLine
 from crappy.elements.tree import Tree
@@ -105,11 +107,12 @@ class TUI():
             self.terminal.x+self.tree.w+2)
     
     
-    def feed(self, key:int ):
+    def feed(self, key:int ) -> bool :
         """
         Pass a keyboard input to the element with focus
         """
         #print("\r",key)
+        loop = True
         # switch element if tab is pressed
         if key == 9:
             # forward (TAB)
@@ -120,7 +123,7 @@ class TUI():
         else:
             # or feed it otherwise
             if self.focusel == 1:
-                self.cli.feed( key )
+                loop = self.cli.feed( key )
             elif self.focusel == 2:
                 self.tree.feed( key )
             elif self.focusel == 3:
@@ -128,6 +131,7 @@ class TUI():
             else:
                 # put an error message here
                 raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+        return loop
     
     
     def switchFocus(self, way:int ):
@@ -221,17 +225,54 @@ class TUI():
             self.cli.redraw()
     
     
-    def clearStats(self):
+    def resetCli(self):
+        """
+        Signal to the cli window to clear the content
+        """
+        self.view.clearAll()
+    
+    
+    def resetTree(self):
+        """
+        Signal to the tree window to clear the content
+        """
+        self.tree.clearAll()
+    
+    
+    def resetView(self):
         """
         Signal to the view window to clear the content
         """
         self.view.clearAll()
     
     
-    def showStats(self, file_path:str ):
+    def cli2tree(self, steps:list ):
+        """
+        Signal to the tree window to follow these steps
+        """
+        self.tree.cliTree( steps )
+    
+    
+    def tree2view(self, file_path:str ):
         """
         Signal to the view window to show these stats
         """
         self.view.inputStats( file_path )
         self.switch2view()
+    
+    
+    
+    def quitting(self):
+        """
+        Prepare to qui
+        """
+        # redraw every window in red
+        curses.curs_set(0)
+        self.screen.clear()
+        self.screen.refresh()
+        self.view.redrawQuit()
+        self.tree.redrawQuit()
+        self.cli.redrawQuit()
+        curses.doupdate()
+        sleep(0.7)
 
