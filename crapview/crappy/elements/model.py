@@ -15,6 +15,18 @@ class UIobj():
         self.window = window
         self.ui = ui
     
+    def endY(self):
+        """
+        Returns the last drawable point on the Y axis
+        """
+        return self.y + self.h - 1
+    
+    def endX(self):
+        """
+        Returns the last drawable point on the X axis
+        """
+        return self.x + self.w - 1
+    
     def initContent(self):
         """
         Model for the Sub-Classes
@@ -44,25 +56,15 @@ class UIobj():
         """
         pass
     
-    def endY(self):
-        """
-        Returns the last drawable point on the Y axis
-        """
-        return self.y + self.h - 1
-    
-    def endX(self):
-        """
-        Returns the last drawable point on the X axis
-        """
-        return self.x + self.w - 1
-    
-    def drawBorder(self):
+    def drawBorder(self, quitting:bool=False):
         """
         Draw the window border
         """
         color = curses.color_pair(7)
         if self.focus is True:
             color = curses.color_pair(2)
+        if quitting is True:
+            color = curses.color_pair(1)
         # draw upper border
         self.window.addstr(
             0, 0,
@@ -89,6 +91,25 @@ class UIobj():
         """
         pass
     
+    def cleanContentArea(self):
+        """
+        Clear the content viewth
+        """
+        soap  = " "*(self.w-2)
+        brush = self.h-2
+        for i in range(1,brush):
+            self.window.addstr(
+                i, 1,
+                soap )
+        # push the updates
+        self.window.noutrefresh()
+    
+    def clearAll(self ):
+        """
+        Model for the Sub-Classes
+        """
+        pass
+    
     def redraw(self):
         """
         Redraw the entire window
@@ -96,5 +117,13 @@ class UIobj():
         self.window.clear()
         self.drawBorder()
         self.drawContent()
+    
+    def redrawQuit(self):
+        """
+        Redraw the entire window
+        """
+        self.window.clear()
+        self.cleanContentArea()
+        self.drawBorder( quitting=True )
     
 
