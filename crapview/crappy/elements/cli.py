@@ -93,10 +93,11 @@ class CommandLine( UIobj ):
         self.drawContent()
     
     
-    def feed(self, key:int ):
+    def feed(self, key:int ) -> bool :
         """
         Manage a keyboard input
         """
+        loop = True
         # help
         if key == curses.KEY_HELP:
             # help mode
@@ -127,7 +128,7 @@ class CommandLine( UIobj ):
         elif key == curses.KEY_ENTER\
           or key == 10:
             # run the actual command
-            self.run()
+            loop = self.run()
         # assume everything else is text
         else:
             if key < 127:
@@ -143,7 +144,7 @@ class CommandLine( UIobj ):
                 except:
                     # failed to convert to char
                     pass
-                
+        return loop
             
         
     
@@ -171,10 +172,11 @@ class CommandLine( UIobj ):
         self.drawContent()
     
     
-    def run(self):
+    def run(self) -> bool :
         """
         Execute the actual command
         """
+        loop = True
         # manage the commands history
         self.aux_command = None
         self.command = self.command.strip().lower()
@@ -183,6 +185,51 @@ class CommandLine( UIobj ):
             # append to history if not empty and different by the last one
             self.history.append( self.command )
         self.history_index = len(self.history)
+        # parse the command
+        command = self.command
+        if command in ["q","quit"]:
+            loop = False
+        elif command in ["t","tree"]:
+            self.ui.switch2tree()
+        elif command in ["v","view"]:
+            self.ui.switch2view()
+        else:
+            # composed command
+            phrase = []
+            for word in command.split(" "):
+                word = word.strip()
+                if word != "":
+                    phrase.append(word)
+            if len(phrase) > 0:
+                # parse it
+                if phrase[0] in ["clear","reset"]\
+                and len(phrase) > 1:
+                    # reset one ore more window interfaces
+                    for word in phrase[1:]:
+                        if word in ["c","cli"]:
+                            self.clearAll()
+                        elif word in ["t","tree"]:
+                            self.ui.resetTree()
+                        elif word in ["v","view"]:
+                            self.ui.resetView()
+                    self.ui.redraw()
+                else:
+                    # try climbing the tree
+                    new_steps = []
+                    for word in phrase:
+                        if word == "g":
+                            word = "globals"
+                        elif word == "s":
+                            word = "sessions"
+                        elif word == "a":
+                            word = "access"
+                        elif word == "e":
+                            word = "error"
+                        new_steps.append( word )
+                    self.ui.cli2tree( new_steps )
+                    self.ui.redraw()
+        # clear the command and return
         self.clear()
+        return loop
 
 
