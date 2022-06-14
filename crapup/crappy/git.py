@@ -179,7 +179,7 @@ def gitPull(
                 f.write( new_line )
         except:
             crapup.printError(
-                "git_ignored", 
+                "git_ignore",
                 "failed to write on file: {grass}%s/{rose}.gitignore{default}"\
                     .format(**crapup.text_colors)\
                     %( crapup.crappath ))
