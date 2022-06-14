@@ -1,5 +1,6 @@
 
-import os
+from os import rename
+from os.path import exists
 from time import perf_counter as timer
 
 from crappy.check import checkFolder, checkFile
@@ -114,7 +115,7 @@ def mergeStatistics(
             # make a copy of the old file
             try:
                 bak_path = "%s.bak" %( path )
-                os.rename( path, bak_path )
+                rename( path, bak_path )
                 craplog.undo_paths.append( bak_path )
             except:
                 # failed to make a backup copy for safety
@@ -211,7 +212,7 @@ def storeSessions(
                             items.append( key )
                             counts.append( value )
                         # store statistics
-                        if os.path.exists( path ):
+                        if exists( path ):
                             checks_passed = mergeStatistics( path, items, counts, craplog )
                         else:
                             checks_passed = saveStatistics( path, items, counts, craplog )
@@ -298,7 +299,7 @@ def updateGlobals(
                     counts.append( value )
                 # store statistics
                 path = "%s/globals/%s/%s.crapstat" %( craplog.statpath, log_type, field )
-                if os.path.exists( path ):
+                if exists( path ):
                     checks_passed = mergeStatistics( path, items, counts, craplog )
                 else:
                     checks_passed = saveStatistics( path, items, counts, craplog )
