@@ -1,7 +1,8 @@
 
-import os
-import subprocess
+from os import mkdir
+from os.path import exists
 from datetime import date
+from subprocess import run, STDOUT, DEVNULL
 
 import tarfile
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -19,7 +20,7 @@ def newName(
     found = False
     while found is False:
         new_path = "%s/originals.%s%s" %( path, number, suffix )
-        if os.path.exists(new_path):
+        if exists(new_path):
             number += 1
         else:
             found = True
@@ -33,15 +34,15 @@ def backupFiles(
     """
     Backup original log files as they are
     """
-    os.mkdir( path )
+    mkdir( path )
     path += "/"
     for log_file in craplog.log_files:
         craplog.printCaret( log_file )
         file_path = "%s/%s" %( craplog.logs_path, log_file )
-        return_code = subprocess.run(
+        return_code = run(
             ["cp", file_path, path],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT)
+            stdout=DEVNULL,
+            stderr=STDOUT)\
             .returncode
         if return_code == 1:
             raise Exception(IOError)
@@ -190,11 +191,11 @@ def backupGlobals(
         r=True, w=True, create=True, resolve=True )
     if success is True:
         path = "%s/4" %( backups_path )
-        if os.path.exists( path ):
-            return_code = subprocess.run(
+        if exists( path ):
+            return_code = run(
                 ["rm", "-r", path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT)
+                stdout=DEVNULL,
+                stderr=STDOUT)\
                 .returncode
             if return_code == 1:
                 success = False
@@ -207,10 +208,10 @@ def backupGlobals(
                 path = "%s/%s" %( backups_path, n )
                 new_path = "%s/%s/" %( backups_path, n+1 )
                 if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
-                    return_code = subprocess.run(
+                    return_code = run(
                         ["mv", path, new_path],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT)
+                        stdout=DEVNULL,
+                        stderr=STDOUT)\
                         .returncode
                     if return_code == 1:
                         undoes.append(new_path[:-1])
@@ -222,7 +223,7 @@ def backupGlobals(
     # check the new dir existence, make it if needed
     if success is True:
         try:
-            os.mkdir( path )
+            mkdir( path )
             remove.append( path )
         except:
             # error creating directory
@@ -235,10 +236,10 @@ def backupGlobals(
             for log_type in ["access","error"]:
                 path = "%s/%s" %( globals_path, log_type )
                 if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
-                    return_code = subprocess.run(
+                    return_code = run(
                         ["cp", "-r", path, new_path],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT)
+                        stdout=DEVNULL,
+                        stderr=STDOUT)\
                         .returncode
                     if return_code == 1:
                         undoes.append(new_path)
@@ -247,11 +248,11 @@ def backupGlobals(
     # remove the last dir
     if success is True:
         path = "%s/4" %( backups_path )
-        if os.path.exists( path ):
-            return_code = subprocess.run(
+        if exists( path ):
+            return_code = run(
                 ["rm", "-r", path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT)
+                stdout=DEVNULL,
+                stderr=STDOUT)\
                 .returncode
             if return_code == 1:
                 success = False
@@ -273,10 +274,10 @@ def backupGlobals(
         print()
         # un-do the un-doable
         if len(remove) > 0:
-            return_code = subprocess.run(
+            return_code = run(
                 ["rm", "-r", remove[0]],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT)
+                stdout=DEVNULL,
+                stderr=STDOUT)\
                 .returncode
             if return_code == 1:
                 success = False
@@ -292,10 +293,10 @@ def backupGlobals(
             new_path = "%s%s" %( path[:-1], int(path[-1:])-1 )
             if success is True:
                 # skip moving if failed for a previous file
-                return_code = subprocess.run(
+                return_code = run(
                     ["mv", path, new_path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
                     .returncode
             if return_code == 1:
                 success = False
