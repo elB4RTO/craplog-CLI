@@ -1,4 +1,4 @@
-from time import sleep
+
 import curses
 
 from crappy.elements.model import UIobj
@@ -109,21 +109,6 @@ class View( UIobj ):
         self.max_clen = self.max_ilen = 0
         self.vertical_shift = self.horizontal_shift = 0
         self.cleanContentArea()
-            
-    
-    
-    def cleanContentArea(self):
-        """
-        Clear the content viewth
-        """
-        soap  = " "*(self.w-2)
-        brush = self.h-2
-        for i in range(1,brush):
-            self.window.addstr(
-                i, 1,
-                soap )
-        # push the updates
-        self.window.noutrefresh()
     
     
     def drawContent(self):
