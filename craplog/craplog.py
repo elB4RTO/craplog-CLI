@@ -285,7 +285,7 @@ class Craplog(object):
         """
         Read the saved configuration
         """
-        path = "%s/crapset/craplog.conf" %(self.crappath[:self.crappath.rfind('/')])
+        path = "%s/crapconf/craplog.conf" %(self.crappath[:self.crappath.rfind('/')])
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -313,27 +313,28 @@ class Craplog(object):
             self.use_arguments = bool(int(configs[1]))
             self.less_output = bool(int(configs[2]))
             self.more_output = bool(int(configs[3]))
-            self.use_colors = bool(int(configs[4]))
+            self.use_colors  = bool(int(configs[4]))
             self.performance = bool(int(configs[5]))
             self.auto_delete = bool(int(configs[6]))
-            self.auto_merge = bool(int(configs[7]))
+            self.auto_merge  = bool(int(configs[7]))
             self.max_file_size = float(configs[8])
             self.session_stats = bool(int(configs[9]))
-            self.global_stats = bool(int(configs[10]))
+            self.global_stats  = bool(int(configs[10]))
             self.access_logs = bool(int(configs[11]))
-            self.error_logs = bool(int(configs[12]))
-            self.backup = bool(int(configs[13]))
+            self.error_logs  = bool(int(configs[12]))
+            self.backup      = bool(int(configs[13]))
             self.archive_tar = bool(int(configs[14]))
             self.archive_zip = bool(int(configs[15]))
             self.delete = bool(int(configs[16]))
-            self.trash = bool(int(configs[17]))
-            self.shred = bool(int(configs[18]))
+            self.trash  = bool(int(configs[17]))
+            self.shred  = bool(int(configs[18]))
             self.logs_path = configs[19]
             self.log_files = configs[20].split(' ')
             self.file_selection = bool(int(configs[21]))
-            self.usage_control = bool(int(configs[22]))
+            self.usage_control  = bool(int(configs[22]))
             self.access_fields = configs[23].split(' ')
-            self.ip_whitelist = configs[24].split(' ')
+            self.ip_whitelist  = configs[24].split(' ')
+            self.initMessages()
             
             # check log files
             tmp = [f.strip() for f in self.log_files]
@@ -347,12 +348,13 @@ class Craplog(object):
             for f in tmp:
                 if f == "":
                     continue
+                f = f.upper()
                 if tmp.count( f ) > 1:
-                        self.printJobFailed()
-                        print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} you have inserted the same field twice: {rose}%s{default}\n"\
-                            .format(**self.text_colors)\
-                            %( f ))
-                        self.exitAborted()
+                    self.printJobFailed()
+                    print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} you have inserted the same field twice: {rose}%s{default}\n"\
+                        .format(**self.text_colors)\
+                        %( f ))
+                    self.exitAborted()
                 elif f not in ["IP","UA","REQ","RES"]:
                     self.printJobFailed()
                     print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid field for access logs: {rose}%s{default}\n"\
@@ -405,10 +407,10 @@ class Craplog(object):
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help ))
+                print("\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help ))
                 exit()
             elif arg == "--examples":
-                print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                print("\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
