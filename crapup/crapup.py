@@ -112,7 +112,7 @@ class Crapup():
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
         self.crappath = crappath[:crappath.rfind('/')]
-        path = "%s/crapset/crapup.conf" %(self.crappath)
+        path = "%s/crapconf/crapup.conf" %(self.crappath)
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -137,11 +137,12 @@ class Crapup():
         # apply the configs
         self.use_configs = bool(int(configs[0]))
         if self.use_configs is True:
-            self.use_arguments: bool(int(configs[1]))
-            self.less_output: bool(int(configs[2]))
-            self.more_output: bool(int(configs[3]))
-            self.use_colors:  bool(int(configs[4]))
-            self.use_git: bool(int(configs[5]))
+            self.use_arguments = bool(int(configs[1]))
+            self.less_output   = bool(int(configs[2]))
+            self.more_output   = bool(int(configs[3]))
+            self.use_colors    = bool(int(configs[4]))
+            self.use_git       = bool(int(configs[5]))
+            self.initMessages()
     
     
     def initMessages(self):
@@ -161,7 +162,7 @@ class Crapup():
         self.MSG_fin      = aux.fin( self.text_colors )
         self.TXT_crapup   = "{red}c{orange}r{grass}a{cyan}p{white}UP{default}".format(**self.text_colors)
         self.TXT_fin      = "{orange}F{grass}I{cyan}N{default}".format(**self.text_colors)
-        self.TXT_craplog  = "{red}C{orange}R{grass}A{cyan}P{blue}L{purple}O{white}G{default}".format(**self.text_colors)
+        self.TXT_craplog  = "{red}C{orange}R{grass}A{cyan}P{white}LOG{default}".format(**self.text_colors)
 
 
     def parseArguments(self, args: list ):
@@ -181,10 +182,10 @@ class Crapup():
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print( "\n%s\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help, self.MSG_examples ))
+                print("\n%s\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help, self.MSG_examples ))
                 exit()
             elif arg == "--examples":
-                print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                print("\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
