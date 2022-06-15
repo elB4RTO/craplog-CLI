@@ -1,4 +1,4 @@
-# craplog-CLI
+# Craplog CLI
 Parse Apache2 logs to create statistics
 
 <br>
@@ -15,6 +15,13 @@ Parse Apache2 logs to create statistics
   - [Avoiding arguments](#avoiding-arguments)
   - [Examples](#examples)
   - [Output control](#output-control)
+- [How to configure](#how-to-configure)
+  - [Crapset](#crapset)
+  - [Configuration files](#configuration-files)
+  - [Hardcoded values](#hardcoded-values)
+- [How to update](#how-to-update)
+  - [Crapup](#crapup)
+  - [Self-service](#self-service)
 - [Logs](#logs)
   - [Usage control](#usage-control)
   - [Log files](#log-files)
@@ -26,9 +33,10 @@ Parse Apache2 logs to create statistics
   - [Sessions statistics](#sessions-statistics)
   - [Global statistics](#global-statistics)
   - [Whitelist](#whitelist)
+- [View statistics](#view-statistics)
+  - [Crapview](#crapview)
 - [Extra features](#extra-features)
-  - [Statistics viewer](#statistics-viewer)
-  - [Check updates](#check-updates)
+  - [Crapstats converter](#crapstats-converter)
 - [Final considerations](#final-considerations)
   - [Estimated working speed](#estimated-working-speed)
   - [Backups](#backups)
@@ -61,7 +69,7 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 ### Run without installation
 
-- Download and unzip this repo
+- Download and un-archive this repo
   <br>*or*<br>
   `git clone https://github.com/elB4RTO/craplog-CLI`<br><br>
 - Open a terminal inside "*craplog-CLI-main/craplog*"
@@ -74,7 +82,7 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 ### Run with installation
 
-- Download and unzip this repo
+- Download and un-archive this repo
   <br>*or*<br>
   `git clone https://github.com/elB4RTO/craplog-CLI`<br><br>
 - Open a terminal inside "*craplog-CLI-main*"
@@ -99,8 +107,8 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 | -m  |             --more |                | more output on screen |
 | -p  |      --performance |                | prints performances data |
 |     |        --no-colors |                | prints text without using colors |
-|     |      --auto-delete |                | auto-deletes files/folders when needed |
-|     |       --auto-merge |                | auto-merges sessions with the same date |
+|     |      --auto-delete |                | auto-chooses to delete files/folders |
+|     |       --auto-merge |                | auto-chooses to merges sessions having the same date |
 | -e  |           --errors |                | make sstatistics of error logs too |
 | -eO |      --only-errors |                | only uses error logs (doesn't parse access logs) |
 | -gO |     --only-globals |                | only updates globals (doesn't store sessions) |
@@ -122,10 +130,9 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 You may not want to pass arguments every time, expecially if they're complex and always the same (or just occasionally different).
 
-You can directly modify Craplog by setting pre-defined initialization values to fit your needs.<br>
-Open your local copy of **craplog.py**, go to line [**101**](https://github.com/elB4RTO/craplog-CLI/blob/main/craplog/craplog.py#L101), read the instructions and personalize Craplog.
+Sometimes is annoying to keep remembering and passing arguments, I know. This is why Craplog gives you the possibility to customize the way it gets ready to do its job.
 
-You will still be able to pass arguments to override those settings, if you want, or you can lock them and discard every argument passed to only use your settings.
+Please refer to the [configuration section](#how-to-configure) for further informations.
 
 <br>
 
@@ -167,6 +174,135 @@ You can control the output on screen, like: quantity of informations printed, pe
 
 ![output diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/output_diff.png)
 *Normal output vs Less output*
+
+<br><br>
+
+## How to configure
+
+There's more then one way you can actually customize Craplog's settings: using the [configuration tool](#configuration-tool), editing the [configuration files](#configuration-files) or the [hardcoded values](#hardcoded-values).
+
+<br>The configuration file will override the hardcoded values and will be overridden by the command-line arguments, so that the configurations **hierarchy** results as follows:
+  - Hardcoded values
+  - Configuration files
+  - Command-line arguments
+
+<br>You can also **lock** a configuration method to avoid it, like discarding any command-line argument or not reading the configuration files. Further informations can be found while following one of the procedures listed above.
+
+<br>
+
+### Crapset
+
+**Crapset** is an utility to eaily and safely customize Craplog.
+
+From Craplog's main folder run:
+`python3 crapset/crapset.py`
+
+<br>
+
+### Configuration files
+
+Manually editing the [configuration files](https://github.com/elB4RTO/craplog-CLI/tree/main/crapconf) you need.<br>
+
+Files can be found inside **craplog-cli/crapconf/**
+
+<br>
+
+### Hardcoded values
+
+Directly modifying the script's hardcoded variables, to set pre-defined initialization values:
+  - **Craplog** -> line [**112**](https://github.com/elB4RTO/craplog-CLI/blob/main/craplog/craplog.py#L112) **@** *craplog-CLI/craplog/craplog.py*
+  - **Crapview** -> line [**13**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapview/crapview.py#L13) **@** *craplog-CLI/cragview/crapview.py*
+  - **Crapup** -> line [**55**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapup/crapup.py#L55) **@** *craplog-CLI/cragup/crapup.py*
+  - **Crapset** -> line [**19**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapset/crapset.py#L19) **@** *craplog-CLI/cragset/crapset.py*
+
+<br><br>
+
+## How to update
+
+Updates can be checked with [Crapup](#crapup):<br>
+`python3 crapup/crapup.py`
+
+In alternative, yo can always do a [manual update](#self-service).
+
+<br>
+
+### Crapup
+
+**Crapup** allows you to query the updates in two different ways.<br><br>
+
+#### Version check
+
+This is the **default** method.
+
+**Crapup** will check for a version-update through a simple GET request to the [version check file](https://github.com/elB4RTO/craplog-CLI/blob/main/version_check) in this page.
+
+Nothing will be downloaded or updated, it will only queries this repo's version and gives back a response. You'll have to [manually download and apply the changes](#self-service).<br><br>
+
+#### Git pull
+
+This is the **suggested** method.
+
+**Crapup** will update your local version by directly fetching this repo. This is the suggested method since it's fast, reliable and easy.
+
+You can also perform this procedure manually if you want, by following the [update with git](#git-update) guide.
+
+<br>
+
+### Self-service
+
+A self-served update of Craplog can be done in the well-known two ways.<br><br>
+
+#### Manual update
+
+To manually update Craplog, please download the new version of this repo and run the [update script](https://github.com/elB4RTO/craplog-CLI/blob/main/update.sh).
+
+Or alternatively manually *copy-paste* this list of files/folders in your Craplog installation directory:<br>
+*craplog/*, *crapset/*, *crapup/*, *crapview/*, *README.md*, *LICENSE*.<br>
+If you opted for the manual *copy-paste*, please make sure the operation fully replace the old content, meaning that you have to check that no old entry (maybe with a different, old name) is left there.<br><br>
+
+#### Git update
+
+To update Craplog with **git** you'll need to have a local clone of this repo.<br>
+If you downloaded Craplog using the `git clone` method, you should be ready to go.
+
+Follow these steps:
+
+- Make sure you're in Craplog's main folder with your terminal<br>
+  *You should see "craplog" as output*<br>
+  `ls | grep craplog`<br><br>
+- Make sure you have *git* installed in your system<br>
+  *This should output the path of your git executable*<br>
+  `which git`<br><br>
+- Test if a git repository is already initialized in the current directory<br>
+  *No error message should be shown*<br>
+  `git status`<br><br>
+  If you get an error message, follow the next steps to initialize a git:<br><br>
+  - Initialize the git repo, using *main* as local branch name<br>
+    `git init -b main`<br><br>
+  - Configure it<br>
+    ```
+    git config core.filemode false
+    git config remote.origin.url https://github.com/elB4RTO/craplog-CLI.git
+    git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+    git config remote.origin.prune true
+    git config branch.main.remote origin
+    git config branch.main.merge refs/heads/main
+    ```
+    <br>
+  - Add Craplog's files to the git index<br>
+    `git add craplog/ crapview/ crapup/ crapset/ README.md LICENSE`<br><br>
+  - Make a *.gitignore* file to ignore the crapstats<br>
+    `echo "/crapstats/" >> .gitignore`<br><br>
+- Your local repo is ready to pull the updates from the remote:<br><br>
+  - You can directly download and apply any modification with just one command:<br>
+    `git pull origin main`<br><br>
+  - Or you can split the process in steps:<br><br>
+      - Download the informations about the new version's changes<br>
+        `git fetch origin`<br><br>
+      - Inspect any modification<br>
+        `git diff origin/main`<br><br>
+      - Finally apply the changes (if you want so)<br>
+        `git merge origin/main`<br><br>
 
 <br><br>
 
@@ -230,7 +366,7 @@ IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URI" "USER AGENT"
 
 ### Storage
 
-Statistics will be stored in Craplog's main folder: **craplog/crapstats**<br>
+Statistics will be stored in Craplog's main folder: **craplog-CLI/crapstats/**<br>
 Please refer to the [statistics viewer tool](#statistics-viewer) to view your crapstats.
 
 <br>
@@ -298,21 +434,28 @@ The **default** is to only skip logs from **::1**, but different sequences can b
 
 Please notice that using a custom list will overwrite the default one, not appending to it. When passing a custom list as argument, you should include the default *::1* in order to keep whitelisting the relative lines.
 
+<br><br>
+
+## View statistics
+
+Craplog saves statistics as plain-text files, so you can directly view them, but you will agree that this ain't the best way to do that.<br><br>
+
+### Crapview
+
+**Crapview** is a cursed application that lets you easily view your crapstats.<br><br>
+
+![performance diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/crapview.png)<br>
+*Viewing statistics*<br><br>
+
+Further details on how to use it can be found [here](https://github.com/elB4RTO/craplog-CLI/tree/main/crapview).
 
 <br><br>
 
 ## Extra features
 
-### Statistics viewer
+### Crapstats converter
 
-
-*COMING SOON*
-
-<br>
-
-### Check updates
-
-*COMING SOON*
+***COMING SOON***
 
 <br><br>
 
