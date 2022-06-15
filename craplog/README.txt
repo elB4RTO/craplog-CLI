@@ -41,10 +41,10 @@
             --no-colors  ¦  print text without using colors
                          ¦
                          ¦
-          --auto-delete  ¦  auto-delete files/folders when needed
+          --auto-delete  ¦  auto-choose to delete files/folders
                          ¦
                          ¦
-           --auto-merge  ¦  auto-merge sessions with the same date
+           --auto-merge  ¦  auto-choose to merge sessions having the same date
                          ¦
                          ¦
       --max-size <size>  ¦  emit a warning if a file's size exceeds this limit
