@@ -38,7 +38,7 @@ def chooseAction(
                 print()
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
-            print("\n{warn}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
+            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
                 .format(**crapup.text_colors))
             if crapup.less_output is False:
                 print()
