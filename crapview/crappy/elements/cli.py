@@ -187,7 +187,7 @@ class CommandLine( UIobj ):
         self.history_index = len(self.history)
         # parse the command
         command = self.command
-        if command in ["q","quit"]:
+        if command in ["q","quit","exit"]:
             loop = False
         elif command in ["t","tree"]:
             self.ui.switch2tree()
