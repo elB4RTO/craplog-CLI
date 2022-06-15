@@ -58,10 +58,10 @@ def help( color_set ) -> str :
             {bold}--no-colors{default}  ¦  print text without using colors
                          ¦
                          ¦
-          {bold}--auto-delete{default}  ¦  auto-delete files/folders when needed
+          {bold}--auto-delete{default}  ¦  auto-choose to delete files/folders
                          ¦
                          ¦
-           {bold}--auto-merge{default}  ¦  auto-merge sessions with the same date
+           {bold}--auto-merge{default}  ¦  auto-choose to merge sessions having the same date
                          ¦
                          ¦
       {bold}--max-size{default} {italic}<size>{default}  ¦  emit a warning if a file's size exceeds this limit
@@ -223,6 +223,7 @@ def colors() -> dict :
              'rose'    : "\033[91m",
              'orange'  : "\033[33m",
              'yellow'  : "\033[93m",
+             'ok'      : "\033[1;32m",
              'err'     : "\033[1;31m",
              'warn'    : "\033[1;33m" }
 
@@ -246,5 +247,6 @@ def no_colors() -> dict :
              'rose'    : "",
              'orange'  : "",
              'yellow'  : "",
+             'ok'      : "",
              'err'     : "",
              'warn'    : "" }
