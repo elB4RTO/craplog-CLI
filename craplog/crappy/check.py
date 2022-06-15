@@ -1,5 +1,6 @@
 
 import os
+from time import sleep
 from time import perf_counter as timer
 
 def checkPathRecursively(
@@ -82,10 +83,11 @@ def chooseAction(
                 print()
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
-            print("\n{warn}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
+            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
                 .format(**craplog.text_colors))
             if craplog.less_output is False:
                 print()
+                sleep(1)
     if craplog.less_output is False:
         print()
     if choice > 0:
@@ -694,10 +696,12 @@ def checkSessionsDates( craplog ):
                         craplog.undoChanges()
                     craplog.exitAborted()
                 else:
-                    print("\n{warn}Warning{white}[{grey}choice{white}]{warn}>{default} not a valid choice: {bold}%s{default}"\
+                    # leave this normal yellow, it's secondary and doesn't need a real attention
+                    print("\n{yellow}Warning{white}[{grey}choice{white}]{warn}>{default} not a valid choice: {bold}%s{default}"\
                         .format(**craplog.text_colors))
                     if craplog.less_output is False:
                         print()
+                        sleep(1)
             # set the time elapsed during user's decision as user-time
             craplog.user_time += timer() - time_gap
 
