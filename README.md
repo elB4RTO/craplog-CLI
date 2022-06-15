@@ -222,7 +222,7 @@ Directly modifying the script's hardcoded variables, to set pre-defined initiali
 Updates can be checked with [Crapup](#crapup):<br>
 `python3 crapup/crapup.py`
 
-In alternative, yo can always do a [manual update](#self-service).
+In alternative, you can always do a [manual update](#self-service).
 
 <br>
 
