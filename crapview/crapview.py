@@ -59,7 +59,7 @@ def initCrapview( args ) -> bool :
     if use_configs is True:
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
-        path = "%s/crapset/crapview.conf" %(crappath[:crappath.rfind('/')])
+        path = "%s/crapconf/crapview.conf" %(crappath[:crappath.rfind('/')])
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -74,8 +74,7 @@ def initCrapview( args ) -> bool :
             print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
                 .format(**text_colors)\
                 %( len(configs) ))
-            if self.less_output is False:
-                print("""
+            print("""
                 if you have manually edited the configurations file, please un-do the changes
                 else, please report this issue""")
             print("\n{err}CRAPVIEW ABORTED{default}\n"\
@@ -86,6 +85,7 @@ def initCrapview( args ) -> bool :
         if use_configs is True:
             use_arguments = bool(int(configs[1]))
             use_colors = bool(int(configs[2]))
+            initMessages()
     
     if use_arguments is True:
         # parse args
@@ -102,12 +102,17 @@ def initCrapview( args ) -> bool :
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print( "\n%s\n%s\n%s\n" %( MSG_craplogo, MSG_help, MSG_examples ))
+                print("\n%s\n%s\n%s\n" %( MSG_craplogo, MSG_help, MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg == "--no-colors":
                 use_colors = False
                 initMessages()
+            elif arg == "--examples":
+                print("\n%s\nNo example to show, sorry :(\n"\
+                    .format(**text_colors)\
+                    %( MSG_craplogo ))
+                exit()
             else:
                 print("""{err}Error{white}[{grey}argument{white}]{red}>{default} not an available option: {rose}%s{default}
              use {cyan}crapview --help{default} to view an help screen\n"""\
