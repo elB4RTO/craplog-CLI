@@ -112,7 +112,7 @@ class Crapup():
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
         self.crappath = crappath[:crappath.rfind('/')]
-        path = "%s/crapconf/crapup.conf" %(self.crappath)
+        path = "%s/crapconf/crapup.crapconf" %(self.crappath)
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -177,15 +177,15 @@ class Crapup():
             if arg == "":
                 continue
             # elB4RTO
-            elif arg == "-elbarto-":
+            elif arg in ["elB4RTO","elbarto","-elbarto-"]:
                 print("\n%s\n" %( self.MSG_elbarto ))
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print("\n%s\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help, self.MSG_examples ))
+                print("\n%s\n\n%s\n\n%s\n" %( self.MSG_craplogo, self.MSG_help, self.MSG_examples ))
                 exit()
             elif arg == "--examples":
-                print("\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                print("\n%s\n\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
@@ -271,10 +271,9 @@ class Crapup():
 
 
 if __name__ == "__main__":
+    failed = False
+    crapup = Crapup( argv )
     try:
-        failed = False
-        # run crapup
-        crapup = Crapup( argv )
         crapup.main()
     except (KeyboardInterrupt):
         failed = True
