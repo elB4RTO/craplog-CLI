@@ -35,7 +35,7 @@ def help( color_set ) -> str :
     return """\
 {err}Synopsis{default}
 
-    crapup {grey}[{white}OPTION{grey}]{default} {grey}[{italic}{white}ARGUMENT{grey}]{default}
+    crapup {grey}[{white}OPTION{grey}]{default}
 
 
 {err}Options{default}
@@ -77,7 +77,7 @@ def examples( color_set ) -> str :
 
 
    - {green}Fetch every new change from the remote git repository and apply it.
-     This is made using system's {bold}{cyan}git{default}{cyan} package{default}.
+     This is made using system's {bold}{cyan}git{default}{cyan} package.
      If Craplog's local git has not been initialized yet, offers to do so.{default}
      
        {italic}craplog{default} {bold}--git{default}\
