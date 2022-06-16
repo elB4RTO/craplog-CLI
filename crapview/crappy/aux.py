@@ -35,7 +35,7 @@ def help( color_set ) -> str :
     return """\
 {err}Synopsis{default}
 
-    crapup {grey}[{white}OPTION{grey}]{default} {grey}[{italic}{white}ARGUMENT{grey}]{default}
+    crapup {grey}[{white}OPTION{grey}]{default}
 
 
 {err}Options{default}
