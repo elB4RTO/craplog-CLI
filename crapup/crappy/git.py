@@ -122,6 +122,7 @@ def gitPull(
         gitConfig( "remote.origin.prune","true" ) # update the local commit refs to follow the remote ones
         gitConfig( "branch.main.remote","origin" )
         gitConfig( "branch.main.merge","refs/heads/main" )
+        gitConfig( "pull.rebase","false" ) # don't touch local files not related to the git index
         
         # add Craplog's files
         command = run(
@@ -153,27 +154,35 @@ def gitPull(
     if git_ignoreds.endswith('\n'):
         trailing_newline = True
     git_ignoreds = git_ignoreds.strip().split()
+    found_stat  = False
     found_stats = False
+    found_conf    = False
     found_configs = False
     for path in git_ignoreds:
         path_ = path.rstrip('/')
         if path_ == "/crapstats"\
         or path_ == "crapstats":
             found_stats = True
-            break
-        elif path_ == "/configs"\
-          or path_ == "configs":
+        if path_ == "*.crapstat":
+            found_stat = True
+        elif path_ == "/crapconf"\
+          or path_ == "crapconf":
             found_configs = True
-            break
-    if found_stats is False\
-    or found_configs is False:
+        elif path_ == "*.crapconf":
+            found_conf = True
+    if found_stat is False or found_stats is False\
+    or found_conf is False or found_configs is False:
         new_line = ""
         if trailing_newline is False:
             new_line += "\n"
         if found_stats is False:
             new_line += "/crapstats\n"
+        if found_stat is False:
+            new_line += "*.crapstat\n"
         if found_configs is False:
-            new_line += "/configs\n"
+            new_line += "/crapconf\n"
+        if found_configs is False:
+            new_line += "*.crapconf\n"
         try:
             with open(".gitignore", 'a') as f:
                 f.write( new_line )
