@@ -59,7 +59,7 @@ def initCrapview( args ) -> bool :
     if use_configs is True:
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
-        path = "%s/crapconf/crapview.conf" %(crappath[:crappath.rfind('/')])
+        path = "%s/crapconf/crapview.crapconf" %(crappath[:crappath.rfind('/')])
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -97,21 +97,21 @@ def initCrapview( args ) -> bool :
             if arg == "":
                 continue
             # elB4RTO
-            elif arg == "-elbarto-":
+            elif arg in ["elB4RTO","elbarto","-elbarto-"]:
                 print("\n%s\n" %( MSG_elbarto ))
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print("\n%s\n%s\n%s\n" %( MSG_craplogo, MSG_help, MSG_examples ))
+                print("\n%s\n\n%s\n\n%s\n" %( MSG_craplogo, MSG_help, MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg == "--no-colors":
                 use_colors = False
                 initMessages()
             elif arg == "--examples":
-                print("\n%s\nNo example to show, sorry :(\n"\
+                print("\n%s\n\n%s\n"\
                     .format(**text_colors)\
-                    %( MSG_craplogo ))
+                    %( MSG_craplogo, MSG_examples ))
                 exit()
             else:
                 print("""{err}Error{white}[{grey}argument{white}]{red}>{default} not an available option: {rose}%s{default}
