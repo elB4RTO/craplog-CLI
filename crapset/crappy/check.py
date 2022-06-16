@@ -65,7 +65,7 @@ def chooseAction(
             print(MSG_choice)
             if crapset.more_output is True:
                 print()
-        proceed = input("Your choice? {white}[{yellow}d{grey}/{azul}r{grey}/{green}h/{rose}q{white}] :{default} "\
+        proceed = input("Your choice? {white}[{yellow}d{grey}/{azul}r{grey}/{green}h{grey}/{rose}q{white}] :{default} "\
             .format(**crapset.text_colors)).strip().lower()
         if proceed in ["q","quit","exit"]:
             choice = 0
@@ -84,7 +84,8 @@ def chooseAction(
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
             print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
-                .format(**crapset.text_colors))
+                .format(**crapset.text_colors)\
+                %( proceed ))
             if crapset.less_output is False:
                 print()
                 sleep(1)
@@ -147,8 +148,6 @@ def checkFolder(
     crapset: object,
     err_key: str,
     path:    str,
-    parent_path: str="",
-    entry_name:  str="",
     r: bool=True,
     w: bool=True,
     create:  bool=True,
@@ -176,10 +175,9 @@ def checkFolder(
                 print("%s         the error is most-likely caused by a lack of permissions" %(spaces))
                 print("%s         please add read/write permissions to the whole crapstats folder and retry" %(spaces))
             print()
-    if entry_name == ""\
-    or parent_path == "":
-        parent_path = path[:path.rfind('/')]
-        entry_name  = path[len(parent_path)+1:]
+    
+    parent_path = path[:path.rfind('/')]
+    entry_name  = path[len(parent_path)+1:]
     # checking
     checks_passed = True
     if os.path.exists( path ):
@@ -299,8 +297,6 @@ def checkFile(
     crapset: object,
     err_key: str,
     path:    str,
-    parent_path: str="",
-    entry_name:  str="",
     r: bool=True,
     w: bool=True,
     create:  bool=True,
@@ -314,10 +310,8 @@ def checkFile(
         if checks_passed is True:
             checks_passed = False
     
-    if entry_name == ""\
-    or parent_path == "":
-        parent_path = path[:path.rfind('/')]
-        entry_name  = path[len(parent_path)+1:]
+    parent_path = path[:path.rfind('/')]
+    entry_name  = path[len(parent_path)+1:]
     # checking
     checks_passed = True
     if os.path.exists( path ):
