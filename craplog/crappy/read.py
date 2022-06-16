@@ -93,8 +93,8 @@ def checkSize(
     """
     Check the size of a file before to read and warn in case of big files
     """
-    if craplog.max_file_size > 0\
-    and (getsize( path ) / 1048576) > craplog.max_file_size:
+    if craplog.warning_size > 0\
+    and (getsize( path ) / 1048576) > craplog.warning_size:
         # file over max allowed dimensions, emit a warning
         craplog.printJobHalted()
         if craplog.more_output is True:
@@ -110,7 +110,7 @@ def checkSize(
                     the warning limit is actually set at: {green}%.2f MB{default}
                     you can temporary change it using {cyan}--max-size {italic}<size>{default}"""\
                 .format(**craplog.text_colors)\
-                %( (getsize( path ) / 1048576), craplog.max_file_size ))
+                %( (getsize( path ) / 1048576), craplog.warning_size ))
         if craplog.less_output is False:
             print()
         choice = choiceDialog( craplog, "Do you really want to use this file" )
