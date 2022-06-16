@@ -36,7 +36,7 @@ class Craplog(object):
         self.performance:    bool
         self.auto_delete:    bool
         self.auto_merge:     bool
-        self.max_file_size:  float
+        self.warning_size:   float
         self.session_stats:  bool
         self.global_stats:   bool
         self.access_logs:    bool
@@ -161,7 +161,7 @@ class Craplog(object):
         # A WARNING IS EMITTED IF THE SIZE AN INPUT FILE OVERTAKES THIS LIMIT
         # [ --max-size ]
         # IN MB (MegaBytes)
-        self.max_file_size = 100.0
+        self.warning_size = 100.0
         #
         # STORE SESSION STATISTICS OF THE PARSED DATA
         # CAN BE DISABLED PASSING [ -gO  /  --only-globals ]
@@ -285,7 +285,7 @@ class Craplog(object):
         """
         Read the saved configuration
         """
-        path = "%s/crapconf/craplog.conf" %(self.crappath[:self.crappath.rfind('/')])
+        path = "%s/crapconf/craplog.crapconf" %(self.crappath[:self.crappath.rfind('/')])
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -317,7 +317,7 @@ class Craplog(object):
             self.performance = bool(int(configs[5]))
             self.auto_delete = bool(int(configs[6]))
             self.auto_merge  = bool(int(configs[7]))
-            self.max_file_size = float(configs[8])
+            self.warning_size = float(configs[8])
             self.session_stats = bool(int(configs[9]))
             self.global_stats  = bool(int(configs[10]))
             self.access_logs = bool(int(configs[11]))
@@ -402,15 +402,15 @@ class Craplog(object):
             if arg == "":
                 continue
             # elB4RTO
-            elif arg == "-elbarto-":
+            elif arg in ["elB4RTO","elbarto","-elbarto-"]:
                 print("\n%s\n" %( self.MSG_elbarto ))
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print("\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help ))
+                print("\n%s\n\n%s\n\n%s\n" %( self.MSG_craplogo, self.MSG_help, self.MSG_examples ))
                 exit()
             elif arg == "--examples":
-                print("\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                print("\n%s\n\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
@@ -428,14 +428,14 @@ class Craplog(object):
             elif arg == "--auto-merge":
                 self.auto_merge = True
             # file size limit
-            elif arg == "--max-size":
+            elif arg == "--warning-size":
                 if i+1 > n_args\
                 or ( args[i+1].startswith("--")\
                   or (args[i+1].startswith("-") and not args[i+1][1].isdigit())):
-                    self.max_file_size = None
+                    self.warning_size = None
                 else:
                     i += 1
-                    self.max_file_size = args[i]
+                    self.warning_size = args[i]
             # job arguments
             elif arg in ["-e", "--errors"]:
                 self.error_logs = True
