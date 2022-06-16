@@ -47,7 +47,7 @@
            --auto-merge  ¦  auto-choose to merge sessions having the same date
                          ¦
                          ¦
-      --max-size <size>  ¦  emit a warning if a file's size exceeds this limit
+  --warning-size <size>  ¦  emit a warning if a file's size exceeds this limit
                          ¦  the <size> is in MB, if set to 0 means unlimited
                          ¦
                          ¦
@@ -151,7 +151,7 @@
      USE THE DEFAULT ACCESS LOGS FILE BUT ONLY UPDATE GLOBALS, NOT SESSIONS.
      SET THE WARNING LEVEL FOR LOG FILES SIZE AT 20 MB.
    
-       craplog -m -p -gO --max-size 20
+       craplog -m -p -gO --warning-size 20
 
 
    - PRINT LESS INFORMATIONS ON SCREEN, WITH PERFORMANCES BUT WITHOUT USING COLORS.
