@@ -65,7 +65,7 @@ def chooseAction(
             print(MSG_choice)
             if craplog.more_output is True:
                 print()
-        proceed = input("Your choice? {white}[{yellow}d{grey}/{azul}r{grey}/{green}h/{rose}q{white}] :{default} "\
+        proceed = input("Your choice? {white}[{yellow}d{grey}/{azul}r{grey}/{green}h{grey}/{rose}q{white}] :{default} "\
             .format(**craplog.text_colors)).strip().lower()
         if proceed in ["q","quit","exit"]:
             choice = 0
@@ -83,8 +83,11 @@ def chooseAction(
                 print()
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
-            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
-                .format(**craplog.text_colors))
+            if craplog.less_output is False:
+                print()
+            print("{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
+                .format(**craplog.text_colors)\
+                %( proceed ))
             if craplog.less_output is False:
                 print()
                 sleep(1)
@@ -501,29 +504,29 @@ def makeInitialChecks( craplog ):
         failed()
 
     # log files
-    if craplog.max_file_size is None:
+    if craplog.warning_size is None:
         failed()
         print("\n{err}Error{white}[{grey}missing_arguments{white}]{red}>{default} you must set the size after {cyan}--max-size{default}\n"\
             .format(**craplog.text_colors))
     else:
         try:
-            craplog.max_file_size = float(craplog.max_file_size)
-            if craplog.max_file_size < 0:
+            craplog.warning_size = float(craplog.warning_size)
+            if craplog.warning_size < 0:
                 failed()
                 print("\n{err}Error{white}[{grey}invalid_size{white}]{red}>{default} the max size must be greater or equal to 0\n"\
                     .format(**craplog.text_colors))
-            elif craplog.max_file_size > 1000000:
+            elif craplog.warning_size > 1000000:
                 failed()
                 print("\n{err}Error{white}[{grey}invalid_size{white}]{red}>{default} the given max size is huge: {yellow}%.2f GB{default}\n"\
                     .format(**craplog.text_colors)
-                    %( craplog.max_file_size / 1024 ))
+                    %( craplog.warning_size / 1024 ))
                 if craplog.less_output is False:
                     print("                     use 0 to have it unlimited")
         except:
             failed()
             print("\n{err}Error{white}[{grey}invalid_argument{white}]{red}>{default} invalid value for {cyan}--max-size{default}: {rose}%s{default}\n"\
                 .format(**craplog.text_colors)
-                %( craplog.max_file_size ))
+                %( craplog.warning_size ))
     if craplog.file_selection is False:
         if craplog.access_logs is False:
             craplog.log_files.clear()
