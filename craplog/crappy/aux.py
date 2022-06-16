@@ -33,7 +33,14 @@ def craplogo() -> str :
 
 def help( color_set ) -> str :
     return """\
-                 {orange}Option{default}  ¦  {orange}Description{default}
+{err}Synopsis{default}
+
+    craplog {grey}[{white}OPTION{grey}]{default} {grey}[{italic}{white}ARGUMENT{grey}]{default}
+
+
+{err}Options{default}
+
+                 {yellow}Option{default}  ¦  {yellow}Description{default}
 {white}-------------------------------------------------------------------------------{default}
                          ¦
                      {bold}-h{default}  ¦  print this screen and exit
@@ -64,7 +71,7 @@ def help( color_set ) -> str :
            {bold}--auto-merge{default}  ¦  auto-choose to merge sessions having the same date
                          ¦
                          ¦
-      {bold}--max-size{default} {italic}<size>{default}  ¦  emit a warning if a file's size exceeds this limit
+  {bold}--warning-size{default} {italic}<size>{default}  ¦  emit a warning if a file's size exceeds this limit
                          ¦  the {italic}<size>{default} is in MB, if set to 0 means unlimited
                          ¦
                          ¦
@@ -138,8 +145,7 @@ def help( color_set ) -> str :
 
 def examples( color_set ) -> str :
     return """\
-  {orange}Examples{default}
-{white}-------------------------------------------------------------------------------{default}
+{err}Examples{default}
 
    - {green}Use default log files (*.log.1) as input, including errors. Store the
      original files as a tar.gz compressed archive, without deleting them.
@@ -173,7 +179,7 @@ def examples( color_set ) -> str :
      Use the default access logs file but only update globals, not sessions.
      Set the warning level for log files size at 20 MB.{default}
    
-       {italic}craplog{default} {bold}-m -p -gO --max-size 20{default}
+       {italic}craplog{default} {bold}-m -p -gO --warning-size 20{default}
 
 
    - {green}Print less informations on screen, with performances but without using colors.
