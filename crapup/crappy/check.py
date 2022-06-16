@@ -20,7 +20,7 @@ def chooseAction(
             print(MSG_choice)
             if crapup.more_output is True:
                 print()
-        proceed = input("Your choice? {white}[{yellow}d{grey}/{azul}r{grey}/{green}h/{rose}q{white}] :{default} "\
+        proceed = input("Your choice? {white}[{yellow}d{grey}/{azul}r{grey}/{green}h{grey}/{rose}q{white}] :{default} "\
             .format(**crapup.text_colors)).strip().lower()
         if proceed in ["q","quit","exit"]:
             choice = 0
@@ -38,8 +38,11 @@ def chooseAction(
                 print()
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
-            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
-                .format(**crapup.text_colors))
+            if crapup.less_output is False:
+                print()
+            print("{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}"\
+                .format(**crapup.text_colors)\
+                %( proceed ))
             if crapup.less_output is False:
                 print()
     if crapup.less_output is False:
