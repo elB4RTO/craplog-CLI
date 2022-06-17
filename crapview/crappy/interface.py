@@ -4,9 +4,9 @@ import curses
 from time import sleep
 
 from crappy.elements.model import UIobj
-from crappy.elements.cli import CommandLine
-from crappy.elements.tree import Tree
-from crappy.elements.view import View
+from crappy.elements.cli   import CommandLine
+from crappy.elements.tree  import Tree
+from crappy.elements.view  import View
 
 
 class TUI():
@@ -79,6 +79,7 @@ class TUI():
         self.redraw()
     
     
+    
     def adapt(self):
         """
         Adapt the elements to fit the available space
@@ -107,6 +108,7 @@ class TUI():
             self.terminal.x+self.tree.w+2)
     
     
+    
     def feed(self, key:int ) -> bool :
         """
         Pass a keyboard input to the element with focus
@@ -129,9 +131,10 @@ class TUI():
             elif self.focusel == 3:
                 self.view.feed( key )
             else:
-                # put an error message here
-                raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+                # unexpected value
+                raise Exception("interface.feed&unexpected value for element focus&%s" %(self.focusel))
         return loop
+    
     
     
     def switchFocus(self, way:int ):
@@ -158,10 +161,11 @@ class TUI():
             curses.curs_set(0)
             self.view.focus = True
         else:
-            # put an error message here
-            raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+            # unexpected value
+            raise Exception("interface.switch&unexpected value for element focus&%s" %(self.focusel))
         # redraw every window
         self.redraw()
+    
     
     
     def switch2cli(self):
@@ -213,6 +217,7 @@ class TUI():
         self.cli.redraw()
     
     
+    
     def redrawFocus(self):
         """
         Redraw the screen
@@ -223,6 +228,7 @@ class TUI():
             self.view.redraw()
         if self.cli.focus is True:
             self.cli.redraw()
+    
     
     
     def resetCli(self):
@@ -244,6 +250,7 @@ class TUI():
         Signal to the view window to clear the content
         """
         self.view.clearAll()
+    
     
     
     def cli2tree(self, steps:list ):
@@ -275,4 +282,4 @@ class TUI():
         self.cli.redrawQuit()
         curses.doupdate()
         sleep(0.7)
-
+    
