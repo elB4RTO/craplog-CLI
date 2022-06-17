@@ -35,6 +35,7 @@ def digestFile(
         craplog.exitAborted()
 
 
+
 def bringHashes( craplog: object ):
     """
     Get the previous hashes for usage-track of log files
@@ -83,6 +84,7 @@ def bringHashes( craplog: object ):
                 craplog.exitAborted()
 
 
+
 def storeHashes( craplog: object ):
     """
     Save the actual list of hashes for usage-track of log files
@@ -116,3 +118,4 @@ def storeHashes( craplog: object ):
             print("                    please make the file readable and retry")
         print()
         craplog.exitAborted()
+    
