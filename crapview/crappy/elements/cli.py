@@ -20,6 +20,7 @@ class CommandLine( UIobj ):
         self.history_index = 1
     
     
+    
     def drawContent(self):
         """
         Draw the command string
@@ -49,6 +50,7 @@ class CommandLine( UIobj ):
         self.window.noutrefresh()
     
     
+    
     def clearAll(self):
         """
         Clean-up variables: commands history and actual string
@@ -58,6 +60,7 @@ class CommandLine( UIobj ):
         self.history_index = 1
         self.aux_command = None
         self.clear()
+    
     
     
     def fromHistory(self, jump:int ):
@@ -91,6 +94,7 @@ class CommandLine( UIobj ):
             self.history_index = new_index
         # draw the new content
         self.drawContent()
+    
     
     
     def feed(self, key:int ) -> bool :
@@ -155,12 +159,14 @@ class CommandLine( UIobj ):
         self.command = ""
         self.drawContent()
     
+    
     def canc(self):
         """
         Remove the last character from the actual command
         """
         self.command = self.command[:-1]
         self.drawContent()
+    
     
     def push(self, char:chr ):
         """
@@ -231,5 +237,4 @@ class CommandLine( UIobj ):
         # clear the command and return
         self.clear()
         return loop
-
-
+    
