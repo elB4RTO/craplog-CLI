@@ -59,6 +59,8 @@ class Tree( UIobj ):
         # build the directory tree
         self.newTree()
     
+    
+    
     def clearAll(self ):
         """
         Clear the content viewth and delete data
@@ -67,6 +69,7 @@ class Tree( UIobj ):
         self.newTree()
         self.cleanContentArea()
         self.drawContent()
+    
     
     
     def newTree(self):
@@ -81,6 +84,7 @@ class Tree( UIobj ):
         self.climbTree()
         self.pickLeafs()
         self.buildContent()
+    
     
     
     def growTree(self):
@@ -127,6 +131,7 @@ class Tree( UIobj ):
         cutDriedBranches( self.tree )
     
     
+    
     def climbTree(self):
         """
         Recursively climbs the directory tree up to the actual branch
@@ -134,6 +139,7 @@ class Tree( UIobj ):
         self.branch = self.tree
         for step in self.steps:
             self.branch = self.branch[ step ]
+    
     
     
     def climbUp(self, step:str ):
@@ -152,6 +158,7 @@ class Tree( UIobj ):
         self.climbTree()
     
     
+    
     def pickLeafs(self):
         """
         Picks-up the elements in the actual branch
@@ -168,6 +175,7 @@ class Tree( UIobj ):
             self.leafs.append("%s %s" %( self.DIR, name ))
         for name in sorted(files):
             self.leafs.append("%s %s" %( self.FILE, self.names[name] ))
+    
     
     
     def buildContent(self):
@@ -205,6 +213,7 @@ class Tree( UIobj ):
         self.content[-1] = self.content[-1].replace("├","└")
     
     
+    
     def smartRedraw(self):
         """
         Just redraw the current and the next line
@@ -225,6 +234,7 @@ class Tree( UIobj ):
         self.window.noutrefresh()
     
     
+    
     def smartClean(self):
         """
         Cleans only the needed content
@@ -239,6 +249,7 @@ class Tree( UIobj ):
                 soap )
         # push the updates
         self.window.noutrefresh()
+    
     
     
     def drawContent(self):
@@ -270,6 +281,7 @@ class Tree( UIobj ):
         self.window.noutrefresh()
     
     
+    
     def updateVLI(self, diff:int ):
         """
         Updates the Visual Line Index
@@ -281,6 +293,7 @@ class Tree( UIobj ):
             self.vli = new_vli
     
     
+    
     def resetVLI(self):
         """
         Resets the Visual Line Index
@@ -289,6 +302,7 @@ class Tree( UIobj ):
             self.aux_vli = self.vli = self.selected
             if self.focus is False:
                 self.setSelectVLI()
+    
     
     
     def setSelectVLI(self):
@@ -317,6 +331,7 @@ class Tree( UIobj ):
             self.branchSelect( branch )
     
     
+    
     def backSelect(self):
         """
         Set the VLI to the old branch position
@@ -336,6 +351,7 @@ class Tree( UIobj ):
         self.aux_vli = self.vli = self.selected
     
     
+    
     def branchSelect(self, branch:str ):
         """
         Set the VLI to the new branch position
@@ -349,6 +365,7 @@ class Tree( UIobj ):
                 i += 1
         self.selected = self.vli + ( i - self.vli )
         self.aux_vli = self.vli = self.selected
+    
     
     
     def leafSelect(self, leaf:str ):
@@ -365,14 +382,15 @@ class Tree( UIobj ):
         self.aux_vli = self.vli = self.selected
     
     
+    
     def select(self):
         """
         Select a branch/leaf to expand/view
         """
         item = self.content[self.vli].strip(" ├└")
         if item == "":
-            # this shouldn't be
-            raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+            # empty string
+            raise Exception("tree.select&selection item is empty")
         elif item.startswith( self.DIR ):
             # expand the dir content
             item = item.strip("%s " %(self.DIR))
@@ -402,6 +420,7 @@ class Tree( UIobj ):
         self.selected = self.vli
     
     
+    
     def search(self, char:chr ):
         """
         Finds the first occurrence matching the char
@@ -429,6 +448,7 @@ class Tree( UIobj ):
             self.aux_vli = self.vli
             self.vli = found
             self.smartRedraw()
+    
     
     
     def feed(self, key:int ):
@@ -505,6 +525,7 @@ class Tree( UIobj ):
                     pass
     
     
+    
     def cliTree(self, new_tree:list ):
         """
         Receive a tree from the CLI and tries to apply it
@@ -562,3 +583,4 @@ class Tree( UIobj ):
                 self.ui.tree2view( new_leaf_path )
             else:
                 self.ui.switch2tree()
+    
