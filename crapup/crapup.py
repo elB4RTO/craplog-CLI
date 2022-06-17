@@ -1,14 +1,21 @@
 
 from sys import argv
+from sys.path import append as libpath
+libpath("../")
+
 from time import sleep
 from os.path import abspath
 
-from crappy import aux
+from craplib import aux
+from crappy.aux import *
 from crappy.git import gitPull
 from crappy.get import versionCheck
 
 
 class Crapup():
+    """
+    Craplog's updater
+    """
     def __init__(self, args:list ):
         # declare variables
         self.use_configs:   bool
@@ -44,6 +51,7 @@ class Crapup():
         # parse arguments if not unset
         if self.use_arguments is True:
             self.parseArguments( args )
+    
     
     
     def initVariables(self):
@@ -103,8 +111,9 @@ class Crapup():
         self.MSG_crapup = self.MSG_fin =\
         self.TXT_crapup = self.TXT_fin =\
         self.TXT_craplog = ""
-
-
+    
+    
+    
     def readConfigs(self):
         """
         Read the saved configuration
@@ -112,7 +121,7 @@ class Crapup():
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
         self.crappath = crappath[:crappath.rfind('/')]
-        path = "%s/crapconf/crapup.crapconf" %(self.crappath)
+        path = "%s/crapconfs/crapup.crapconf" %(self.crappath)
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -145,6 +154,7 @@ class Crapup():
             self.initMessages()
     
     
+    
     def initMessages(self):
         """
         Bring message strings
@@ -155,16 +165,17 @@ class Crapup():
         else:
             self.text_colors = aux.no_colors()
         self.MSG_elbarto  = aux.elbarto()
-        self.MSG_help     = aux.help( self.text_colors )
-        self.MSG_examples = aux.examples( self.text_colors )
-        self.MSG_craplogo = aux.craplogo()
-        self.MSG_crapup   = aux.crapup( self.text_colors )
-        self.MSG_fin      = aux.fin( self.text_colors )
-        self.TXT_crapup   = "{red}c{orange}r{grass}a{cyan}p{white}UP{default}".format(**self.text_colors)
-        self.TXT_fin      = "{orange}F{grass}I{cyan}N{default}".format(**self.text_colors)
-        self.TXT_craplog  = "{red}C{orange}R{grass}A{cyan}P{white}LOG{default}".format(**self.text_colors)
-
-
+        self.MSG_help     = MSG_help( self.text_colors )
+        self.MSG_examples = MSG_examples( self.text_colors )
+        self.MSG_craplogo = aux.LOGO_crapup()
+        self.MSG_crapup   = aux.MSG_crapup( self.text_colors )
+        self.MSG_fin      = aux.MSG_fin( self.text_colors )
+        self.TXT_crapup   = aux.TXT_crapup( self.text_colors )
+        self.TXT_fin      = aux.TXT_fin( self.text_colors )
+        self.TXT_craplog  = aux.TXT_craplog( self.text_colors )
+    
+    
+    
     def parseArguments(self, args: list ):
         """
         Finalize Craplog's variables (if not manually unset)
@@ -182,10 +193,10 @@ class Crapup():
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print("\n%s\n\n%s\n\n%s\n" %( self.MSG_craplogo, self.MSG_help, self.MSG_examples ))
+                print("\n%s\n\n%s\n\n%s\n" %( self.LOGO_crapup, self.MSG_help, self.MSG_examples ))
                 exit()
             elif arg == "--examples":
-                print("\n%s\n\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                print("\n%s\n\n%s\n" %( self.LOGO_crapup, self.MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
@@ -206,8 +217,9 @@ class Crapup():
                     print("                 use {cyan}crapup --help{default} to view an help screen"\
                         .format(**self.text_colors))
                 exit("")
-
-
+    
+    
+    
     def welcomeMessage(self):
         """
         Print the welcome message
@@ -219,8 +231,9 @@ class Crapup():
             print("{bold}%s"\
                 .format(**self.text_colors)\
                 %( self.TXT_crapup ))
-
-
+    
+    
+    
     def exitMessage(self):
         """
         Print the exit message
@@ -233,6 +246,7 @@ class Crapup():
                 %( self.TXT_fin ))
     
     
+    
     def printError(self, err_key:str, message:str ):
         """
         Print an error message
@@ -240,6 +254,7 @@ class Crapup():
         print("\n{err}Error{white}[{grey}%s{white}]{red}>{default} %s{default}"\
             .format(**self.text_colors)\
             %( err_key, message ))
+    
     
     
     def exitAborted(self):
@@ -251,8 +266,8 @@ class Crapup():
         if self.less_output is False:
             print()
         exit()
-
-
+    
+    
     def main(self):
         """
         Main function to call
@@ -281,3 +296,4 @@ if __name__ == "__main__":
         failed = True
     finally:
         del crapup
+    
