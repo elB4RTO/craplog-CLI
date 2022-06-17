@@ -7,7 +7,8 @@ from subprocess import run, STDOUT, DEVNULL
 import tarfile
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from crappy.check import checkFolder
+from craplib.utils import checkFolder
+
 
 def newName(
     path:   str,
@@ -25,6 +26,7 @@ def newName(
         else:
             found = True
     return "originals.%s%s" %( number, suffix )
+
 
 
 def backupFiles(
@@ -49,6 +51,7 @@ def backupFiles(
         craplog.restoreCaret()
 
 
+
 def backupTarGz(
     craplog: object,
     path:    str
@@ -59,7 +62,7 @@ def backupTarGz(
     with tarfile.open( path, 'w:gz' ) as tz:
         for log_file in craplog.log_files:
             craplog.printCaret(
-                "%s {white}->{azul} tar.gz"\
+                "%s {white}->{sky} tar.gz"\
                     .format(**craplog.text_colors)\
                     %(log_file) )
             file_path = "%s/%s" %( craplog.logs_path, log_file )
@@ -67,6 +70,7 @@ def backupTarGz(
                 file_path,
                 arcname=log_file )
             craplog.restoreCaret()
+
 
 
 def backupZip(
@@ -81,7 +85,7 @@ def backupZip(
         with ZipFile( path, 'w' ) as z:
             for log_file in craplog.log_files:
                 craplog.printCaret(
-                    "%s {white}->{azul} zip"\
+                    "%s {white}->{sky} zip"\
                         .format(**craplog.text_colors)\
                         %(log_file) )
                 file_path = "%s/%s" %( craplog.logs_path, log_file )
@@ -101,6 +105,7 @@ def backupZip(
                     file_path,
                     arcname=log_file )
                 craplog.restoreCaret()
+
 
 
 def backupOriginals(
@@ -311,3 +316,4 @@ def backupGlobals(
                     print("                       please add read/write permissions to the whole crapstats folder")
                 print()
                 # don't break, keep printing file names to be restored manually
+    
