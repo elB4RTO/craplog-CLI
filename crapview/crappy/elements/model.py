@@ -15,6 +15,7 @@ class UIobj():
         self.window = window
         self.ui = ui
     
+    
     def endY(self):
         """
         Returns the last drawable point on the Y axis
@@ -27,11 +28,15 @@ class UIobj():
         """
         return self.x + self.w - 1
     
+    
+    
     def initContent(self):
         """
         Model for the Sub-Classes
         """
         pass
+    
+    
     
     def config(self, new_h, new_w, new_y, new_x ):
         """
@@ -50,11 +55,15 @@ class UIobj():
             self.window.mvwin( self.y, self.x )
         self.redraw()
     
+    
+    
     def feed(self, key:int ):
         """
         Model for the Sub-Classes
         """
         pass
+    
+    
     
     def drawBorder(self, quitting:bool=False):
         """
@@ -85,11 +94,15 @@ class UIobj():
             color )
         self.window.noutrefresh()
     
+    
+    
     def drawContent(self):
         """
         Model for the Sub-Classes
         """
         pass
+    
+    
     
     def cleanContentArea(self):
         """
@@ -104,11 +117,15 @@ class UIobj():
         # push the updates
         self.window.noutrefresh()
     
+    
+    
     def clearAll(self ):
         """
         Model for the Sub-Classes
         """
         pass
+    
+    
     
     def redraw(self):
         """
@@ -118,6 +135,8 @@ class UIobj():
         self.drawBorder()
         self.drawContent()
     
+    
+    
     def redrawQuit(self):
         """
         Redraw the entire window
@@ -126,4 +145,3 @@ class UIobj():
         self.cleanContentArea()
         self.drawBorder( quitting=True )
     
-
