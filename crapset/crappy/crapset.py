@@ -1,8 +1,8 @@
 
 from time import sleep
 
-from crappy.model import ModelSet
-from crappy.check import checkFile, checkFolder
+from craplib.utils import checkFile, checkFolder
+from crappy.model  import ModelSet
 
 
 class SetSet(ModelSet):
@@ -61,6 +61,7 @@ class SetSet(ModelSet):
   {italic}Disable using colors and enable using less output at once{default}\n%s{bold}    : don't use colors and use less_output{default}%s\
 """.format(**supercrap.text_colors)\
    %(self.space,self.morespace,self.morespace,self.morespace,self.morespace,self.space)
+    
     
     
     def readConfigs(self, supercrap:object ):
