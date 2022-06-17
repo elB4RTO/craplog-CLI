@@ -3,14 +3,12 @@ from os import chdir
 from os.path import abspath
 from subprocess import run, PIPE, DEVNULL
 
-from crappy.check import checkFile
+from craplib.utils import checkFolder, checkFile
 
 
-def gitPull(
-    crapup: object
-):
+def gitPull( crapup:object ):
     """
-    Manage the git-pull
+    Manages the git-pull
     """
     def gitConfig( field:str, value:str ):
         nonlocal crapup
