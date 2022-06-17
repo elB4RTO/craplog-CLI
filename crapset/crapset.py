@@ -1,9 +1,13 @@
 
 from sys import argv
+from sys.path import append as libpath
+libpath("../")
+
 from time import sleep
 from os.path import abspath
 
-from crappy import aux
+from craplib import aux
+from crappy.aux import *
 from crappy.crapup import UpSet
 from crappy.crapset import SetSet
 from crappy.craplog import LogSet
@@ -11,12 +15,15 @@ from crappy.crapview import ViewSet
 
 
 class Crapset():
+    """
+    Craplog's configurator
+    """
     def __init__(self, args:list ):
         """ Initialize Crapset """
         # get the path to the configuration files
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
-        self.confpath = "%s/crapconf" %(crappath[:crappath.rfind('/')])
+        self.confpath = "%s/crapconfs" %(crappath[:crappath.rfind('/')])
         self.file_path = "%s/crapset.crapconf" %(self.confpath)
         #
         ################################################################
@@ -75,8 +82,9 @@ class Crapset():
         self.setset.readConfigs( self )
         self.logset.readConfigs( self )
         self.viewset.readConfigs( self )
-
-
+    
+    
+    
     def readConfigs(self):
         """
         Read the saved configuration
@@ -112,6 +120,7 @@ class Crapset():
             self.initMessages()
     
     
+    
     def parseArguments(self, args:list ):
         """ Initialize Crapset """
         n_args = len(args)-1
@@ -127,14 +136,10 @@ class Crapset():
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print("\n%s\n\nHelp can be found using {cyan}h{default} {italic}or{default} {cyan}help{default} while running Crapset\n"\
-                    .format(**self.text_colors)\
-                    %( self.MSG_craplogo ))
+                print("\n%s\n\n%s\n\n%s\n" %( self.LOGO_crapset, self.MSG_help, self.MSG_examples ))
                 exit()
             elif arg == "--examples":
-                print("\n%s\n\nHelp can be found using {cyan}h{default} {italic}or{default} {cyan}help{default} while running Crapset\n"\
-                    .format(**self.text_colors)\
-                    %( self.MSG_craplogo ))
+                print("\n%s\n\n%s\n" %( self.LOGO_crapset, self.MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
@@ -151,6 +156,7 @@ class Crapset():
                 exit("")
     
     
+    
     def initMessages(self):
         """
         Bring message strings
@@ -161,16 +167,19 @@ class Crapset():
         else:
             self.text_colors = aux.no_colors()
         self.MSG_elbarto  = aux.elbarto()
-        self.MSG_craplogo = aux.craplogo()
-        self.MSG_crapset  = aux.crapup( self.text_colors )
-        self.MSG_fin      = aux.fin( self.text_colors )
-        self.TXT_fin      = "{orange}F{grass}I{cyan}N{default}".format(**self.text_colors)
-        self.TXT_crapset  = "{red}c{orange}r{grass}a{cyan}p{white}SET{default}".format(**self.text_colors)
-        self.TXT_crapup   = "{red}c{orange}r{grass}a{cyan}p{white}UP{default}".format(**self.text_colors)
-        self.TXT_craplog  = "{red}c{orange}r{grass}a{cyan}p{white}LOG{default}".format(**self.text_colors)
-        self.TXT_crapview = "{red}c{orange}r{grass}a{cyan}p{white}VIEW{default}".format(**self.text_colors)
-
-
+        self.MSG_help     = MSG_help( self.text_colors )
+        self.MSG_examples = MSG_examples( self.text_colors )
+        self.LOGO_crapset = aux.LOGO_crapset()
+        self.MSG_crapset  = aux.MSG_crapset( self.text_colors )
+        self.MSG_fin      = aux.MSG_fin( self.text_colors )
+        self.TXT_fin      = aux.TXT_fin( self.text_colors )
+        self.TXT_crapset  = aux.TXT_crapset( self.text_colors )
+        self.TXT_crapup   = aux.TXT_crapup( self.text_colors )
+        self.TXT_craplog  = aux.TXT_craplog( self.text_colors )
+        self.TXT_crapview = aux.TXT_crapview( self.text_colors )
+    
+    
+    
     def welcomeMessage(self):
         """
         Print the welcome message
@@ -182,8 +191,9 @@ class Crapset():
             print("{bold}%s"\
                 .format(**self.text_colors)\
                 %( self.TXT_crapset ))
-
-
+    
+    
+    
     def exitMessage(self):
         """
         Print the exit message
@@ -194,6 +204,7 @@ class Crapset():
             print("{bold}%s"\
                 .format(**self.text_colors)\
                 %( self.TXT_fin ))
+    
     
     
     def printWarning(self, err_key:str, message:str ):
@@ -207,6 +218,7 @@ class Crapset():
             %( err_key, message ))
     
     
+    
     def printError(self, err_key:str, message:str ):
         """
         Print an error message
@@ -218,6 +230,7 @@ class Crapset():
             %( err_key, message ))
     
     
+    
     def exitAborted(self):
         """
         Print the abortion message and exit
@@ -227,6 +240,7 @@ class Crapset():
         if self.less_output is False:
             print()
         exit()
+    
     
     
     def saveConfigs(self):
@@ -245,6 +259,7 @@ class Crapset():
         # crapview
         if self.viewset.unsaved_changes is True:
             self.viewset.writeConfigs( self )
+    
     
     
     def checkUnsavedChanges(self):
@@ -296,7 +311,7 @@ class Crapset():
                     if self.less_output is False:
                         print()
                         sleep(1)
-            
+        
     
     
     def main(self):
@@ -385,7 +400,6 @@ class Crapset():
     
 
 
-
 if __name__ == "__main__":
     failed = False
     crapset = Crapset( argv )
@@ -410,3 +424,4 @@ if __name__ == "__main__":
         crapset.checkUnsavedChanges()
         crapset.exitMessage()
         del crapset
+    
