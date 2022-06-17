@@ -1,9 +1,8 @@
 
 from time import sleep
-from random import choice, shuffle
 
-from crappy.model import ModelSet
-from crappy.check import checkFile, checkFolder
+from craplib.utils import checkFile, checkFolder
+from crappy.model  import ModelSet
 
 
 class ViewSet(ModelSet):
@@ -58,6 +57,7 @@ class ViewSet(ModelSet):
   {italic}Enable using both configuration files and arguments at once{default}\n%s{bold}    : use configs, arguments{default}%s\
 """.format(**supercrap.text_colors)\
    %(self.space,self.morespace,self.morespace,self.morespace,self.morespace,self.space)
+    
         
     
     def readConfigs(self, supercrap:object ):
@@ -143,4 +143,5 @@ class ViewSet(ModelSet):
             self.unsaved_changes = False
     
     
-    # the integrity check is useless here, the default is good
+    # the integrity check is useless here, there's nothing to check
+    
