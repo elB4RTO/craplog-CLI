@@ -1,47 +1,35 @@
 
-def elbarto() -> str :
-    return """\
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░██░░░░░░░░░░░░░░░░░░██████████░░░░░░░░░░░░░░░░░░░░
-░░░░░███████░██░░░░░░░░░░░░░░░░░░░░░░█░░░░░░░░█░█░█░█░█░█░░░░░░
-░░░░░░█░░░░░░██░░░░░███░░░░██░░████░░█░████░░░███████████░░░░░░
-░░░░░░████░░░██░░░░░█░░█░░█░█░░░█░░█░█░█░░█░░░███████████░░░░░░
-░░░░░░█░░░░░░██░░░░░███░░░█░░█░░███░░█░█░░█░░░███████████░ ░░░░
-░░░░░░██████░█░░░░░░█░░█░██████░█░░█░░░████░░░            ░░░░░
-░░░░░░░░░░░░░░░░░░░░███░░█░░░░█░█░░█░░░░░░░░░░  ▄       ▄░ ░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░███████████░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░███████████░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░████░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\
-"""
-
-
-def craplogo() -> str :
-    return """\
-     __    ___     _____    ___     _       _____    _____
-    / _|  |   \\   |  _  |  |   \\   | |     |  _  |  |  ___|
-   | /    | || |  | |_| |  | || |  | |     | | | |  | |
-   | |    |   /   |  _  |  |  _/   | |     | | | |  | | __
-   | \\_   |   \\   | | | |  | |     | |__   | |_| |  | |_| |
-    \\__|  |_|\\_\\  |_| |_|  |_|     |____|  |_____|  |_____|\
-"""
-
-
-def help( color_set ) -> str :
+def MSG_help( color_set:dict ) -> str :
     return """\
 {err}Synopsis{default}
 
-    craplog {grey}[{white}OPTION{grey}]{default} {grey}[{italic}{white}ARGUMENT{grey}]{default}
+    craplog {grey}[{white}TOOL{grey}]{default} {grey}[{white}OPTION{grey}]{default} {grey}[{italic}{white}ARGUMENT{default}{grey}]{default}
+
+
+{err}Tools{default}
+
+                   {yellow}Tool{default}  ¦  {yellow}Description{default}
+{white}--------------------------------------------------------------------------------{default}
+                         ¦
+                    {italic}log{default}  ¦  Craplog: make statistics from the logs
+                         ¦  {italic}Implicit, can be omitted{default}
+                         ¦
+                   {bold}view{default}  ¦  Crapview: view your statistics
+                         ¦  {italic}See the related {default}--help{italic} for more details{default}
+                         ¦
+                    {bold}set{default}  ¦  Crapset: configure these tools
+                         ¦  {italic}See the related {default}--help{italic} for more details{default}
+                         ¦
+                     {bold}up{default}  ¦  Crapup: check for updates
+                         ¦  {italic}See the related {default}--help{italic} for more details{default}
+                         ¦
+{white}--------------------------------------------------------------------------------{default}
 
 
 {err}Options{default}
 
                  {yellow}Option{default}  ¦  {yellow}Description{default}
-{white}-------------------------------------------------------------------------------{default}
+{white}--------------------------------------------------------------------------------{default}
                          ¦
                      {bold}-h{default}  ¦  print this screen and exit
                  {bold}--help{default}  ¦
@@ -139,13 +127,18 @@ def help( color_set ) -> str :
                          ¦    - the match is successful when the logged IP
                          ¦      starts with /or/ is equal to a whitelisted IP
                          ¦
-{white}-------------------------------------------------------------------------------{default}
+{white}--------------------------------------------------------------------------------{default}\
 """.format(**color_set).replace("¦", "{white}¦{default}".format(**color_set))
 
 
-def examples( color_set ) -> str :
+def MSG_examples( color_set:dict ) -> str :
     return """\
 {err}Examples{default}
+
+   - {green}Get help about a tool, {azul}Crapup{default}{green} in this case.
+     To run a tool, replace {cyan}--help{green} with the options you please.{default}
+     
+       {italic}craplog{default} {azul}update{default} {bold}--help{default}
 
    - {green}Use default log files (*.log.1) as input, including errors. Store the
      original files as a tar.gz compressed archive, without deleting them.
@@ -155,8 +148,8 @@ def examples( color_set ) -> str :
        {italic}craplog{default} {bold}-e -bT --trash{default}
 
 
-   - {green}As the previous but only parse errors, avoiding access logs.
-     Store the original files as a zip compressed archive, without deleting them.
+   - {green}As the previous but only parse errors, avoiding access logs. Store the
+     original files as a zip compressed archive, without deleting them.
      Shred files if needed (instead of normal deletion).
      Global statistics will updated by default.{default}
      
@@ -182,77 +175,9 @@ def examples( color_set ) -> str :
        {italic}craplog{default} {bold}-m -p -gO --warning-size 20{default}
 
 
-   - {green}Print less informations on screen, with performances but without using colors.
+   - {green}Print less informations, with performances but without using colors.
      Use the default access and error logs files, but do not updatie globals.
      Make a backup copy of the original files used and delete them when done.{default}
    
-       {italic}craplog{default} {bold}-l -p --no-colors -e -gA -b -dO{default}
+       {italic}craplog{default} {bold}-l -p --no-colors -e -gA -b -dO{default}\
 """.format(**color_set)
-
-
-def craplog( color_set ) -> str :
-    return """{bold}\
-   {red} CCCC{default}{bold}  {orange}RRRR {default}{bold}  {grass}AAAAA{default}{bold}  {cyan}PPPP {default}{bold}  {white}L    {default}{bold}  {white}OOOOO{default}{bold}  {white}GGGGG{default}{bold}
-   {red}C    {default}{bold}  {orange}R   R{default}{bold}  {grass}A   A{default}{bold}  {cyan}P   P{default}{bold}  {white}L    {default}{bold}  {white}O   O{default}{bold}  {white}G    {default}{bold}
-   {red}C    {default}{bold}  {orange}RRRR {default}{bold}  {grass}AAAAA{default}{bold}  {cyan}PPPP {default}{bold}  {white}L    {default}{bold}  {white}O   O{default}{bold}  {white}G  GG{default}{bold}
-   {red}C    {default}{bold}  {orange}R  R {default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {white}L    {default}{bold}  {white}O   O{default}{bold}  {white}G   G{default}{bold}
-   {red} CCCC{default}{bold}  {orange}R   R{default}{bold}  {grass}A   A{default}{bold}  {cyan}P    {default}{bold}  {white}LLLLL{default}{bold}  {white}OOOOO{default}{bold}  {white}GGGGG{default}\
-""".format(**color_set)
-
-
-def fin( color_set ) -> str :
-    return """{bold}\
-   {orange}FFFFF{default}{bold}  {grass}II{default}{bold}  {cyan}N   N{default}{bold}
-   {orange}F    {default}{bold}  {grass}II{default}{bold}  {cyan}NN  N{default}{bold}
-   {orange}FFF  {default}{bold}  {grass}II{default}{bold}  {cyan}N N N{default}{bold}
-   {orange}F    {default}{bold}  {grass}II{default}{bold}  {cyan}N  NN{default}{bold}
-   {orange}F    {default}{bold}  {grass}II{default}{bold}  {cyan}N   N{default}\
-""".format(**color_set)
-
-
-def colors() -> dict :
-    return { 'default' : "\033[0m",
-             'bold'    : "\033[1m",
-             'italic'  : "\033[3m",
-             'black'   : "\033[30m",
-             'grey'    : "\033[90m",
-             'white'   : "\033[37m",
-             'paradise': "\033[97m",
-             'purple'  : "\033[35m",
-             'pink'    : "\033[95m",
-             'blue'    : "\033[34m",
-             'azul'    : "\033[94m",
-             'cyan'    : "\033[36m",
-             'grass'   : "\033[32m",
-             'green'   : "\033[92m",
-             'red'     : "\033[31m",
-             'rose'    : "\033[91m",
-             'orange'  : "\033[33m",
-             'yellow'  : "\033[93m",
-             'ok'      : "\033[1;32m",
-             'err'     : "\033[1;31m",
-             'warn'    : "\033[1;33m" }
-
-
-def no_colors() -> dict :
-    return { 'default' : "",
-             'bold'    : "",
-             'italic'  : "",
-             'black'   : "",
-             'grey'    : "",
-             'white'   : "",
-             'paradise': "",
-             'purple'  : "",
-             'pink'    : "",
-             'blue'    : "",
-             'azul'    : "",
-             'cyan'    : "",
-             'grass'   : "",
-             'green'   : "",
-             'red'     : "",
-             'rose'    : "",
-             'orange'  : "",
-             'yellow'  : "",
-             'ok'      : "",
-             'err'     : "",
-             'warn'    : "" }
