@@ -3,7 +3,7 @@ from os import rename
 from os.path import exists
 from time import perf_counter as timer
 
-from crappy.check import checkFolder, checkFile
+from craplib.utils import checkFolder, checkFile
 
 
 def sortStatistics(
@@ -19,6 +19,7 @@ def sortStatistics(
             if counts[i] > counts[j]:
                 counts[i],counts[j] = counts[j],counts[i]
                 items[i],items[j] = items[j],items[i]
+
 
 
 def saveStatistics(
@@ -51,6 +52,7 @@ def saveStatistics(
             print("              please add read/write permissions to the whole crapstats folder and retry")
         print()
     return successful
+
 
 
 def mergeStatistics(
@@ -135,6 +137,7 @@ def mergeStatistics(
     finally:
         # whatever happened, return the result
         return successful
+
 
 
 def storeSessions(
@@ -235,6 +238,7 @@ def storeSessions(
         craplog.exitAborted()
 
 
+
 def updateGlobals(
     craplog: object
 ):
@@ -314,4 +318,4 @@ def updateGlobals(
     # exit if an error occured
     if checks_passed is False:
         craplog.exitAborted()
-
+    
