@@ -180,7 +180,7 @@ Examples
 
 
    - Print less informations, with performances but without using colors.
-     Use the default access and error logs files, but do not updatie globals.
+     Use the default acces s and error logs files, but do not updatie globals.
      Make a backup copy of the original files used and delete them when done.
    
        craplog -l -p --no-colors -e -gA -b -dO
