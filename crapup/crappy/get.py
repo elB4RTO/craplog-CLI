@@ -2,11 +2,9 @@
 from requests import get as GET
 
 
-def versionCheck(
-    crapup: object
-):
+def versionCheck( crapup:object ):
     """
-    Manage the request
+    Manages the request
     """
     # version check url
     url = "https://github.com/elB4RTO/craplog-CLI/blob/main/version_check"
