@@ -2,7 +2,6 @@
 from time import sleep
 
 from random import choice, shuffle
-from crappy.check import checkFile, checkFolder
 
 
 class ModelSet():
@@ -73,7 +72,7 @@ class ModelSet():
                 elif val_type is not str:
                     val_ = val
                     val = str(val)
-                    col = supercrap.text_colors['azul']
+                    col = supercrap.text_colors['sky']
                     if val_type is bool:
                         if val_ is True:
                             col = supercrap.text_colors['green']
