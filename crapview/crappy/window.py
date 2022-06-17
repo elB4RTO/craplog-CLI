@@ -5,7 +5,11 @@ from os import get_terminal_size
 
 from crappy.interface import TUI
 
+
 class Window():
+    """
+    Base window (the terminal)
+    """
     def __init__(self, stdscr, crappath ):
         """
         Crapview's initializer
@@ -21,6 +25,7 @@ class Window():
         self.dry_run = False
     
     
+    
     def checkResized(self):
         """
         If the window has been resized, updates new values
@@ -33,6 +38,7 @@ class Window():
             self.ui.resize( n_cols, n_rows )
             self.ui.redraw()
             self.dry_run = True
+    
     
     
     def run(self):
@@ -55,3 +61,4 @@ class Window():
             curses.doupdate()
             #self.screen.refresh() # <-- DELETE IF USELESS
         self.ui.quitting()
+    
