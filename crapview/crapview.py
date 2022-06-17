@@ -1,11 +1,16 @@
 
 import curses
 
+from time import sleep
+
 from sys import argv
+from sys.path import append as libpath
+libpath("../")
 
 from os.path import abspath
 
-from crappy import aux
+from craplib import aux
+from crappy.aux    import *
 from crappy.window import Window
 
 
@@ -45,10 +50,10 @@ def initCrapview( args ) -> bool :
     def initMessages():
         nonlocal use_colors, text_colors
         nonlocal MSG_elbarto, MSG_help, MSG_examples, MSG_craplogo
-        MSG_elbarto = aux.elbarto()
-        MSG_help = aux.help( text_colors )
-        MSG_examples = aux.examples( text_colors )
-        MSG_craplogo = aux.craplogo()
+        MSG_elbarto  = aux.elbarto()
+        MSG_help     = MSG_help( text_colors )
+        MSG_examples = MSG_examples( text_colors )
+        MSG_craplogo = aux.LOGO_crapview()
     
     if use_colors is True:
         text_colors = aux.colors()
@@ -59,7 +64,7 @@ def initCrapview( args ) -> bool :
     if use_configs is True:
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
-        path = "%s/crapconf/crapview.crapconf" %(crappath[:crappath.rfind('/')])
+        path = "%s/crapconfs/crapview.crapconf" %(crappath[:crappath.rfind('/')])
         with open(path,'r') as f:
             tmp = f.read().strip().split('\n')
         configs = []
@@ -102,7 +107,10 @@ def initCrapview( args ) -> bool :
                 exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print("\n%s\n\n%s\n\n%s\n" %( MSG_craplogo, MSG_help, MSG_examples ))
+                print("\n%s\n\n%s\n\n%s\n" %( self.LOGO_crapview, self.MSG_help, self.MSG_examples ))
+                exit()
+            elif arg == "--examples":
+                print("\n%s\n\n%s\n" %( self.LOGO_crapview, self.MSG_examples ))
                 exit()
             # auxiliary arguments
             elif arg == "--no-colors":
@@ -120,6 +128,7 @@ def initCrapview( args ) -> bool :
                     %(arg))
                 exit()
     return use_colors
+
 
 
 def initCurses( screen, use_colors ):
@@ -159,6 +168,8 @@ def initCurses( screen, use_colors ):
     # activate keypad mode
     #screen.keypad( True )
 
+
+
 def deinitscr( screen ):
     """
     De-initialize terminal screen
@@ -169,6 +180,7 @@ def deinitscr( screen ):
     curses.nocbreak()
     curses.echo()
     curses.endwin()
+
 
 
 def main( screen ):
@@ -187,6 +199,7 @@ def main( screen ):
 # RUN CRAPLOG
 if __name__ == "__main__":
     failed = False
+    err_key = err_msg = ""
     use_colors = initCrapview( argv )
     # init screen
     screen = curses.initscr()
@@ -195,8 +208,40 @@ if __name__ == "__main__":
         # run crapview
         curses.wrapper( main )
     except (KeyboardInterrupt):
-        failed = True
-    except:
+        failed = None
+        err_key = "keyboard"
+        err_msg = "keyboard interrupt"
+    except Exception as exc:
         failed = True
     finally:
         deinitscr( screen )
+        if failed is not False:
+            # wait or the error message may not be displayed correctly
+            sleep(0.5)
+            # get the colors
+            if use_colors is True:
+                text_colors = aux.colors()
+            else:
+                text_colors = aux.no_colors()
+            # enters only if no keyboard interrupt occured
+            if failed is True:
+                # get the error key
+                exc = str(exc)
+                s = exc.find('&')
+                err_key = exc[:s]
+                exc = exc[s+1:]
+                # get the error message
+                s = exc.find('&')
+                if s == -1:
+                    # no secondary items
+                    err_msg = exc
+                else:
+                    # has a secondary item
+                    err_msg = "%s: {rose}%s{default}" %( exc[:s], exc[s+1:] )
+            # print the message
+            print("\n{err}Error{white}[{grey}%s{white}]{red}>{default} %s\n"\
+                .format(**text_colors)\
+                %( err_key, err_msg ))
+            print("{err}CRAPVIEW ABORTED{default}\n"\
+                .format(**text_colors))
+    
