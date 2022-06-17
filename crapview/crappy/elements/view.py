@@ -36,6 +36,7 @@ class View( UIobj ):
         }
     
     
+    
     def inputStats(self, file_path:str ):
         """
         Read and show the statistics
@@ -54,22 +55,22 @@ class View( UIobj ):
                 # read old statistics from file
                 stats = f.read().strip().split('\n')
         except:
-            # failed to read, put an error message here
-            raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+            # failed to read
+            raise Exception("view.input&failed to read file&%s" %(file_path))
         else:
             # successfully read
             for stat in stats:
                 stat = stat.lstrip()
                 s = stat.find(' ')
                 if s < 0:
-                    # no separator found, put an error message here
-                    raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+                    # no separator found
+                    raise Exception("view.input&malformed line, no separator found&%s" %(stat))
                 # get item and count
                 try:
                     count = int(stat[:s].strip())
                 except:
-                    # can't convert to number, put an error message here
-                    raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+                    # can't convert to number
+                    raise Exception("view.input&malformed count value&%s" %(stat))
                 try:
                     item = stat[s+1:].strip()
                 except:
@@ -83,11 +84,13 @@ class View( UIobj ):
             self.makeBars()
             # stats collected, check integrity
             if len(self.counts) != len(self.items) != len(self.bars):
-                # something went wrong, put an error message here
-                raise Exception("\033[1;31m!-> PUT AN ERROR MESSAGE HERE !!!\033[0m")
+                # something went wrong
+                raise Exception("view.input&something went wrong, lists differ in length&%s %s %s"\
+                    %(len(self.counts),len(self.items),len(self.bars)))
             self.drawContent()
             self.cleanContentArea()
             self.drawContent()
+    
     
     
     def makeBars(self):
@@ -96,6 +99,7 @@ class View( UIobj ):
         """
         k = sum(self.counts) / (self.w-2)
         self.bars = [ int(x/k) for x in self.counts ]
+    
     
     
     def clearAll(self):
@@ -109,6 +113,7 @@ class View( UIobj ):
         self.max_clen = self.max_ilen = 0
         self.vertical_shift = self.horizontal_shift = 0
         self.cleanContentArea()
+    
     
     
     def drawContent(self):
@@ -184,7 +189,7 @@ class View( UIobj ):
             if y+2 > self.h-2:
                 break
         self.window.noutrefresh()
-        
+    
     
     
     def feed(self, key:int ):
@@ -299,4 +304,3 @@ class View( UIobj ):
             self.makeBars()
             self.drawContent()
     
-
