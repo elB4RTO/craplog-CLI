@@ -1,8 +1,8 @@
 
 from time import sleep
 
-from crappy.model import ModelSet
-from crappy.check import checkFile, checkFolder
+from craplib.utils import checkFile, checkFolder
+from crappy.model  import ModelSet
 
 
 class LogSet(ModelSet):
@@ -116,6 +116,7 @@ class LogSet(ModelSet):
    %(self.space,self.morespace,self.morespace,self.morespace,self.morespace,
      self.morespace,self.morespace,self.morespace,self.morespace,self.morespace,
      self.morespace,self.morespace,self.morespace,self.space)
+    
     
     
     def readConfigs(self, supercrap:object ):
