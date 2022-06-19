@@ -181,14 +181,14 @@ def collectLogLines(
         'access' : [],
         'error'  : []
     }
+    remove_list = []
     for file_name in craplog.log_files:
         craplog.printCaret( file_name )
         path = "%s/%s" %( craplog.logs_path, file_name )
         if craplog.usage_control is True:
             if checkUsage( craplog, path, file_name ) is False:
-                # file already used
-                craplog.printJobFailed()
-                craplog.exitAborted()
+                # file already used, don't remove now or the loop will be damaged
+                remove_list.append( file_name )
         if checkSize( craplog, path, file_name ) is False:
             # file too big
             craplog.exitAborted()
@@ -228,5 +228,12 @@ def collectLogLines(
                 craplog.logs_size += 1
         craplog.total_lines += len(log_lines)
         craplog.restoreCaret()
+    if len(remove_list) > 0:
+        for file_name in remove_list:
+            craplog.log_files.remove( file_name )
+        if len(craplog.log_files) == 0:
+            print("{rose}Nothing to do".format(**craplog.text_colors))
+            craplog.exitMessage(True)
+            exit()
     return data
 
