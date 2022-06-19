@@ -22,10 +22,10 @@ Tools
                    view  ¦  Crapview: view your statistics
                          ¦  See the related --help for more details
                          ¦
-                    set  ¦  Crapset: configure these tools
+                  setup  ¦  Crapset: configure these tools
                          ¦  See the related --help for more details
                          ¦
-                     up  ¦  Crapup: check for updates
+                 update  ¦  Crapup: check for updates
                          ¦  See the related --help for more details
                          ¦
 
@@ -139,10 +139,10 @@ Options
 
 Examples
 
-   - Get help about a tool, Crapup in this case.
+   - Get help about a tool, Crapview in this case.
      To run a tool, replace --help with the options you please.
      
-       craplog update --help
+       craplog view --help
 
    - Use default log files (*.log.1) as input, including errors. Store the
      original files as a tar.gz compressed archive, without deleting them.
