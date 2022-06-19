@@ -2,7 +2,7 @@
 from os.path import exists
 from hashlib import sha256
 
-from crappy.check import checkFile
+from craplib.utils import checkFile
 
 
 def digestFile(
