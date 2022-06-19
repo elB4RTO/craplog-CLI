@@ -64,6 +64,8 @@ class ModelSet():
                 %( self.space,self.morespace ))
             max_len = max([ len(s) for s in to_show ])
             for opt in to_show:
+                if opt == 'file selection':
+                    continue
                 col = supercrap.text_colors['yellow']
                 val = self.sets_map[ opt ]
                 val_type = type(val)
@@ -130,7 +132,7 @@ class ModelSet():
             elif user_input in ["b","back","main"]:
                 loop = False
             elif user_input in ["s","w","save","write"]:
-                self.writeConfigs()
+                self.writeConfigs( supercrap )
             elif user_input in ["h","help","help me","show help"]:
                 print(self.MSG_choices)
                 print(self.MSG_options)
@@ -151,7 +153,7 @@ class ModelSet():
                 if user_input.startswith("go fuck yourself"):
                     # smile, that's a joke ;)
                     msg = ["ok"]*80+["... thanks, you're so nice"]*19+["go fuck YOURself"]
-                    msg.shuffle()
+                    shuffle(msg)
                     print("{bold}%s{default}".format(**supercrap.text_colors)%( choice(msg) ))
                     if msg == "go fuck YOURself":
                         exit() # LOL
@@ -300,6 +302,7 @@ class ModelSet():
                                                     discarded.append(" ".join(arguments[i:]))
                                             break
                             else:
+                                # to list
                                 value = []
                                 for v in arguments:
                                     v = v.strip()
@@ -307,6 +310,11 @@ class ModelSet():
                                         value.append( v )
                                 if len(value) == 0:
                                     continue
+                                if target == "log files":
+                                    if value == ["access.log.1"]:
+                                        self.sets_map['file selection'] = False
+                                    else:
+                                        self.sets_map['file selection'] = True
                             
                             self.sets_map[ target ] = value
                             self.unsaved_changes = True
