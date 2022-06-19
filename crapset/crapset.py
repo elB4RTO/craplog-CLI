@@ -1,10 +1,13 @@
 
 from sys import argv
-from sys.path import append as libpath
-libpath("../")
+from sys import path as libpath
 
 from time import sleep
 from os.path import abspath
+
+crappath = abspath(__file__)
+crappath = crappath[:crappath.rfind('/')]
+libpath.append(crappath[:crappath.rfind('/')])
 
 from craplib import aux
 from crappy.aux import *
@@ -128,7 +131,7 @@ class Crapset():
         while i < n_args:
             i += 1
             arg = args[i]
-            if arg == "":
+            if arg in ["","set","crapset","setup","config"]:
                 continue
             # elB4RTO
             elif arg in ["elB4RTO","elbarto","-elbarto-"]:
@@ -235,7 +238,7 @@ class Crapset():
         """
         Print the abortion message and exit
         """
-        print("{err}CRAPSET ABORTED{default}"\
+        print("\n{err}CRAPSET ABORTED{default}"\
             .format(**self.text_colors))
         if self.less_output is False:
             print()
@@ -403,14 +406,9 @@ class Crapset():
 if __name__ == "__main__":
     failed = False
     crapset = Crapset( argv )
-    
     crapset.welcomeMessage()
-    crapset.main()
     try:
-        pass
-        #crapset.welcomeMessage()
-        #crapset.main()
-        #crapset.exitMessage()
+        crapset.main()
     except (KeyboardInterrupt):
         failed = True
         crapset.printError("failed","{yellow}keyboard interruption".format(**crapset.text_colors))
