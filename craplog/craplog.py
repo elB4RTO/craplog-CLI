@@ -2,8 +2,11 @@
 import os
 
 from sys import argv
-from sys.path import append as libpath
-libpath("../")
+from sys import path as libpath
+
+crappath = os.path.abspath(__file__)
+crappath = crappath[:crappath.rfind('/')]
+libpath.append(crappath[:crappath.rfind('/')])
 
 from time import sleep
 from time import perf_counter as timer
@@ -81,7 +84,7 @@ class Craplog(object):
         self.caret_return: int
         self.text_colors:  dict
         self.MSG_elbarto:  str
-        self.MSG_craplogo: str
+        self.LOGO_craplog: str
         self.MSG_help:     str
         self.MSG_examples: str
         self.MSG_craplog:  str
@@ -385,7 +388,7 @@ class Craplog(object):
         else:
             self.text_colors = aux.no_colors()
         self.MSG_elbarto  = aux.elbarto()
-        self.MSG_craplogo = aux.LOGO_craplog()
+        self.LOGO_craplog = aux.LOGO_craplog()
         self.MSG_help     = MSG_help( self.text_colors )
         self.MSG_examples = MSG_examples( self.text_colors )
         self.MSG_craplog  = aux.MSG_craplog( self.text_colors )
@@ -404,7 +407,7 @@ class Craplog(object):
         while i < n_args:
             i += 1
             arg = args[i]
-            if arg == "":
+            if arg in ["","log","craplog"]:
                 continue
             # elB4RTO
             elif arg in ["elB4RTO","elbarto","-elbarto-"]:
@@ -544,11 +547,12 @@ class Craplog(object):
     
     
     
-    def exitMessage(self):
+    def exitMessage(self, no_perf:bool=False ):
         """
         Print the exit message
         """
-        if self.performance is True:
+        if self.performance is True\
+        and no_perf is False:
             self.printOverallPerformance()
         if self.less_output is False:
             print("\n%s\n" %( self.MSG_fin ))
