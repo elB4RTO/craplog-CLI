@@ -96,7 +96,7 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 - Download and un-archive this repo
   <br>*or*<br>
   ```
-  git clone https://github.com/elB4RTO/craplog-CLI
+  git clone https://github.com/elB4RTO/craplog-CLI.git
   ```
   <br>
 - Open a terminal inside "*craplog-CLI-main*"
@@ -462,7 +462,7 @@ This version of Craplog keeps track of the log files which have been used.
 When a file is parsed succesfully, its **sha256** checksum is stored.<br>
 The stored checksums will be checked every time a file is given as input, to help preventing parsing the same files twice.
 
-Hasheswill be stored in **craplog/crapstats/.hashes**
+Hashes will be stored in **craplog/crapstats/.hashes**
 
 <br>
 
@@ -509,7 +509,7 @@ IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URI" "USER AGENT"
 ### Storage
 
 Statistics will be stored in Craplog's main folder: **craplog-CLI/crapstats/**<br>
-Please refer to the [statistics viewer tool](#statistics-viewer) to view your crapstats.
+Please refer to the [statistics viewer tool](#view-statistics) to view your crapstats.
 
 <br>
 
@@ -609,7 +609,7 @@ It is pretty straight forward: use `TAB` to switch between windows, `ENTER` to i
 
 On the left side you can see the **tree** of your *statistics*, as it is in your system.
 
-On the right side you can **view** the selected *statistics file*. You can see the elementa and their counts. The bars will show the percentage compared to the other elements in the same file.
+On the right side you can **view** the selected *statistics file*. You can see the elements *(in white)* and their counts *(in green)*. The bars will show the percentage compared to the other elements in the same file.
 
 Last but not least, at the bottom you can find the **cli**, which is not a real cli, but more like a search box.<br>
 Available **keywords** ar the following:
@@ -638,7 +638,7 @@ Available **keywords** ar the following:
 
 ### Estimated working speed
 
-1~10 MB/s
+1~15 MB/s
 
 May be higher or lower depending on the complexity of the logs, the complexity of the stored statistics (in case of merge), your hardware and the workload of your system during the execution.<br>
 Usually, if it takes more than 10 seconds to parse 10 MB of data, it means you've probably been tested in some way (better to check).<br><br>
