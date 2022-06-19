@@ -218,8 +218,8 @@ class Tree( UIobj ):
         """
         Just redraw the current and the next line
         """
-        t_color = curses.color_pair(2)
-        h_color = curses.color_pair(18)
+        t_color = curses.color_pair(31)
+        h_color = curses.color_pair(32)
         # redraw the actual line as non-highlighted
         self.window.addstr(
             self.aux_vli+1, 1,
@@ -257,11 +257,11 @@ class Tree( UIobj ):
         Draws the entire content
         """
         # set the color for the content
-        t_color = curses.color_pair(7)
-        h_color = curses.color_pair(2)
+        t_color = curses.color_pair(21)
+        h_color = curses.color_pair(22)
         if self.focus is True:
-            t_color = curses.color_pair(2)
-            h_color = curses.color_pair(18)
+            t_color = curses.color_pair(31)
+            h_color = curses.color_pair(32)
         else:
             self.setSelectVLI()
         # print the content
