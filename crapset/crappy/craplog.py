@@ -110,12 +110,12 @@ class LogSet(ModelSet):
   {italic}Enable making a backup of the original logs as zip archive{default}\n%s{bold}    : use backup zip{default}%s
   {italic}Set a custom warning size for the log files{default}%s\n{bold}    : set warning size 30{default}%s
   {italic}Set a custom path for the logs folder{default}%s\n{bold}    : set logs path /yout/path/to/logs{default}%s
-  {italic}Enable using the trash and set the path to it{default}%s\n{bold}    : use trash and set trash path /yout/path/to/trash{default}
+  {italic}Enable using the trash and set the path to it{default}%s\n{bold}    : use trash and set trash path /yout/path/to/trash{default}%s
   {italic}Set a custom whitelist of IPs{default}%s\n{bold}    : set whitelist ::1 192.168. {default}%s%s\
 """.format(**supercrap.text_colors)\
    %(self.space,self.morespace,self.morespace,self.morespace,self.morespace,
      self.morespace,self.morespace,self.morespace,self.morespace,self.morespace,
-     self.morespace,self.morespace,self.morespace,self.space)
+     self.morespace,self.morespace,self.morespace,self.morespace,self.space)
     
     
     
@@ -274,9 +274,9 @@ class LogSet(ModelSet):
                 with open(self.file_path,'w') as f:
                     f.write( configs )
                     if supercrap.more_output is True:
-                        print("\n{ok}Succesfully written configurations for {bold}CRAP{white}LOG{default}\n"\
+                        print("\n{ok}Succesfully written configurations for {bold}%s{default}\n"\
                             .format(**supercrap.text_colors)\
-                            %( self.file_path ))
+                            %( supercrap.TXT_craplog ))
             except:
                 # failed to read
                 result = False
@@ -343,6 +343,9 @@ class LogSet(ModelSet):
                 .format(**supercrap.text_colors))
             if supercrap.more_output is True:
                 print("                  you can't avoid working on both access and error log files, nothing will be done")
+        if  self.sets_map['log files'] != ["access.log.1"]\
+        and self.sets_map['file selection'] is False:
+            self.sets_map['file selection'] = True
         if len(self.sets_map['access fields']) == 0:
             checks_passed = False
             if supercrap.less_output is False:
