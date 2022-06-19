@@ -125,9 +125,9 @@ class ViewSet(ModelSet):
                 with open(self.file_path,'w') as f:
                     f.write( configs )
                     if supercrap.more_output is True:
-                        print("\n{ok}Succesfully written configurations for {bold}CRAP{white}VIEW{default}\n"\
+                        print("\n{ok}Succesfully written configurations for {bold}%s{default}\n"\
                             .format(**supercrap.text_colors)\
-                            %( self.file_path ))
+                            %( supercrap.TXT_crapview ))
             except:
                 # failed to read
                 result = False
