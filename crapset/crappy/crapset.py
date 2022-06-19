@@ -134,9 +134,9 @@ class SetSet(ModelSet):
                 with open(self.file_path,'w') as f:
                     f.write( configs )
                     if supercrap.more_output is True:
-                        print("\n{ok}Succesfully written configurations for {bold}CRAP{white}SET{default}\n"\
+                        print("\n{ok}Succesfully written configurations for {bold}%s{default}\n"\
                             .format(**supercrap.text_colors)\
-                            %( self.file_path ))
+                            %( supercrap.TXT_crapset ))
             except:
                 # failed to write
                 result = False
@@ -156,8 +156,8 @@ class SetSet(ModelSet):
     def checkIntegrity(self, supercrap:object ) -> bool :
         """ Check the integrity of the configuration """
         checks_passed = True
-        if  self.sets_map['less_output'] is True\
-        and self.sets_map['more_output'] is True:
+        if  self.sets_map['less output'] is True\
+        and self.sets_map['more output'] is True:
             checks_passed = False
             if supercrap.less_output is False:
                 print()
