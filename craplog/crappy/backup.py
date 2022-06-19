@@ -1,12 +1,14 @@
 
-import os
-import subprocess
+from os import mkdir
+from os.path import exists
 from datetime import date
+from subprocess import run, STDOUT, DEVNULL
 
 import tarfile
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from crappy.check import checkFolder
+from craplib.utils import checkFolder
+
 
 def newName(
     path:   str,
@@ -19,11 +21,12 @@ def newName(
     found = False
     while found is False:
         new_path = "%s/originals.%s%s" %( path, number, suffix )
-        if os.path.exists(new_path):
+        if exists(new_path):
             number += 1
         else:
             found = True
     return "originals.%s%s" %( number, suffix )
+
 
 
 def backupFiles(
@@ -33,19 +36,20 @@ def backupFiles(
     """
     Backup original log files as they are
     """
-    os.mkdir( path )
+    mkdir( path )
     path += "/"
     for log_file in craplog.log_files:
         craplog.printCaret( log_file )
         file_path = "%s/%s" %( craplog.logs_path, log_file )
-        return_code = subprocess.run(
+        return_code = run(
             ["cp", file_path, path],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT)
+            stdout=DEVNULL,
+            stderr=STDOUT)\
+            .returncode
         if return_code == 1:
             raise Exception(IOError)
         craplog.restoreCaret()
+
 
 
 def backupTarGz(
@@ -58,7 +62,7 @@ def backupTarGz(
     with tarfile.open( path, 'w:gz' ) as tz:
         for log_file in craplog.log_files:
             craplog.printCaret(
-                "%s {white}->{azul} tar.gz"\
+                "%s {white}->{sky} tar.gz"\
                     .format(**craplog.text_colors)\
                     %(log_file) )
             file_path = "%s/%s" %( craplog.logs_path, log_file )
@@ -66,6 +70,7 @@ def backupTarGz(
                 file_path,
                 arcname=log_file )
             craplog.restoreCaret()
+
 
 
 def backupZip(
@@ -80,7 +85,7 @@ def backupZip(
         with ZipFile( path, 'w' ) as z:
             for log_file in craplog.log_files:
                 craplog.printCaret(
-                    "%s {white}->{azul} zip"\
+                    "%s {white}->{sky} zip"\
                         .format(**craplog.text_colors)\
                         %(log_file) )
                 file_path = "%s/%s" %( craplog.logs_path, log_file )
@@ -100,6 +105,7 @@ def backupZip(
                     file_path,
                     arcname=log_file )
                 craplog.restoreCaret()
+
 
 
 def backupOriginals(
@@ -190,12 +196,12 @@ def backupGlobals(
         r=True, w=True, create=True, resolve=True )
     if success is True:
         path = "%s/4" %( backups_path )
-        if os.path.exists( path ):
-            return_code = subprocess.run(
+        if exists( path ):
+            return_code = run(
                 ["rm", "-r", path],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT)
+                stdout=DEVNULL,
+                stderr=STDOUT)\
+                .returncode
             if return_code == 1:
                 success = False
                 err_msg = "unable to remove the directory: {grass}%s/{rose}%s{default}"\
@@ -207,11 +213,11 @@ def backupGlobals(
                 path = "%s/%s" %( backups_path, n )
                 new_path = "%s/%s/" %( backups_path, n+1 )
                 if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
-                    return_code = subprocess.run(
+                    return_code = run(
                         ["mv", path, new_path],
-                        check=True,
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT)
+                        stdout=DEVNULL,
+                        stderr=STDOUT)\
+                        .returncode
                     if return_code == 1:
                         undoes.append(new_path[:-1])
                         success = False
@@ -222,7 +228,7 @@ def backupGlobals(
     # check the new dir existence, make it if needed
     if success is True:
         try:
-            os.mkdir( path )
+            mkdir( path )
             remove.append( path )
         except:
             # error creating directory
@@ -235,11 +241,11 @@ def backupGlobals(
             for log_type in ["access","error"]:
                 path = "%s/%s" %( globals_path, log_type )
                 if checkFolder( craplog, "globals_backup", path, create=None, resolve=True ):
-                    return_code = subprocess.run(
+                    return_code = run(
                         ["cp", "-r", path, new_path],
-                        check=True,
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT)
+                        stdout=DEVNULL,
+                        stderr=STDOUT)\
+                        .returncode
                     if return_code == 1:
                         undoes.append(new_path)
                         success = False
@@ -247,12 +253,12 @@ def backupGlobals(
     # remove the last dir
     if success is True:
         path = "%s/4" %( backups_path )
-        if os.path.exists( path ):
-            return_code = subprocess.run(
+        if exists( path ):
+            return_code = run(
                 ["rm", "-r", path],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT)
+                stdout=DEVNULL,
+                stderr=STDOUT)\
+                .returncode
             if return_code == 1:
                 success = False
                 err_msg = "unable to remove the directory: {grass}%s/{rose}%s{default}"\
@@ -273,11 +279,11 @@ def backupGlobals(
         print()
         # un-do the un-doable
         if len(remove) > 0:
-            return_code = subprocess.run(
+            return_code = run(
                 ["rm", "-r", remove[0]],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT)
+                stdout=DEVNULL,
+                stderr=STDOUT)\
+                .returncode
             if return_code == 1:
                 success = False
                 print("\n{err}Error{white}[{grey}globals_backup{white}]{red}>{default} unable to remove the directory: {grass}%s/{rose}%s{default}"\
@@ -292,11 +298,11 @@ def backupGlobals(
             new_path = "%s%s" %( path[:-1], int(path[-1:])-1 )
             if success is True:
                 # skip moving if failed for a previous file
-                return_code = subprocess.run(
+                return_code = run(
                     ["mv", path, new_path],
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
+                    .returncode
             if return_code == 1:
                 success = False
                 print("\n{err}Error{white}[{grey}globals_backups{white}]{red}>{default} unable to rename the directory: {grass}%s/{rose}%s{default}"\
@@ -310,3 +316,4 @@ def backupGlobals(
                     print("                       please add read/write permissions to the whole crapstats folder")
                 print()
                 # don't break, keep printing file names to be restored manually
+    

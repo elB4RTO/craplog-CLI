@@ -4,19 +4,37 @@
 
 ================================================================================
 
-  USAGE:
 
-    INSTALLED:
-      craplog <arguments>
+Synopsis
 
-    FROM LOCATION:
-      python3 craplog.py <arguments>
+    craplog [TOOL] [OPTION] [ARGUMENT]
 
 ================================================================================
- 
-  ARGUMENTS:
- 
-                 OPTION  ¦  DESCRIPTION
+
+Tools
+
+                   Tool  ¦  Description
+--------------------------------------------------------------------------------
+                         ¦
+                    log  ¦  Craplog: make statistics from the logs
+                         ¦  Implicit, can be omitted
+                         ¦
+                   view  ¦  Crapview: view your statistics
+                         ¦  See the related --help for more details
+                         ¦
+                  setup  ¦  Crapset: configure these tools
+                         ¦  See the related --help for more details
+                         ¦
+                 update  ¦  Crapup: check for updates
+                         ¦  See the related --help for more details
+                         ¦
+
+================================================================================
+
+
+Options
+
+                 Option  ¦  Description
 --------------------------------------------------------------------------------
                          ¦
                      -h  ¦  print this screen and exit
@@ -41,13 +59,13 @@
             --no-colors  ¦  print text without using colors
                          ¦
                          ¦
-          --auto-delete  ¦  auto-delete files/folders when needed
+          --auto-delete  ¦  auto-choose to delete files/folders
                          ¦
                          ¦
-           --auto-merge  ¦  auto-merge sessions with the same date
+           --auto-merge  ¦  auto-choose to merge sessions having the same date
                          ¦
                          ¦
-      --max-size <size>  ¦  emit a warning if a file's size exceeds this limit
+  --warning-size <size>  ¦  emit a warning if a file's size exceeds this limit
                          ¦  the <size> is in MB, if set to 0 means unlimited
                          ¦
                          ¦
@@ -117,49 +135,54 @@
                          ¦
 
 ================================================================================
- 
-  EXAMPLES:
-  
-   - USE DEFAULT LOG FILES (*.log.1) AS INPUT, INCLUDING ERRORS. STORE THE
-     ORIGINAL FILES AS A tar.gz COMPRESSED ARCHIVE AND MOVE FILES TO TRASH IF
-     NEEDED (INSTEAD OF COMPLETE DELETION).
-     GLOBAL STATISTICS WILL UPDATED BY DEFAULT.
+
+
+Examples
+
+   - Get help about a tool, Crapview in this case.
+     To run a tool, replace --help with the options you please.
+     
+       craplog view --help
+
+   - Use default log files (*.log.1) as input, including errors. Store the
+     original files as a tar.gz compressed archive, without deleting them.
+     Move files to trash if needed (instead of complete deletion).
+     Global statistics will updated by default.
      
        craplog -e -bT --trash
 
-   - AS THE PREVIOUS BUT ONLY PARSE ERRORS, AVOIDING ACCESS LOGS.
-     STORE THE ORIGINAL FILES AS A zip COMPRESSED ARCHIVE, WITHOUT DELETING THEM.
-     SHRED FILES IF NEEDED (INSTEAD OF NORMAL DELETION).
-     GLOBAL STATISTICS WILL UPDATED BY DEFAULT.
+
+   - As the previous but only parse errors, avoiding access logs. Store the
+     original files as a zip compressed archive, without deleting them.
+     Shred files if needed (instead of normal deletion).
+     Global statistics will updated by default.
      
        craplog -eO -bZ --shred
 
 
-   - USE DEFINED ACCESS AND/OR ERROR LOGS FILES FROM AN ALTERNATIVE LOGS PATH.
-     AUTOMATICALLY MERGE SESSIONS HAVING THE SAME DATE IF NEEDED.
+   - Use defined access and/or error logs files from an alternative logs path.
+     Automatically merge sessions having the same date if needed.
    
        craplog -e -P /your/logs/path -F file.log.2 file.log.3.gz --auto-merge
 
 
-   - USE DEFAULT LOG FILES FOR BOTH ACCESS AND ERROR LOGS. USE A WHITELIST FOR
-     IPs AND SELECT WHICH ACCESS FIELDS TO PARSE.
+   - Use default log files for both access and error logs. Use a whitelist for
+     IPs and select which access fields to parse.
    
        craplog -e -W ::1 192.168. -A REQ RES
 
 
-   - PRINT MORE INFORMATIONS ON SCREEN, INCLUDING PERFORMANCE DETAILS.
-     USE THE DEFAULT ACCESS LOGS FILE BUT ONLY UPDATE GLOBALS, NOT SESSIONS.
-     SET THE WARNING LEVEL FOR LOG FILES SIZE AT 20 MB.
+   - Print more informations on screen, including performance details.
+     Use the default access logs file but only update globals, not sessions.
+     Set the warning level for log files size at 20 MB.
    
-       craplog -m -p -gO --max-size 20
+       craplog -m -p -gO --warning-size 20
 
 
-   - PRINT LESS INFORMATIONS ON SCREEN, WITH PERFORMANCES BUT WITHOUT USING COLORS.
-     USE THE DEFAULT ACCESS AND ERROR LOGS FILES, BUT DO NOT UPDATIE GLOBALS.
-     MAKE A BACKUP COPY OF THE ORIGINAL FILES USED AND DELETE THEM WHEN DONE.
+   - Print less informations, with performances but without using colors.
+     Use the default access and error logs files, but do not updatie globals.
+     Make a backup copy of the original files used and delete them when done.
    
-       craplog -l --no-colors -e -gA -b -dO
-  
-  
---------------------------------------------------------------------------------
- 
+       craplog -l -p --no-colors -e -gA -b -dO
+
+================================================================================

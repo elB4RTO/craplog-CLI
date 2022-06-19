@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# get the correct tool
+skiparg="$1"
+crapexe="craplog/craplog.py"
+case "$skiparg"
+in
+	"log" | "craplog" )
+		wait
+	;;
+	"view" | "setup" | "stats" | "crapview" )
+		crapexe="crapview/crapview.py"
+	;;
+	"set" | "config" | "crapset" )
+		crapexe="crapset/crapset.py"
+	;;
+	"up" | "update" | "crapup" )
+		crapexe="crapup/crapup.py"
+	;;
+	*)
+		skiparg=""
+	;;
+esac
+# assemble
+

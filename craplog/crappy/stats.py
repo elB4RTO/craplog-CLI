@@ -1,8 +1,9 @@
 
-import os
+from os import rename
+from os.path import exists
 from time import perf_counter as timer
 
-from crappy.check import checkFolder, checkFile
+from craplib.utils import checkFolder, checkFile
 
 
 def sortStatistics(
@@ -18,6 +19,7 @@ def sortStatistics(
             if counts[i] > counts[j]:
                 counts[i],counts[j] = counts[j],counts[i]
                 items[i],items[j] = items[j],items[i]
+
 
 
 def saveStatistics(
@@ -50,6 +52,7 @@ def saveStatistics(
             print("              please add read/write permissions to the whole crapstats folder and retry")
         print()
     return successful
+
 
 
 def mergeStatistics(
@@ -114,7 +117,7 @@ def mergeStatistics(
             # make a copy of the old file
             try:
                 bak_path = "%s.bak" %( path )
-                os.rename( path, bak_path )
+                rename( path, bak_path )
                 craplog.undo_paths.append( bak_path )
             except:
                 # failed to make a backup copy for safety
@@ -134,6 +137,7 @@ def mergeStatistics(
     finally:
         # whatever happened, return the result
         return successful
+
 
 
 def storeSessions(
@@ -211,7 +215,7 @@ def storeSessions(
                             items.append( key )
                             counts.append( value )
                         # store statistics
-                        if os.path.exists( path ):
+                        if exists( path ):
                             checks_passed = mergeStatistics( path, items, counts, craplog )
                         else:
                             checks_passed = saveStatistics( path, items, counts, craplog )
@@ -232,6 +236,7 @@ def storeSessions(
     # exit if an error occured
     if checks_passed is False:
         craplog.exitAborted()
+
 
 
 def updateGlobals(
@@ -298,7 +303,7 @@ def updateGlobals(
                     counts.append( value )
                 # store statistics
                 path = "%s/globals/%s/%s.crapstat" %( craplog.statpath, log_type, field )
-                if os.path.exists( path ):
+                if exists( path ):
                     checks_passed = mergeStatistics( path, items, counts, craplog )
                 else:
                     checks_passed = saveStatistics( path, items, counts, craplog )
@@ -313,4 +318,4 @@ def updateGlobals(
     # exit if an error occured
     if checks_passed is False:
         craplog.exitAborted()
-
+    

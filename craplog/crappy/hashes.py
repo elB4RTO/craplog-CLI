@@ -1,8 +1,8 @@
 
-import os
+from os.path import exists
 from hashlib import sha256
 
-from crappy.check import checkFile
+from craplib.utils import checkFile
 
 
 def digestFile(
@@ -35,6 +35,7 @@ def digestFile(
         craplog.exitAborted()
 
 
+
 def bringHashes( craplog: object ):
     """
     Get the previous hashes for usage-track of log files
@@ -44,7 +45,7 @@ def bringHashes( craplog: object ):
         craplog, "usage_hashes", path, craplog.statpath, ".hashes",
         r=True, w=True, create=True, resolve=True )
     if checks_passed is True:
-        if os.path.exists( path ):
+        if exists( path ):
             try:
                 # read the content
                 with open(path,'r') as f:
@@ -83,6 +84,7 @@ def bringHashes( craplog: object ):
                 craplog.exitAborted()
 
 
+
 def storeHashes( craplog: object ):
     """
     Save the actual list of hashes for usage-track of log files
@@ -116,3 +118,4 @@ def storeHashes( craplog: object ):
             print("                    please make the file readable and retry")
         print()
         craplog.exitAborted()
+    

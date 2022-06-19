@@ -1,4 +1,5 @@
 
+
 def processDate(
     date_: str
 ) -> str :
@@ -36,6 +37,7 @@ def processDate(
     year = date[2]
     # return the formatted date
     return "%s-%s-%s" %( year, month, day )
+
 
 
 def parseAccess(
@@ -109,6 +111,7 @@ def parseAccess(
         craplog.access_size += len(line)
 
 
+
 def parseErrors(
     craplog: object,
     lines:   list
@@ -174,6 +177,7 @@ def parseErrors(
                 craplog.collection['error'][date][field][item] += 1
         # sum data size
         craplog.errors_size += len(line)
+
 
 
 def parseLogLines(

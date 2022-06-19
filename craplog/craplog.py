@@ -1,13 +1,20 @@
-#!/usr/bin/python3
 
 import os
-import sys
-import subprocess
+
+from sys import argv
+from sys import path as libpath
+
+crappath = os.path.abspath(__file__)
+crappath = crappath[:crappath.rfind('/')]
+libpath.append(crappath[:crappath.rfind('/')])
 
 from time import sleep
 from time import perf_counter as timer
 
-from crappy import aux
+from subprocess import run, STDOUT, DEVNULL
+
+from craplib import aux
+from crappy.aux    import MSG_help, MSG_examples
 from crappy.check  import makeInitialChecks, checkSessionsDates
 from crappy.hashes import bringHashes, storeHashes
 from crappy.read   import collectLogLines
@@ -18,14 +25,14 @@ from crappy.backup import backupOriginals, backupGlobals
 
 class Craplog(object):
     """
-    Make ststistics from Apache2 logs
+    Make statistics from Apache2 logs
     """
-
     def __init__(self, args: list ):
         """
         Craplog's initializer
         """
         # variables from args
+        self.use_configs:    bool
         self.use_arguments:  bool
         self.less_output:    bool
         self.more_output:    bool
@@ -33,7 +40,7 @@ class Craplog(object):
         self.performance:    bool
         self.auto_delete:    bool
         self.auto_merge:     bool
-        self.max_file_size:  float
+        self.warning_size:   float
         self.session_stats:  bool
         self.global_stats:   bool
         self.access_logs:    bool
@@ -47,6 +54,7 @@ class Craplog(object):
         self.logs_path:      str
         self.log_files:      list
         self.file_selection: bool
+        self.usage_control:  bool
         self.access_fields:  list
         self.ip_whitelist:   list
         # variables for jobs
@@ -76,22 +84,30 @@ class Craplog(object):
         self.caret_return: int
         self.text_colors:  dict
         self.MSG_elbarto:  str
-        self.MSG_craplogo: str
+        self.LOGO_craplog: str
         self.MSG_help:     str
         self.MSG_examples: str
         self.MSG_craplog:  str
         self.MSG_fin:      str
         self.TXT_craplog:  str
         self.TXT_fin:      str
-
+        
+        # get craplog's path
+        self.crappath = os.path.abspath(__file__)
+        self.crappath = self.crappath[:self.crappath.rfind('/')]
+        self.statpath = "%s/crapstats" %(self.crappath[:self.crappath.rfind('/')])
         # initialize variables
         self.initVariables()
         self.initMessages()
+        # read configs if not unset
+        if self.use_configs is True:
+            self.readConfigs()
         # parse arguments if not unset
         if self.use_arguments is True:
             self.parseArguments( args )
-
-
+    
+    
+    
     def initVariables(self):
         """
         Initialize Craplog's variables
@@ -100,6 +116,18 @@ class Craplog(object):
         """
         ################################################################
         #                 START OF THE EDITABLE SECTION
+        #
+        # HIERARCHY FOR APPLYING SETTINGS:
+        #  - HARDCODED VARIABLES (THESE ONES)
+        #  - CONFIGURATIONS FILE
+        #  - COMMAND LINE ARGUMENTS
+        # THE ELEMENTS ON TOP ARE REPLACED BY THE ONES WHICH FOLLOW THEM,
+        # IF HARDCODED VARIABLES ARE SET TO DO SO
+        #
+        # READ THE CONFIGURATIONS FILE AND LOAD THE SETTING
+        # [  ]
+        # IF SET TO 'False' MEANS THAT THE SAVED CONFIGS WILL BE IGNORED
+        self.use_configs = True
         #
         # USE COMMAND LINE ARGUMENTS
         # [  ]
@@ -138,7 +166,7 @@ class Craplog(object):
         # A WARNING IS EMITTED IF THE SIZE AN INPUT FILE OVERTAKES THIS LIMIT
         # [ --max-size ]
         # IN MB (MegaBytes)
-        self.max_file_size = 100.0
+        self.warning_size = 100.0
         #
         # STORE SESSION STATISTICS OF THE PARSED DATA
         # CAN BE DISABLED PASSING [ -gO  /  --only-globals ]
@@ -210,6 +238,13 @@ class Craplog(object):
         # [  ]
         self.file_selection = False
         #
+        # STORE A HASH OF EVERY PARSED FILE TO AVOID PARSING THEM TWICE
+        # [  ]
+        # THE HASH ALGORITHM IS sha256
+        # PLEASE NOTICE THAT THIS CANNOT BE USED TO TRACK YOU OR YOUR FILES,
+        # THE HASH IS IRREVERSIBLE AND CAN'T THEREFORE BE USED TO HARM YOUR PRIVACY
+        self.usage_control = True
+        #
         # LIST OF FIELDS TO BE USED WHILE PARSING ACCESS LOGS' LINES
         # [ -A  /  --access-fields ]
         # WHEN PASSING ARGUMENTS:
@@ -249,46 +284,142 @@ class Craplog(object):
         self.access_lines = 0
         self.errors_lines = 0
         self.whitelist_lines = 0
-
-
+    
+    
+    
+    def readConfigs(self):
+        """
+        Read the saved configuration
+        """
+        path = "%s/crapconfs/craplog.crapconf" %(self.crappath[:self.crappath.rfind('/')])
+        with open(path,'r') as f:
+            tmp = f.read().strip().split('\n')
+        configs = []
+        for f in tmp:
+            f = f.strip()
+            if f == ""\
+            or f[0] == "#":
+                continue
+            configs.append(f)
+        # check the length
+        if len(configs) != 25:
+            self.printJobFailed()
+            print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
+                .format(**self.text_colors)\
+                %( len(configs) ))
+            if self.less_output is False:
+                print("                if you have manually edited the configurations file, please un-do the changes")
+                print("                else, please report this issue")
+            print()
+            self.exitAborted()
+        
+        # apply the configs
+        self.use_configs = bool(int(configs[0]))
+        if self.use_configs is True:
+            self.use_arguments = bool(int(configs[1]))
+            self.less_output = bool(int(configs[2]))
+            self.more_output = bool(int(configs[3]))
+            self.use_colors  = bool(int(configs[4]))
+            self.performance = bool(int(configs[5]))
+            self.auto_delete = bool(int(configs[6]))
+            self.auto_merge  = bool(int(configs[7]))
+            self.warning_size = float(configs[8])
+            self.session_stats = bool(int(configs[9]))
+            self.global_stats  = bool(int(configs[10]))
+            self.access_logs = bool(int(configs[11]))
+            self.error_logs  = bool(int(configs[12]))
+            self.backup      = bool(int(configs[13]))
+            self.archive_tar = bool(int(configs[14]))
+            self.archive_zip = bool(int(configs[15]))
+            self.delete = bool(int(configs[16]))
+            self.trash  = bool(int(configs[17]))
+            self.shred  = bool(int(configs[18]))
+            self.logs_path = configs[19]
+            self.log_files = configs[20].split(' ')
+            self.file_selection = bool(int(configs[21]))
+            self.usage_control  = bool(int(configs[22]))
+            self.access_fields = configs[23].split(' ')
+            self.ip_whitelist  = configs[24].split(' ')
+            self.initMessages()
+            
+            # check log files
+            tmp = [f.strip() for f in self.log_files]
+            self.log_files = []
+            for f in tmp:
+                if f != "":
+                    self.log_files.append( f )
+            # check access fields
+            tmp = [f.strip() for f in self.access_fields]
+            self.access_fields = []
+            for f in tmp:
+                if f == "":
+                    continue
+                f = f.upper()
+                if tmp.count( f ) > 1:
+                    self.printJobFailed()
+                    print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} you have inserted the same field twice: {rose}%s{default}\n"\
+                        .format(**self.text_colors)\
+                        %( f ))
+                    self.exitAborted()
+                elif f not in ["IP","UA","REQ","RES"]:
+                    self.printJobFailed()
+                    print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid field for access logs: {rose}%s{default}\n"\
+                        .format(**self.text_colors)\
+                        %( f ))
+                    self.exitAborted()
+                self.access_fields.append( f )
+            # check whitelist
+            tmp = [f.strip() for f in self.ip_whitelist]
+            self.ip_whitelist = []
+            for f in tmp:
+                if f != "":
+                    self.ip_whitelist.append( f )
+    
+    
+    
     def initMessages(self):
         """
         Bring message strings
         """
         self.last_job     = ""
         self.caret_return = 0
-        self.text_colors  = aux.colors()
-        if self.use_colors is False:
+        if self.use_colors is True:
+            self.text_colors = aux.colors()
+        else:
             self.text_colors = aux.no_colors()
         self.MSG_elbarto  = aux.elbarto()
-        self.MSG_craplogo = aux.craplogo()
-        self.MSG_help     = aux.help( self.text_colors )
-        self.MSG_examples = aux.examples( self.text_colors )
-        self.MSG_craplog  = aux.craplog( self.text_colors )
-        self.MSG_fin      = aux.fin( self.text_colors )
-        self.TXT_craplog  = "{red}C{orange}R{grass}A{cyan}P{blue}L{purple}O{white}G{default}".format(**self.text_colors)
-        self.TXT_fin      = "{orange}F{grass}I{cyan}N{default}".format(**self.text_colors)
-
-
+        self.LOGO_craplog = aux.LOGO_craplog()
+        self.MSG_help     = MSG_help( self.text_colors )
+        self.MSG_examples = MSG_examples( self.text_colors )
+        self.MSG_craplog  = aux.MSG_craplog( self.text_colors )
+        self.MSG_fin      = aux.MSG_fin( self.text_colors )
+        self.TXT_craplog  = aux.TXT_craplog( self.text_colors )
+        self.TXT_fin      = aux.TXT_fin( self.text_colors )
+    
+    
+    
     def parseArguments(self, args: list ):
         """
         Finalize Craplog's variables (if not manually unset)
         """
-        n_args = len(sys.argv)-1
+        n_args = len(args)-1
         i = 0
         while i < n_args:
             i += 1
-            arg = sys.argv[i]
-            if arg == "":
+            arg = args[i]
+            if arg in ["","log","craplog"]:
                 continue
             # elB4RTO
-            elif arg == "-elbarto-":
+            elif arg in ["elB4RTO","elbarto","-elbarto-"]:
                 print("\n%s\n" %( self.MSG_elbarto ))
+                exit()
             # help
             elif arg in ["help", "-h", "--help"]:
-                print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_help ))
+                print("\n%s\n\n%s\n\n%s\n" %( self.LOGO_craplog, self.MSG_help, self.MSG_examples ))
+                exit()
             elif arg == "--examples":
-                print( "\n%s\n%s\n" %( self.MSG_craplogo, self.MSG_examples ))
+                print("\n%s\n\n%s\n" %( self.LOGO_craplog, self.MSG_examples ))
+                exit()
             # auxiliary arguments
             elif arg in ["-l", "--less"]:
                 self.less_output = True
@@ -298,20 +429,21 @@ class Craplog(object):
                 self.performance = True
             elif arg == "--no-colors":
                 self.use_colors = False
+                self.initMessages()
             # automation arguments
             elif arg == "--auto-delete":
                 self.auto_delete = True
             elif arg == "--auto-merge":
                 self.auto_merge = True
             # file size limit
-            elif arg == "--max-size":
+            elif arg == "--warning-size":
                 if i+1 > n_args\
-                or ( sys.argv[i+1].startswith("--")\
-                  or (sys.argv[i+1].startswith("-") and not sys.argv[i+1][1].isdigit())):
-                    self.max_file_size = None
+                or ( args[i+1].startswith("--")\
+                  or (args[i+1].startswith("-") and not args[i+1][1].isdigit())):
+                    self.warning_size = None
                 else:
                     i += 1
-                    self.max_file_size = sys.argv[i]
+                    self.warning_size = args[i]
             # job arguments
             elif arg in ["-e", "--errors"]:
                 self.error_logs = True
@@ -338,44 +470,44 @@ class Craplog(object):
             elif arg == "--trash":
                 self.trash = True
                 if  i+1 <= n_args\
-                and not sys.argv[i+1].startswith("-"):
+                and not args[i+1].startswith("-"):
                     i += 1
-                    self.trash_path = sys.argv[i]
+                    self.trash_path = args[i]
             elif arg in ["-P", "--logs-path"]:
                 if i+1 > n_args\
-                or sys.argv[i+1].startswith("-"):
+                or args[i+1].startswith("-"):
                     self.logs_path = ""
                 else:
                     i += 1
-                    self.logs_path = sys.argv[i]
+                    self.logs_path = args[i]
             elif arg in ["-F", "--log-files"]:
                 self.file_selection = True
                 self.log_files = []
                 while True:
                     if i+1 > n_args\
-                    or sys.argv[i+1].startswith("-"):
+                    or args[i+1].startswith("-"):
                         break
                     else:
                         i += 1
-                        self.log_files.append( sys.argv[i] )
+                        self.log_files.append( args[i] )
             elif arg in ["-A", "--access-fields"]:
                 self.access_fields = []
                 while True:
                     if i+1 > n_args\
-                    or sys.argv[i+1].startswith("-"):
+                    or args[i+1].startswith("-"):
                         break
                     else:
                         i += 1
-                        self.access_fields.append( sys.argv[i] )
+                        self.access_fields.append( args[i] )
             elif arg in ["-W", "--ip-whitelist"]:
                 self.ip_whitelist = []
                 while True:
                     if i+1 > n_args\
-                    or sys.argv[i+1].startswith("-"):
+                    or args[i+1].startswith("-"):
                         break
                     else:
                         i += 1
-                        self.ip_whitelist.append( sys.argv[i] )
+                        self.ip_whitelist.append( args[i] )
             else:
                 print("{err}Error{white}[{grey}argument{white}]{red}>{default} not an available option: {rose}%s{default}"\
                     .format(**self.text_colors)\
@@ -384,8 +516,9 @@ class Craplog(object):
                     print("                 use {cyan}craplog --help{default} to view an help screen"\
                         .format(**self.text_colors))
                 exit("")
-
-
+    
+    
+    
     def welcomeMessage(self):
         """
         Print the welcome message
@@ -411,8 +544,25 @@ class Craplog(object):
             print("{bold}%s"\
                 .format(**self.text_colors)\
                 %( self.TXT_craplog ))
-
-
+    
+    
+    
+    def exitMessage(self, no_perf:bool=False ):
+        """
+        Print the exit message
+        """
+        if self.performance is True\
+        and no_perf is False:
+            self.printOverallPerformance()
+        if self.less_output is False:
+            print("\n%s\n" %( self.MSG_fin ))
+        else:
+            print("{bold}%s"\
+                .format(**self.text_colors)\
+                %( self.TXT_fin ))
+    
+    
+    
     def printJob(self, message: str ):
         """
         Print a job-relative message
@@ -421,16 +571,17 @@ class Craplog(object):
             .format(**self.text_colors)\
             %( message )
         print(self.last_job, end="", flush=True)
-
-
+    
+    
     def reprintJob(self):
         """
         Print a job-relative message
         """
         self.caret_return = 0
         print(self.last_job, end="", flush=True)
-
-
+    
+    
+    
     def printJobHalted(self):
         """
         Print the job has been halted
@@ -440,8 +591,8 @@ class Craplog(object):
             print("{orange}Halted{default}"\
                 .format(**self.text_colors),
                 end="", flush=True )
-
-
+    
+    
     def printJobDone(self):
         """
         Print the job is done
@@ -449,8 +600,8 @@ class Craplog(object):
         print("{grass}Done{default}"\
             .format(**self.text_colors))
         self.last_job = ""
-
-
+    
+    
     def printJobFailed(self):
         """
         Print the job failed
@@ -464,11 +615,11 @@ class Craplog(object):
                 self.printElapsedTime()
                 self.timer_gap = timer()
                 self.last_job = ""
-            if len(self.undo_pahts) > 0:
+            if len(self.undo_paths) > 0:
                 self.undoChanges()
-                
-
-
+        
+    
+    
     def printCaret(self, message: str ):
         """
         Print the message and update the caret for a restore
@@ -479,8 +630,8 @@ class Craplog(object):
                 %( message ),
                 end="", flush=True )
             self.caret_return = len(message)
-
-
+    
+    
     def restoreCaret(self):
         """
         Restore the caret to the previous position
@@ -490,8 +641,9 @@ class Craplog(object):
                 %( "\b"*self.caret_return, " "*self.caret_return, "\b"*self.caret_return ),
                 end="", flush=True )
         self.caret_return = 0
-
-
+    
+    
+    
     def printAborted(self):
         """
         Print the abortion message
@@ -499,12 +651,13 @@ class Craplog(object):
         self.aborted = True
         if self.less_output is False:
             print()
-        print("{bold}{red}CRAPLOG ABORTED{default}"\
+        print("{err}CRAPLOG ABORTED{default}"\
             .format(**self.text_colors))
         if self.less_output is False:
             print()
     
-
+    
+    
     def exitAborted(self):
         """
         Print the abortion message and exit
@@ -513,13 +666,14 @@ class Craplog(object):
         self.finalCleanUp()
         if self.less_output is False:
             print()
-        print("{bold}{red}CRAPLOG ABORTED{default}"\
+        print("{err}CRAPLOG ABORTED{default}"\
             .format(**self.text_colors))
         if self.less_output is False:
             print()
         exit()
-
-
+    
+    
+    
     def printElapsedTime(self):
         """
         Print the time elapsed since the last gap
@@ -539,8 +693,9 @@ class Craplog(object):
             print("{grey}┖┄{purple}elapsed time{paradise}:{pink} %s{default}"\
                 .format(**self.text_colors)\
                 %( msg ))
-
-
+    
+    
+    
     def printOverallPerformance(self):
         """
         Print overall performance details
@@ -629,8 +784,9 @@ class Craplog(object):
                     print("{grey}┖┄{pink}over lines{white}:{paradise} %.2f {white}lines/min{default}"\
                         .format(**self.text_colors)\
                             %( real_lines / (self.crap_time/60) ))
-
-
+    
+    
+    
     def removeEntry(self, path: str ):
         """
         Remove an entry (file/folder) accordingly to settings
@@ -644,34 +800,48 @@ class Craplog(object):
             del_mode = "shred"
         parent = path[:path.rfind('/')]
         entry  = path[len(parent)+1:]
+        if os.path.isdir( path ):
+            entry_type = "folder"
+        elif os.path.isfile( path ):
+            entry_type = "file"
+        else:
+            # unknown type
+            self.printJobFailed()
+            print("\n{err}Error{white}[{grey}type{white}]{red}>{default} the entry is not a directory, nor a file: {grass}%s/{rose}%s{default}"\
+                .format(**self.text_colors)\
+                %( parent, entry ))
+            if self.more_output is True:
+                print("             ok, that was unexpected")
+                print("             please manually check it and consider reporting this issue")
+            print()
         # check the type
         return_code = 0
         if os.path.isfile( path ):
             # is a file
             if self.trash is True:
-                return_code = subprocess.run(
+                return_code = run(
                     ["mv", path, self.trash_path],
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
+                    .returncode
             elif self.shred is True:
-                return_code = subprocess.run(
+                return_code = run(
                     ["shred", "-uvz", path],
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
+                    .returncode
             else:
-                return_code = subprocess.run(
+                return_code = run(
                     ["rm", path],
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
+                    .returncode
 
             if return_code == 1:
                 self.printJobFailed()
-                print("\n{err}Error{white}[{grey}file{white}]{red}>{default} unable to %s this file%s: {grass}%s/{rose}%s{default}"\
+                print("\n{err}Error{white}[{grey}file{white}]{red}>{default} unable to %s this %s%s: {grass}%s/{rose}%s{default}"\
                     .format(**self.text_colors)\
-                    %( parent, entry, del_mode, del_mode_aux ))
+                    %( del_mode, entry_type, del_mode_aux, parent, entry ))
                 if self.more_output is True:
                     print("               the error is most-likely caused by a lack of permissions")
                     print("               please proceed manually")
@@ -680,11 +850,11 @@ class Craplog(object):
         elif os.path.isdir( path ):
             # is a folder
             if self.trash is True:
-                return_code = subprocess.run(
+                return_code = run(
                     ["mv", path, self.trash_path],
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT)
+                    stdout=DEVNULL,
+                    stderr=STDOUT)\
+                    .returncode
             else:
                 if self.shred is True:
                     # recursively rename the folder with zeroes
@@ -696,27 +866,27 @@ class Craplog(object):
                         old_path = new_path
                         new_name = "0"*(len(new_name)-1)
                         new_path = "%s/%s" %( parent, new_name )
-                        return_code = subprocess.run(
+                        return_code = run(
                             ["mv", path, new_path],
-                            check=True,
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.STDOUT)
+                            stdout=DEVNULL,
+                            stderr=STDOUT)\
+                            .returncode
                         if return_code != 0:
                             break
                     path = new_path
                 if return_code == 0:
                     # delete the folder
-                    return_code = subprocess.run(
+                    return_code = run(
                         ["rmdir", path],
-                        check=True,
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT)
+                        stdout=DEVNULL,
+                        stderr=STDOUT)\
+                        .returncode
 
             if return_code == 1:
                 self.printJobFailed()
-                print("\n{err}Error{white}[{grey}folder{white}]{red}>{default} unable to %s this directory%s: {grass}%s/{rose}%s{default}"\
+                print("\n{err}Error{white}[{grey}folder{white}]{red}>{default} unable to %s this %s%s: {grass}%s/{rose}%s{default}"\
                     .format(**self.text_colors)\
-                    %( parent, entry, del_mode, del_mode_aux ))
+                    %(  del_mode, entry_type, del_mode_aux, parent, entry ))
                 if self.more_output is True:
                     print("               the error is most-likely caused by a non-empty folder")
                     print("               or by a lack of permissions")
@@ -732,8 +902,9 @@ class Craplog(object):
                 print("             ok, that was unexpected")
                 print("             please manually check it and consider reporting this issue")
             print()
-
-
+    
+    
+    
     def renameEntry(self, path: str, new_path: str):
         """
         Rename an entry (file/folder)
@@ -760,23 +931,25 @@ class Craplog(object):
             # print the error message only if not printed yet
             if self.proceed is True:
                 self.printJobFailed()
-                print("\n{err}Error{white}[{grey}file{white}]{red}>{default} unable to rename this %s: {grass}%s/{rose}%s{default}"\
+                print("\n{err}Error{white}[{grey}rename{white}]{red}>{default} unable to rename this %s: {grass}%s/{rose}%s{default}"\
                     .format(**self.text_colors)\
-                    %( parent, entry, entry_type ))
+                    %( entry_type, parent, entry ))
                 if self.more_output is True:
-                    print("               the error is most-likely caused by a lack of permissions")
-                    print("               please proceed manually")
+                    print("                 the error is most-likely caused by a lack of permissions")
+                    print("                 please proceed manually")
                 print()
-
-
+    
+    
+    
     def removeOriginals(self):
         """
         Remove the original log files used
         """
         for original_file in self.log_files:
             self.removeEntry( "%s/%s" %( self.logs_path, original_file ))
-
-
+    
+    
+    
     def undoChanges(self):
         """
         Un-do changes after a failure
@@ -855,8 +1028,9 @@ class Craplog(object):
         # in any case, clear the lists
         self.undo_paths.clear()
         self.undo_fails.clear()
-
-
+    
+    
+    
     def finalizeChanges(self):
         """
         Finalize changes if exiting successfully
@@ -893,8 +1067,9 @@ class Craplog(object):
         else:
             # successfully finalized
             self.undo_paths.clear()
-
-
+    
+    
+    
     def finalCleanUp(self):
         """
         Clean-up variables
@@ -906,8 +1081,9 @@ class Craplog(object):
         self.logs_path = ""
         self.statpath = ""
         self.crappath = ""
-
-
+    
+    
+    
     def main(self):
         """
         Make Craplog do its job
@@ -921,10 +1097,6 @@ class Craplog(object):
         if self.more_output is True:
             self.printJob("Initializing craplog")
         self.time_gap = timer()
-        # get craplog's path
-        self.crappath = os.path.abspath(__file__)
-        self.crappath = self.crappath[:self.crappath.rfind('/')]
-        self.statpath = "%s/crapstats" %(self.crappath[:self.crappath.rfind('/')])
         # make initial checkings
         makeInitialChecks( self )
         # retrieve usage-control hashes
@@ -1099,22 +1271,15 @@ class Craplog(object):
             print()
         
         # fin
-        if self.performance is True:
-            self.printOverallPerformance()
-        if self.less_output is False:
-            print("\n%s\n" %( self.MSG_fin ))
-        else:
-            print("{bold}%s"\
-                .format(**self.text_colors)\
-                %( self.TXT_fin ))
+        self.exitMessage()
+    
 
 
-
-# RUN CRAPLOG
 if __name__ == "__main__":
-    craplog = Craplog( sys.argv )
     failed = False
+    craplog = Craplog( argv )
     try:
+        # run craplog
         craplog.main()
     except (KeyboardInterrupt):
         failed = True
@@ -1138,3 +1303,4 @@ if __name__ == "__main__":
                     craplog.exitAborted()
         # successful
         del craplog
+    

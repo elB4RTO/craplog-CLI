@@ -1,6 +1,7 @@
 
-import os
 import gzip
+
+from os.path import getsize
 from random import choice, randint
 from time import perf_counter as timer
 
@@ -29,7 +30,7 @@ def choiceDialog(
             break
         else:
             # leave this normal yellow, it's secondary and doesn't need real attention
-            print("\n{yellow}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}\n"\
+            print("\n{warn}Warning{white}[{grey}choice{white}]{yellow}>{default} not a valid choice: {bold}%s{default}\n"\
                 .format(**craplog.text_colors)
                 %( proceed ))
     # set the time elapsed during user's decision as user-time
@@ -92,8 +93,8 @@ def checkSize(
     """
     Check the size of a file before to read and warn in case of big files
     """
-    if craplog.max_file_size > 0\
-    and (os.path.getsize( path ) / 1048576) > craplog.max_file_size:
+    if craplog.warning_size > 0\
+    and (getsize( path ) / 1048576) > craplog.warning_size:
         # file over max allowed dimensions, emit a warning
         craplog.printJobHalted()
         if craplog.more_output is True:
@@ -109,7 +110,7 @@ def checkSize(
                     the warning limit is actually set at: {green}%.2f MB{default}
                     you can temporary change it using {cyan}--max-size {italic}<size>{default}"""\
                 .format(**craplog.text_colors)\
-                %( (os.path.getsize( path ) / 1048576), craplog.max_file_size ))
+                %( (getsize( path ) / 1048576), craplog.warning_size ))
         if craplog.less_output is False:
             print()
         choice = choiceDialog( craplog, "Do you really want to use this file" )
@@ -180,13 +181,14 @@ def collectLogLines(
         'access' : [],
         'error'  : []
     }
+    remove_list = []
     for file_name in craplog.log_files:
         craplog.printCaret( file_name )
         path = "%s/%s" %( craplog.logs_path, file_name )
-        if checkUsage( craplog, path, file_name ) is False:
-            # file already used
-            craplog.printJobFailed()
-            craplog.exitAborted()
+        if craplog.usage_control is True:
+            if checkUsage( craplog, path, file_name ) is False:
+                # file already used, don't remove now or the loop will be damaged
+                remove_list.append( file_name )
         if checkSize( craplog, path, file_name ) is False:
             # file too big
             craplog.exitAborted()
@@ -226,5 +228,12 @@ def collectLogLines(
                 craplog.logs_size += 1
         craplog.total_lines += len(log_lines)
         craplog.restoreCaret()
+    if len(remove_list) > 0:
+        for file_name in remove_list:
+            craplog.log_files.remove( file_name )
+        if len(craplog.log_files) == 0:
+            print("{rose}Nothing to do".format(**craplog.text_colors))
+            craplog.exitMessage(True)
+            exit()
     return data
 
