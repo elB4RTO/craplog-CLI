@@ -26,9 +26,9 @@ class CommandLine( UIobj ):
         Draw the command string
         """
         # set the color for the content
-        color = curses.color_pair(7)
+        color = curses.color_pair(21)
         if self.focus is True:
-            color = curses.color_pair(2)
+            color = curses.color_pair(31)
         # define the printable content
         printable = self.command
         if len(printable) > (self.w-5):
