@@ -1,5 +1,5 @@
 
-def help( color_set:dict ) -> str :
+def aux_help( color_set:dict ) -> str :
     return """\
 {err}Synopsis{default}
 
@@ -21,7 +21,7 @@ def help( color_set:dict ) -> str :
 """.format(**color_set).replace("¦", "{white}¦{default}".format(**color_set))
 
 
-def examples( color_set:dict ) -> str :
+def aux_examples( color_set:dict ) -> str :
     return """\
 {err}Examples{default}
 
