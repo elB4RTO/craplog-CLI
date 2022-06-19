@@ -17,10 +17,10 @@ def MSG_help( color_set:dict ) -> str :
                    {bold}view{default}  ¦  Crapview: view your statistics
                          ¦  {italic}See the related {default}--help{italic} for more details{default}
                          ¦
-                    {bold}set{default}  ¦  Crapset: configure these tools
+                  {bold}setup{default}  ¦  Crapset: configure these tools
                          ¦  {italic}See the related {default}--help{italic} for more details{default}
                          ¦
-                     {bold}up{default}  ¦  Crapup: check for updates
+                 {bold}update{default}  ¦  Crapup: check for updates
                          ¦  {italic}See the related {default}--help{italic} for more details{default}
                          ¦
 {white}--------------------------------------------------------------------------------{default}
@@ -135,10 +135,10 @@ def MSG_examples( color_set:dict ) -> str :
     return """\
 {err}Examples{default}
 
-   - {green}Get help about a tool, {azul}Crapup{default}{green} in this case.
+   - {green}Get help about a tool, {azul}Crapview{default}{green} in this case.
      To run a tool, replace {cyan}--help{green} with the options you please.{default}
      
-       {italic}craplog{default} {azul}update{default} {bold}--help{default}
+       {italic}craplog{default} {azul}view{default} {bold}--help{default}
 
    - {green}Use default log files (*.log.1) as input, including errors. Store the
      original files as a tar.gz compressed archive, without deleting them.
