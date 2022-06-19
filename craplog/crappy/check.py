@@ -3,7 +3,7 @@ import os
 from time import sleep
 from time import perf_counter as timer
 
-from craplib.check import checkFolder, checkFile
+from craplib.utils import checkFolder, checkFile
 
 
 def makeInitialChecks( craplog:object ):
