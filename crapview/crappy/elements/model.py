@@ -69,11 +69,11 @@ class UIobj():
         """
         Draw the window border
         """
-        color = curses.color_pair(7)
+        color = curses.color_pair(20)
         if self.focus is True:
-            color = curses.color_pair(2)
+            color = curses.color_pair(30)
         if quitting is True:
-            color = curses.color_pair(1)
+            color = curses.color_pair(40)
         # draw upper border
         self.window.addstr(
             0, 0,
