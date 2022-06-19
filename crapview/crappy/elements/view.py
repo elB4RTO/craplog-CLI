@@ -1,6 +1,8 @@
 
 import curses
 
+from random import randint
+
 from crappy.elements.model import UIobj
 
 
@@ -24,16 +26,6 @@ class View( UIobj ):
         # graphs
         self.BLOCK = "█"
         self.HALF  = "▒"
-        self.colors = {
-            'IP'  : curses.color_pair(5), # magenta
-            'UA'  : curses.color_pair(5), # magenta
-            'REQ' : curses.color_pair(3), # yellow
-            'RES' : curses.color_pair(3), # yellow
-            'ERR' : curses.color_pair(1), # red
-            'LEV' : curses.color_pair(1), # red
-            'T' : curses.color_pair(7), # white
-            'H' : curses.color_pair(2) # green
-        }
     
     
     
@@ -122,11 +114,11 @@ class View( UIobj ):
         """
         self.cleanContentArea()
         # pick the colors
-        b_col = self.colors[self.field]
-        c_col = self.colors['H']
-        i_col = self.colors['T']
+        b_col = curses.color_pair( randint(1,6) )
+        c_col = curses.color_pair(31)
+        i_col = curses.color_pair(21)
         if self.focus is False:
-            b_col = self.colors['H']
+            b_col = curses.color_pair(7)
         # get the viewable section
         start = self.vertical_shift
         stop  = self.vertical_shift + ((self.h-2)//3)
