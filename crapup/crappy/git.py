@@ -1,6 +1,6 @@
 
 from os import chdir
-from os.path import abspath
+from os.path import abspath, exists
 from subprocess import run, PIPE, DEVNULL
 
 from craplib.utils import checkFolder, checkFile
@@ -77,14 +77,15 @@ def gitPull( crapup:object ):
     command = run(
         ["git", "status"],
         stdout=DEVNULL,
-        stderr=PIPE )\
-        .returncode
+        stderr=PIPE )
     if command.returncode != 0:
         while True:
             if crapup.less_output is False:
                 print()
             print("{warn}Warning{white}[{grey}local_git{white}]{red}>{default} it seems you don't have a local {bold}Craplog's git{default} initialized"\
-                .format(**colors))
+                .format(**crapup.text_colors))
+            if crapup.less_output is False:
+                print()
             choice = input("Do you want to initialize it? {white}[{grass}y{grey}/{red}n{white}] :{default} "\
                 .format(**crapup.text_colors)).strip().lower()
             if choice in ["y","yes"]:
@@ -101,8 +102,7 @@ def gitPull( crapup:object ):
         command = run(
             ["git", "init","-b","main"],
             stdout=DEVNULL,
-            stderr=PIPE )\
-            .returncode
+            stderr=PIPE )
         if command.returncode != 0:
             crapup.printError(
                 "git_config",
@@ -124,10 +124,9 @@ def gitPull( crapup:object ):
         
         # add Craplog's files
         command = run(
-            ["git", "add","craplog/","crapview/","crapup/","README.md", "LICENSE"],
+            ["git", "add","craplib/","craplog/","crapview/","crapup/","README.md", "LICENSE"],
             stdout=DEVNULL,
-            stderr=PIPE )\
-            .returncode
+            stderr=PIPE )
         if command.returncode != 0:
             crapup.printError(
                 "git_config",
@@ -135,39 +134,43 @@ def gitPull( crapup:object ):
             crapup.exitAborted()
         
     # explicitly specify to ignore user's data folders [crapstats,configs]
-    trailing_newline = False
-    checkFile(
-        crapup, "git_ignored", "%s/.gitignored"%(crapup.crappath),
-        r=True, w=True, create=True, resolve=True )
-    try:
-        with open(".gitignore", 'r') as f:
-            git_ignoreds = f.read()
-    except:
-        crapup.printError(
-            "git_ignored", 
-            "failed to read from file: {grass}%s/{rose}.gitignore{default}"\
-                .format(**crapup.text_colors)\
-                %( crapup.crappath ))
-        crapup.exitAborted()
-    if git_ignoreds.endswith('\n'):
-        trailing_newline = True
-    git_ignoreds = git_ignoreds.strip().split()
+    file_mode = 'w'
     found_stat  = False
     found_stats = False
     found_conf    = False
     found_configs = False
-    for path in git_ignoreds:
-        path_ = path.rstrip('/')
-        if path_ == "/crapstats"\
-        or path_ == "crapstats":
-            found_stats = True
-        if path_ == "*.crapstat":
-            found_stat = True
-        elif path_ == "/crapconf"\
-          or path_ == "crapconf":
-            found_configs = True
-        elif path_ == "*.crapconf":
-            found_conf = True
+    trailing_newline = False
+    path_ignore = "%s/.gitignore"%(crapup.crappath)
+    if exists( path_ignore ):
+        checkFile(
+            crapup, "git_ignore", path_ignore,
+            r=True, w=True, create=True, resolve=True )
+        try:
+            with open(".gitignore", 'r') as f:
+                git_ignoreds = f.read()
+        except:
+            crapup.printError(
+                "git_ignored", 
+                "failed to read from file: {grass}%s/{rose}.gitignore{default}"\
+                    .format(**crapup.text_colors)\
+                    %( crapup.crappath ))
+            crapup.exitAborted()
+        file_mode = 'a'
+        if git_ignoreds.endswith('\n'):
+            trailing_newline = True
+        git_ignoreds = git_ignoreds.strip().split()
+        for path in git_ignoreds:
+            path_ = path.rstrip('/')
+            if path_ == "/crapstats"\
+            or path_ == "crapstats":
+                found_stats = True
+            if path_ == "*.crapstat":
+                found_stat = True
+            elif path_ == "/crapconfs"\
+              or path_ == "crapconfs":
+                found_configs = True
+            elif path_ == "*.crapconf":
+                found_conf = True
     if found_stat is False or found_stats is False\
     or found_conf is False or found_configs is False:
         new_line = ""
@@ -182,7 +185,7 @@ def gitPull( crapup:object ):
         if found_configs is False:
             new_line += "*.crapconf\n"
         try:
-            with open(".gitignore", 'a') as f:
+            with open(path_ignore, file_mode) as f:
                 f.write( new_line )
         except:
             crapup.printError(
@@ -195,8 +198,7 @@ def gitPull( crapup:object ):
     command = run(
         ["git", "pull", "origin", "main"],
         stdout=DEVNULL,
-        stderr=PIPE )\
-        .returncode
+        stderr=PIPE )
     if command.returncode != 0:
         crapup.printError(
             "git_pull",
