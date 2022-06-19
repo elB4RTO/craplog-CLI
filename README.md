@@ -295,10 +295,10 @@ Files can be found inside **craplog-cli/crapconfs/**
 ### Hardcoded values
 
 Directly modifying the script's hardcoded variables, to set pre-defined initialization values:
-  - **Craplog**  -> line [**112**](https://github.com/elB4RTO/craplog-CLI/blob/main/craplog/craplog.py#L112) **@** *craplog-CLI/craplog/craplog.py*
-  - **Crapview** -> line [**13**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapview/crapview.py#L13) **@** *craplog-CLI/cragview/crapview.py*
-  - **Crapup**   -> line [**55**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapup/crapup.py#L55) **@** *craplog-CLI/cragup/crapup.py*
-  - **Crapset**  -> line [**19**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapset/crapset.py#L19) **@** *craplog-CLI/cragset/crapset.py*
+  - **Craplog**  -> line [**117**](https://github.com/elB4RTO/craplog-CLI/blob/main/craplog/craplog.py#L117) **@** *craplog-CLI/craplog/craplog.py*
+  - **Crapview** -> line [**21**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapview/crapview.py#L21) **@** *craplog-CLI/cragview/crapview.py*
+  - **Crapup**   -> line [**63**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapup/crapup.py#L63) **@** *craplog-CLI/cragup/crapup.py*
+  - **Crapset**  -> line [**32**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapset/crapset.py#L32) **@** *craplog-CLI/cragset/crapset.py*
 
 <br><br>
 
