@@ -202,6 +202,7 @@ def checkFolder(
     or parent_path == "":
         parent_path = path[:path.rfind('/')]
         entry_name  = path[len(parent_path)+1:]
+    spaces = " "*len(err_key)
     # checking
     checks_passed = True
     if os.path.exists( path ):
@@ -215,7 +216,6 @@ def checkFolder(
                     .format(**craptool.text_colors)\
                     %( err_key, parent_path, entry_name ))
                 if craptool.more_output is True:
-                    spaces = " "*len(err_key)
                     print("%s         %s doesn't have permissions to read from files inside this folder" %(spaces,craptool.name))
                     print("%s         please make the directory readable and retry" %(spaces))
                 print()
@@ -226,7 +226,6 @@ def checkFolder(
                     .format(**craptool.text_colors)\
                     %( err_key, parent_path, entry_name ))
                 if craptool.more_output is True:
-                    spaces = " "*len(err_key)
                     print("%s         %s doesn't have permissions to write on files inside this folder" %(spaces,craptool.name))
                     print("%s         please make the directory writable and retry" %(spaces))
                 print()
@@ -293,7 +292,6 @@ def checkFolder(
                         .format(**craptool.text_colors)\
                         %( err_key, parent_path, entry_name ))
                     if craptool.more_output is True:
-                        spaces = " "*len(err_key)
                         print("%s         the entry was supposed to be a folder, but it was found to be a file" %(spaces))
                     print()
 
@@ -311,7 +309,7 @@ def checkFolder(
         # does not exists
         if create is True:
             try:
-                makeit( path )
+                makeit()
             except:
                 # error creating directory
                 failed()
@@ -359,6 +357,7 @@ def checkFile(
     or parent_path == "":
         parent_path = path[:path.rfind('/')]
         entry_name  = path[len(parent_path)+1:]
+    spaces = " "*len(err_key)
     # checking
     checks_passed = True
     if os.path.exists( path ):
@@ -372,7 +371,6 @@ def checkFile(
                     .format(**craptool.text_colors)\
                     %( err_key, parent_path, entry_name ))
                 if craptool.more_output is True:
-                    spaces = " "*len(err_key)
                     print("%s         craptool doesn't have permissions to read from this file" %(spaces))
                     print("%s         please make the file readable and retry" %(spaces))
                 print()
@@ -383,7 +381,6 @@ def checkFile(
                     .format(**craptool.text_colors)\
                     %( err_key, parent_path, entry_name ))
                 if craptool.more_output is True:
-                    spaces = " "*len(err_key)
                     print("%s         craptool doesn't have permissions to write in this file" %(spaces))
                     print("%s         please make the file writable and retry" %(spaces))
                 print()
@@ -445,7 +442,6 @@ def checkFile(
                         .format(**craptool.text_colors)\
                         %( err_key, parent_path, entry_name ))
                     if craptool.more_output is True:
-                        spaces = " "*len(err_key)
                         print("%s         the entry was supposed to be a file, but it was found to be a folder" %(spaces))
                     print()
             else:
@@ -476,7 +472,6 @@ def checkFile(
                 print("\n{warn}Warning{white}[{grey}%s{white}]{red}>{default} configuration file {bold}not found{default}: {rose}%s{default}\n"\
                     .format(**craptool.text_colors)\
                     %( err_key, path[path.rfind('/')+1:] ))
-                spaces = " "*len(err_key)
                 if craptool.less_output is False:
                     print("%s         the default configuration will be used" %(spaces))
                 if craptool.more_output is True:
