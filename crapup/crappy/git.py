@@ -86,7 +86,7 @@ def gitPull( crapup:object ):
                 .format(**crapup.text_colors))
             if crapup.less_output is False:
                 print()
-            choice = input("Do you want to initialize it? {white}[{grass}y{grey}/{red}n{white}] :{default} "\
+            choice = input("Do you want to initialize it? {white}[{green}y{grey}/{rose}n{white}] :{default} "\
                 .format(**crapup.text_colors)).strip().lower()
             if choice in ["y","yes"]:
                 break
@@ -124,7 +124,7 @@ def gitPull( crapup:object ):
         
         # add Craplog's files
         command = run(
-            ["git", "add","craplib/","craplog/","crapview/","crapup/","README.md", "LICENSE"],
+            ["git", "add","craplib/","craplog/","crapset/","crapup/","crapview/","README.md", "LICENSE"],
             stdout=DEVNULL,
             stderr=PIPE )
         if command.returncode != 0:
@@ -193,7 +193,20 @@ def gitPull( crapup:object ):
                 "failed to write on file: {grass}%s/{rose}.gitignore{default}"\
                     .format(**crapup.text_colors)\
                     %( crapup.crappath ))
-        
+    
+    # copy the .gitignore to restore later an keep personal changes
+    if exists( path_ignore ):
+        command = run(
+            ["mv", ".gitignore", ".gitignore.copy"],
+            stdout=DEVNULL,
+            stderr=PIPE )
+        if command.returncode != 0:
+            crapup.printError(
+                "git_ignore",
+                "failed to backup file: {bold}.gitignore{default}"\
+                    .format(**crapup.text_colors))
+            print()
+            crapup.exitAborted()
     # pull the remote git
     command = run(
         ["git", "pull", "origin", "main"],
@@ -204,7 +217,7 @@ def gitPull( crapup:object ):
             "git_pull",
             "failed to pull the remote git")
         if crapup.less_output is False:
-            print("                 remote url: {bold}%s{default}\n"\
+            print("                 remote url: {bold}%s{default}"\
                 .format(**crapup.text_colors)\
                 %( git_remote ))
         if crapup.more_output is True:
@@ -213,8 +226,32 @@ def gitPull( crapup:object ):
                 %( command.stderr.decode.strip('\n') ))
         print()
         crapup.exitAborted()
+    # restore the personal gitignore file
+    if exists( "%s.copy" %(path_ignore) ):
+        command = run(
+            ["mv", ".gitignore.copy", ".gitignore"],
+            stdout=DEVNULL,
+            stderr=PIPE )
+        if command.returncode != 0:
+            print("{warn}Warning{white}[{grey}git_ignore{white}]{red}>{default} failed to restore file: {bold}.gitignore.copy{default}"\
+                .format(**crapup.text_colors))
+            if crapup.less_output is False:
+                print("                     that was you personal file before the update")
+                print("                     if you need it, please restore it manually")
+            print()
+    # remove un-needed stuff
+    command = run(
+        ["rm", "-r", "install.sh", "update.sh", "installation_stuff", ".github"],
+        stdout=DEVNULL,
+        stderr=PIPE )
+    if command.returncode != 0:
+        print("{yellow}Warning{white}[{grey}clean_up{white}]{red}>{default} failed to remove some un-needed files"\
+            .format(**crapup.text_colors))
+        if crapup.less_output is False:
+            print("                   nothing to worry about, just Craplog's repo stuff")
+        print()
     
     # succesfully updated
-    print("{bold}%s{ok} has been updated{default}"\
+    print("{bold}%s{ok} is up-to-date{default}"\
         .format(**crapup.text_colors)\
         %( crapup.TXT_craplog ))
