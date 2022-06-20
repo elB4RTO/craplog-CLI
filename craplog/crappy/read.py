@@ -18,7 +18,7 @@ def choiceDialog(
     time_gap = timer()
     choice = False
     while True:
-        proceed = input("%s? {white}[{grass}y{grey}/{red}n{white}] :{default} "\
+        proceed = input("%s? {white}[{green}y{grey}/{rose}n{white}] :{default} "\
             .format(**craplog.text_colors)
             %(question)
             ).strip().lower()
