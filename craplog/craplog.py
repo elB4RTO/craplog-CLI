@@ -292,88 +292,95 @@ class Craplog(object):
         Read the saved configuration
         """
         path = "%s/crapconfs/craplog.crapconf" %(self.crappath[:self.crappath.rfind('/')])
-        with open(path,'r') as f:
-            tmp = f.read().strip().split('\n')
-        configs = []
-        for f in tmp:
-            f = f.strip()
-            if f == ""\
-            or f[0] == "#":
-                continue
-            configs.append(f)
-        # check the length
-        if len(configs) != 25:
-            self.printJobFailed()
-            print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
-                .format(**self.text_colors)\
-                %( len(configs) ))
+        if os.path.exists( path ) is False:
+            # leave this normal yellow, it's secondary and doesn't need a real attention
             if self.less_output is False:
-                print("                if you have manually edited the configurations file, please un-do the changes")
-                print("                else, please report this issue")
-            print()
-            self.exitAborted()
-        
-        # apply the configs
-        self.use_configs = bool(int(configs[0]))
-        if self.use_configs is True:
-            self.use_arguments = bool(int(configs[1]))
-            self.less_output = bool(int(configs[2]))
-            self.more_output = bool(int(configs[3]))
-            self.use_colors  = bool(int(configs[4]))
-            self.performance = bool(int(configs[5]))
-            self.auto_delete = bool(int(configs[6]))
-            self.auto_merge  = bool(int(configs[7]))
-            self.warning_size = float(configs[8])
-            self.session_stats = bool(int(configs[9]))
-            self.global_stats  = bool(int(configs[10]))
-            self.access_logs = bool(int(configs[11]))
-            self.error_logs  = bool(int(configs[12]))
-            self.backup      = bool(int(configs[13]))
-            self.archive_tar = bool(int(configs[14]))
-            self.archive_zip = bool(int(configs[15]))
-            self.delete = bool(int(configs[16]))
-            self.trash  = bool(int(configs[17]))
-            self.shred  = bool(int(configs[18]))
-            self.logs_path = configs[19]
-            self.log_files = configs[20].split(' ')
-            self.file_selection = bool(int(configs[21]))
-            self.usage_control  = bool(int(configs[22]))
-            self.access_fields = configs[23].split(' ')
-            self.ip_whitelist  = configs[24].split(' ')
-            self.initMessages()
-            
-            # check log files
-            tmp = [f.strip() for f in self.log_files]
-            self.log_files = []
+                print("\n{warn}Warning{white}[{grey}configs{white}]{warn}>{default} {yellow}configurations file not found\n"\
+                    .format(**self.text_colors))
+                sleep(1)
+        else:
+            with open(path,'r') as f:
+                tmp = f.read().strip().split('\n')
+            configs = []
             for f in tmp:
-                if f != "":
-                    self.log_files.append( f )
-            # check access fields
-            tmp = [f.strip() for f in self.access_fields]
-            self.access_fields = []
-            for f in tmp:
-                if f == "":
+                f = f.strip()
+                if f == ""\
+                or f[0] == "#":
                     continue
-                f = f.upper()
-                if tmp.count( f ) > 1:
-                    self.printJobFailed()
-                    print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} you have inserted the same field twice: {rose}%s{default}\n"\
-                        .format(**self.text_colors)\
-                        %( f ))
-                    self.exitAborted()
-                elif f not in ["IP","UA","REQ","RES"]:
-                    self.printJobFailed()
-                    print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid field for access logs: {rose}%s{default}\n"\
-                        .format(**self.text_colors)\
-                        %( f ))
-                    self.exitAborted()
-                self.access_fields.append( f )
-            # check whitelist
-            tmp = [f.strip() for f in self.ip_whitelist]
-            self.ip_whitelist = []
-            for f in tmp:
-                if f != "":
-                    self.ip_whitelist.append( f )
+                configs.append(f)
+            # check the length
+            if len(configs) != 25:
+                self.printJobFailed()
+                print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
+                    .format(**self.text_colors)\
+                    %( len(configs) ))
+                if self.less_output is False:
+                    print("                if you have manually edited the configurations file, please un-do the changes")
+                    print("                else, please report this issue")
+                print()
+                self.exitAborted()
+            
+            # apply the configs
+            self.use_configs = bool(int(configs[0]))
+            if self.use_configs is True:
+                self.use_arguments = bool(int(configs[1]))
+                self.less_output = bool(int(configs[2]))
+                self.more_output = bool(int(configs[3]))
+                self.use_colors  = bool(int(configs[4]))
+                self.performance = bool(int(configs[5]))
+                self.auto_delete = bool(int(configs[6]))
+                self.auto_merge  = bool(int(configs[7]))
+                self.warning_size = float(configs[8])
+                self.session_stats = bool(int(configs[9]))
+                self.global_stats  = bool(int(configs[10]))
+                self.access_logs = bool(int(configs[11]))
+                self.error_logs  = bool(int(configs[12]))
+                self.backup      = bool(int(configs[13]))
+                self.archive_tar = bool(int(configs[14]))
+                self.archive_zip = bool(int(configs[15]))
+                self.delete = bool(int(configs[16]))
+                self.trash  = bool(int(configs[17]))
+                self.shred  = bool(int(configs[18]))
+                self.logs_path = configs[19]
+                self.log_files = configs[20].split(' ')
+                self.file_selection = bool(int(configs[21]))
+                self.usage_control  = bool(int(configs[22]))
+                self.access_fields = configs[23].split(' ')
+                self.ip_whitelist  = configs[24].split(' ')
+                self.initMessages()
+                
+                # check log files
+                tmp = [f.strip() for f in self.log_files]
+                self.log_files = []
+                for f in tmp:
+                    if f != "":
+                        self.log_files.append( f )
+                # check access fields
+                tmp = [f.strip() for f in self.access_fields]
+                self.access_fields = []
+                for f in tmp:
+                    if f == "":
+                        continue
+                    f = f.upper()
+                    if tmp.count( f ) > 1:
+                        self.printJobFailed()
+                        print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} you have inserted the same field twice: {rose}%s{default}\n"\
+                            .format(**self.text_colors)\
+                            %( f ))
+                        self.exitAborted()
+                    elif f not in ["IP","UA","REQ","RES"]:
+                        self.printJobFailed()
+                        print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid field for access logs: {rose}%s{default}\n"\
+                            .format(**self.text_colors)\
+                            %( f ))
+                        self.exitAborted()
+                    self.access_fields.append( f )
+                # check whitelist
+                tmp = [f.strip() for f in self.ip_whitelist]
+                self.ip_whitelist = []
+                for f in tmp:
+                    if f != "":
+                        self.ip_whitelist.append( f )
     
     
     
