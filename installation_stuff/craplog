@@ -8,10 +8,10 @@ in
 	"log" | "craplog" )
 		wait
 	;;
-	"view" | "setup" | "stats" | "crapview" )
+	"view" | "stats" | "crapview" )
 		crapexe="crapview/crapview.py"
 	;;
-	"set" | "config" | "crapset" )
+	"set" | "setup" | "config" | "crapset" )
 		crapexe="crapset/crapset.py"
 	;;
 	"up" | "update" | "crapup" )
