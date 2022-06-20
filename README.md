@@ -75,17 +75,17 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
   git clone https://github.com/elB4RTO/craplog-CLI.git
   ```
   <br>
-- Open a terminal inside "*craplog-CLI-main/craplog*"
+- Open a terminal inside "*craplog-CLI-main/*"
   <br>*or*<br>
   ```
-  cd craplog-CLI/craplog/
+  cd craplog-CLI/
   ```
   <br>
 - Run craplog using python's environment:
   <br>
   
   ```
-  python3 craplog.py --help
+  python3 craplog/craplog.py --help
   ```
   <br>
 
