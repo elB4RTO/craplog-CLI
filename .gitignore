@@ -1,3 +1,4 @@
-/.github
 /crapconfs
 /crapstats
+*.crapstat
+.gitignore.copy
