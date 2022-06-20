@@ -111,7 +111,7 @@ printf "\n\033[32mUpdate completed\033[0m\n"
 # remove the download folder
 while :
 do
-    printf "Do you want to remove the source folder? \033[97m[\033[32my\033[90m/\033[31mn\033[97m] :\033[0m "
+    printf "Do you want to remove the source folder? \033[97m[\033[92my\033[90m/\033[91mn\033[97m] :\033[0m "
     read agree
     case "$agree"
     in
@@ -128,5 +128,5 @@ do
     esac
 done
 
-printf "\n\033[1m\033[33mF\033[32mI\033[36mN\033[0m\n"
+printf "\n\033[1m\033[33m F\033[32m I\033[36m N\033[0m\n"
 
