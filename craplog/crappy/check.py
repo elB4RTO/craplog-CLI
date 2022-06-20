@@ -261,7 +261,7 @@ def checkSessionsDates( craplog ):
                         .format(**craplog.text_colors))
                     if craplog.more_output is True:
                         print("Please make sure you're not parsing the same files twice\n")
-                proceed = input("Continue? {white}[{grass}y{grey}/{red}n{white}] :{default} "\
+                proceed = input("Continue? {white}[{green}y{grey}/{rose}n{white}] :{default} "\
                     .format(**craplog.text_colors)).strip().lower()
                 if proceed in ["y","yes"]:
                     break
