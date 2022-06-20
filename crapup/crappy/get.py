@@ -32,8 +32,8 @@ def versionCheck( crapup:object ):
         crapup.exitAborted()
     # pick the actual version
     pos = html.find( version_mark )
+    new_version = None
     if pos >= 0:
-        new_version = None
         try:
             # get the new version string and convert it to number
             new_version = html[
@@ -51,8 +51,18 @@ def versionCheck( crapup:object ):
                 print("                       please report this issue")
             print()
             crapup.exitAborted()
+    # failed to find the mark
+    if new_version is None:
+        crapup.printError(
+            "version_mark",
+            "failed to find the version mark{default}"\
+                .format(**crapup.text_colors))
+        if crapup.more_output is True:
+            print("                     please report this issue")
+        print()
+        crapup.exitAborted()
     # compare to the actual version
-    if new_version < crapup.version:
+    elif new_version < crapup.version:
         # this version is newer then official one :O
         print("{err}Er{purple}R{blue}n{grass}1{warn}ng{white}[{grey}version{white}]{red}>{default} you have a version from the future! {rose}%s{default}\n"\
             .format(**crapup.text_colors)\
@@ -72,7 +82,7 @@ def versionCheck( crapup:object ):
         exit()
     else:
         # older version
-        print("{bold}New version available{default}{paradise}:{default} {warn}%s{default}"\
+        print("{ok}New version available{default}{paradise}:{default} {warn}%s{default}"\
             .format(**crapup.text_colors)\
             %( new_version ))
         if crapup.more_output is True:
