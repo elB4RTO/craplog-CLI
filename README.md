@@ -599,7 +599,7 @@ craplog view
 
 Without Craplog installed *(from the main folder)*:
 ```
-`python3 crapview/crapview.py
+python3 crapview/crapview.py
 ```
 <br>
 
