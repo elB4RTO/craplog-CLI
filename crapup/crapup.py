@@ -1,10 +1,13 @@
 
 from sys import argv
-from sys.path import append as libpath
-libpath("../")
+from sys import path as libpath
 
 from time import sleep
 from os.path import abspath
+
+crappath = abspath(__file__)
+crappath = crappath[:crappath.rfind('/')]
+libpath.append(crappath[:crappath.rfind('/')])
 
 from craplib import aux
 from crappy.aux import *
@@ -29,7 +32,7 @@ class Crapup():
         # messages
         self.text_colors:  dict
         self.MSG_elbarto:  str
-        self.MSG_craplogo: str
+        self.LOGO_crapup:  str
         self.MSG_help:     str
         self.MSG_examples: str
         self.MSG_crapup:   str
@@ -106,7 +109,7 @@ class Crapup():
         self.version = 3.07
         self.repo = "https://github.com/elB4RTO/craplog-CLI"
         self.crappath = ""
-        self.MSG_elbarto = self.MSG_craplogo =\
+        self.MSG_elbarto = self.LOGO_crapup =\
         self.MSG_help = self.MSG_examples =\
         self.MSG_crapup = self.MSG_fin =\
         self.TXT_crapup = self.TXT_fin =\
@@ -122,36 +125,43 @@ class Crapup():
         crappath = crappath[:crappath.rfind('/')]
         self.crappath = crappath[:crappath.rfind('/')]
         path = "%s/crapconfs/crapup.crapconf" %(self.crappath)
-        with open(path,'r') as f:
-            tmp = f.read().strip().split('\n')
-        configs = []
-        for f in tmp:
-            f = f.strip()
-            if f == ""\
-            or f[0] == "#":
-                continue
-            configs.append(f)
-        # check the length
-        if len(configs) != 6:
-            print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
-                .format(**self.text_colors)\
-                %( len(configs) ))
+        if os.path.exists( path ) is False:
+            # leave this normal yellow, it's secondary and doesn't need a real attention
             if self.less_output is False:
-                print("""
-                if you have manually edited the configurations file, please un-do the changes
-                else, please report this issue""")
-            print("\n{err}CRAPUP ABORTED{default}\n"\
-                .format(**self.text_colors))
-            exit()
-        # apply the configs
-        self.use_configs = bool(int(configs[0]))
-        if self.use_configs is True:
-            self.use_arguments = bool(int(configs[1]))
-            self.less_output   = bool(int(configs[2]))
-            self.more_output   = bool(int(configs[3]))
-            self.use_colors    = bool(int(configs[4]))
-            self.use_git       = bool(int(configs[5]))
-            self.initMessages()
+                print("\n{warn}Warning{white}[{grey}configs{white}]{warn}>{default} {yellow}configurations file not found\n"\
+                    .format(**self.text_colors))
+                sleep(1)
+        else:
+            with open(path,'r') as f:
+                tmp = f.read().strip().split('\n')
+            configs = []
+            for f in tmp:
+                f = f.strip()
+                if f == ""\
+                or f[0] == "#":
+                    continue
+                configs.append(f)
+            # check the length
+            if len(configs) != 6:
+                print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
+                    .format(**self.text_colors)\
+                    %( len(configs) ))
+                if self.less_output is False:
+                    print("""
+                    if you have manually edited the configurations file, please un-do the changes
+                    else, please report this issue""")
+                print("\n{err}CRAPUP ABORTED{default}\n"\
+                    .format(**self.text_colors))
+                exit()
+            # apply the configs
+            self.use_configs = bool(int(configs[0]))
+            if self.use_configs is True:
+                self.use_arguments = bool(int(configs[1]))
+                self.less_output   = bool(int(configs[2]))
+                self.more_output   = bool(int(configs[3]))
+                self.use_colors    = bool(int(configs[4]))
+                self.use_git       = bool(int(configs[5]))
+                self.initMessages()
     
     
     
@@ -167,7 +177,7 @@ class Crapup():
         self.MSG_elbarto  = aux.elbarto()
         self.MSG_help     = MSG_help( self.text_colors )
         self.MSG_examples = MSG_examples( self.text_colors )
-        self.MSG_craplogo = aux.LOGO_crapup()
+        self.LOGO_crapup  = aux.LOGO_crapup()
         self.MSG_crapup   = aux.MSG_crapup( self.text_colors )
         self.MSG_fin      = aux.MSG_fin( self.text_colors )
         self.TXT_crapup   = aux.TXT_crapup( self.text_colors )
@@ -185,7 +195,7 @@ class Crapup():
         while i < n_args:
             i += 1
             arg = args[i]
-            if arg == "":
+            if arg in ["","up","crapup","update"]:
                 continue
             # elB4RTO
             elif arg in ["elB4RTO","elbarto","-elbarto-"]:
@@ -208,7 +218,7 @@ class Crapup():
                 self.initMessages()
             # git argument
             elif arg == "--git":
-                self.git_update = True
+                self.use_git = True
             else:
                 print("{err}Error{white}[{grey}argument{white}]{red}>{default} not an available option: {rose}%s{default}"\
                     .format(**self.text_colors)\
