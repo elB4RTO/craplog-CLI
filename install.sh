@@ -67,7 +67,7 @@ then
     do
         printf "\n\033[1m\033[33mWarning\033[97m[\033[90mbin\033[97m]\033[33m>\033[0m the installation folder already exists\n"
         printf "\nIf you choose to continue, the actual content will be lost forever\n"
-        printf "Erase the directory? \033[97m[\033[32my\033[90m/\033[31mn\033[97m] :\033[0m "
+        printf "Erase the directory? \033[97m[\033[92my\033[90m/\033[91mn\033[97m] :\033[0m "
         read agree
         case "$agree"
         in
@@ -94,7 +94,7 @@ then
     do
         printf "\n\033[1m\033[33mWarning\033[97m[\033[90mbin\033[97m]\033[33m>\033[0m file \033[32m/usr/bin/\033[91mcraplog\033[0m already exists\n"
         printf "\nIf you choose to continue, the actual file will be lost forever\n"
-        printf "Overwrite the file? \033[97m[\033[32my\033[90m/\033[31mn\033[97m] :\033[0m "
+        printf "Overwrite the file? \033[97m[\033[92my\033[90m/\033[91mn\033[97m] :\033[0m "
         read agree
         case "$agree"
         in
@@ -184,7 +184,7 @@ printf "\n\033[32mInstallation complete\033[0m\n"
 # remove the download folder
 while :
 do
-    printf "Do you want to remove the source folder? \033[97m[\033[32my\033[90m/\033[31mn\033[97m] :\033[0m "
+    printf "Do you want to remove the source folder? \033[97m[\033[92my\033[90m/\033[91mn\033[97m] :\033[0m "
     read agree
     case "$agree"
     in
@@ -201,5 +201,5 @@ do
     esac
 done
 
-printf "\n\033[1m\033[33mF\033[32mI\033[36mN\033[0m\n"
+printf "\n\033[1m\033[33m F\033[32m I\033[36m N\033[0m\n"
 
