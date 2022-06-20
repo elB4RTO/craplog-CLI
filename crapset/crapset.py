@@ -92,35 +92,42 @@ class Crapset():
         """
         Read the saved configuration
         """
-        with open(self.file_path,'r') as f:
-            tmp = f.read().strip().split('\n')
-        configs = []
-        for f in tmp:
-            f = f.strip()
-            if f == ""\
-            or f[0] == "#":
-                continue
-            configs.append(f)
-        # check the length
-        if len(configs) != 5:
-            print("\n{err}Error{white}[{grey}crapset.crapconf{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
-                .format(**self.text_colors)\
-                %( len(configs) ))
+        if os.path.exists( self.file_path ) is False:
+            # leave this normal yellow, it's secondary and doesn't need a real attention
             if self.less_output is False:
-                print("""
-                         if you have manually edited the configurations file, please un-do the changes
-                         else, please report this issue""")
-            print("\n{err}CRAPSET ABORTED{default}\n"\
-                .format(**self.text_colors))
-            exit()
-        # apply the configs
-        self.use_configs = bool(int(configs[0]))
-        if self.use_configs is True:
-            self.use_arguments: bool(int(configs[1]))
-            self.less_output: bool(int(configs[2]))
-            self.more_output: bool(int(configs[3]))
-            self.use_colors:  bool(int(configs[4]))
-            self.initMessages()
+                print("\n{warn}Warning{white}[{grey}configs{white}]{warn}>{default} {yellow}configurations file not found\n"\
+                    .format(**self.text_colors))
+                sleep(1)
+        else:
+		    with open(self.file_path,'r') as f:
+		        tmp = f.read().strip().split('\n')
+		    configs = []
+		    for f in tmp:
+		        f = f.strip()
+		        if f == ""\
+		        or f[0] == "#":
+		            continue
+		        configs.append(f)
+		    # check the length
+		    if len(configs) != 5:
+		        print("\n{err}Error{white}[{grey}crapset.crapconf{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
+		            .format(**self.text_colors)\
+		            %( len(configs) ))
+		        if self.less_output is False:
+		            print("""
+		                     if you have manually edited the configurations file, please un-do the changes
+		                     else, please report this issue""")
+		        print("\n{err}CRAPSET ABORTED{default}\n"\
+		            .format(**self.text_colors))
+		        exit()
+		    # apply the configs
+		    self.use_configs = bool(int(configs[0]))
+		    if self.use_configs is True:
+		        self.use_arguments: bool(int(configs[1]))
+		        self.less_output: bool(int(configs[2]))
+		        self.more_output: bool(int(configs[3]))
+		        self.use_colors:  bool(int(configs[4]))
+		        self.initMessages()
     
     
     
