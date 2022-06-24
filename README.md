@@ -1,6 +1,10 @@
 # Craplog CLI
 Parse Apache2 logs to create statistics
 
+<br/>
+
+![logo](https://github.com/elB4RTO/CRAPLOG/blob/main/craplogo.png)
+
 <br>
 
 ## Table of contents
