@@ -371,7 +371,7 @@ def checkFile(
                     .format(**craptool.text_colors)\
                     %( err_key, parent_path, entry_name ))
                 if craptool.more_output is True:
-                    print("%s         craptool doesn't have permissions to read from this file" %(spaces))
+                    print("%s         %s doesn't have permissions to read from this file" %(craptool.name,spaces))
                     print("%s         please make the file readable and retry" %(spaces))
                 print()
             if w is True\
@@ -381,7 +381,7 @@ def checkFile(
                     .format(**craptool.text_colors)\
                     %( err_key, parent_path, entry_name ))
                 if craptool.more_output is True:
-                    print("%s         craptool doesn't have permissions to write in this file" %(spaces))
+                    print("%s         %s doesn't have permissions to write in this file" %(craptool.name,spaces))
                     print("%s         please make the file writable and retry" %(spaces))
                 print()
         else:
@@ -461,7 +461,7 @@ def checkFile(
             pass
         else:
             # ..but should have existed
-            if craptool.name != "craptool":
+            if craptool.name != "crapset":
                 # print an error message
                 failed()
                 print("\n{err}Error{white}[{grey}%s{white}]{red}>{default} the given path does not exist: %s\n"\

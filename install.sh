@@ -158,7 +158,7 @@ do
     then
         dst="$(echo $dst | cut -d/ -f2)/"
     fi
-    mv "$crapdir/$src" "$inst_path/$dst"
+    cp "$crapdir/$src" "$inst_path/$dst"
     wait
 done
 

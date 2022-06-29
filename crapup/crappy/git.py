@@ -223,7 +223,7 @@ def gitPull( crapup:object ):
         if crapup.more_output is True:
             print("\n{rose}%s{default}"\
                 .format(**crapup.text_colors)\
-                %( command.stderr.decode.strip('\n') ))
+                %( command.stderr.decode().strip('\n') ))
         print()
         crapup.exitAborted()
     # restore the personal gitignore file

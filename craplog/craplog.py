@@ -31,6 +31,8 @@ class Craplog(object):
         """
         Craplog's initializer
         """
+        # craptool name
+        self.name = "craplog"
         # variables from args
         self.use_configs:    bool
         self.use_arguments:  bool

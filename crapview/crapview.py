@@ -6,7 +6,7 @@ from time import sleep
 from sys import argv
 from sys import path as libpath
 
-from os.path import abspath
+from os.path import abspath, exists
 
 crappath = abspath(__file__)
 crappath = crappath[:crappath.rfind('/')]
@@ -68,39 +68,39 @@ def initCrapview( args ) -> bool :
         crappath = abspath(__file__)
         crappath = crappath[:crappath.rfind('/')]
         path = "%s/crapconfs/crapview.crapconf" %(crappath[:crappath.rfind('/')])
-        if os.path.exists( path ) is False:
+        if exists( path ) is False:
             # leave this normal yellow, it's secondary and doesn't need a real attention
             if self.less_output is False:
                 print("\n{warn}Warning{white}[{grey}configs{white}]{warn}>{default} {yellow}configurations file not found\n"\
                     .format(**self.text_colors))
                 sleep(2)
         else:
-		    with open(path,'r') as f:
-		        tmp = f.read().strip().split('\n')
-		    configs = []
-		    for f in tmp:
-		        f = f.strip()
-		        if f == ""\
-		        or f[0] == "#":
-		            continue
-		        configs.append(f)
-		    # check the length
-		    if len(configs) != 3:
-		        print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
-		            .format(**text_colors)\
-		            %( len(configs) ))
-		        print("""
-		            if you have manually edited the configurations file, please un-do the changes
-		            else, please report this issue""")
-		        print("\n{err}CRAPVIEW ABORTED{default}\n"\
-		            .format(**text_colors))
-		        exit()
-		    # apply the configs
-		    use_configs = bool(int(configs[0]))
-		    if use_configs is True:
-		        use_arguments = bool(int(configs[1]))
-		        use_colors = bool(int(configs[2]))
-		        initMessages()
+            with open(path,'r') as f:
+                tmp = f.read().strip().split('\n')
+            configs = []
+            for f in tmp:
+                f = f.strip()
+                if f == ""\
+                or f[0] == "#":
+                    continue
+                configs.append(f)
+            # check the length
+            if len(configs) != 3:
+                print("\n{err}Error{white}[{grey}configs{white}]{red}>{default} invalid number of lines: {rose}%s{default}"\
+                    .format(**text_colors)\
+                    %( len(configs) ))
+                print("""
+                    if you have manually edited the configurations file, please un-do the changes
+                    else, please report this issue""")
+                print("\n{err}CRAPVIEW ABORTED{default}\n"\
+                    .format(**text_colors))
+                exit()
+            # apply the configs
+            use_configs = bool(int(configs[0]))
+            if use_configs is True:
+                use_arguments = bool(int(configs[1]))
+                use_colors = bool(int(configs[2]))
+                initMessages()
     
     if use_arguments is True:
         # parse args

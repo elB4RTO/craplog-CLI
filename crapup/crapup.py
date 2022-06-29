@@ -3,7 +3,7 @@ from sys import argv
 from sys import path as libpath
 
 from time import sleep
-from os.path import abspath
+from os.path import abspath, exists
 
 crappath = abspath(__file__)
 crappath = crappath[:crappath.rfind('/')]
@@ -20,6 +20,8 @@ class Crapup():
     Craplog's updater
     """
     def __init__(self, args:list ):
+        # craptool name
+        self.name = "crapup"
         # declare variables
         self.use_configs:   bool
         self.use_arguments: bool
@@ -125,7 +127,7 @@ class Crapup():
         crappath = crappath[:crappath.rfind('/')]
         self.crappath = crappath[:crappath.rfind('/')]
         path = "%s/crapconfs/crapup.crapconf" %(self.crappath)
-        if os.path.exists( path ) is False:
+        if exists( path ) is False:
             # leave this normal yellow, it's secondary and doesn't need a real attention
             if self.less_output is False:
                 print("\n{warn}Warning{white}[{grey}configs{white}]{warn}>{default} {yellow}configurations file not found\n"\
@@ -271,6 +273,8 @@ class Crapup():
         """
         Print the abortion message and exit
         """
+        if self.less_output is False:
+            print()
         print("{err}CRAPUP ABORTED{default}"\
             .format(**self.text_colors))
         if self.less_output is False:

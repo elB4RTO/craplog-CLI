@@ -37,7 +37,7 @@ def versionCheck( crapup:object ):
         try:
             # get the new version string and convert it to number
             new_version = html[
-                (pos+len(version_mark)+1)
+                (pos+len(version_mark))
                 :
                 html.find(version_mark,(pos+len(version_mark)+1)) ]
             new_version = float( new_version )

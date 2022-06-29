@@ -107,6 +107,7 @@ class Tree( UIobj ):
         trunk = "%s/crapstats" %( self.roots )
         trunk_len = len(trunk)+1
         for path,dirs,files in growing( trunk ):
+            dirs2del = []
             # step in the correct position
             branch = self.tree
             if len(path) > trunk_len:
@@ -119,9 +120,11 @@ class Tree( UIobj ):
             for dir_name in dirs:
                 if dir_name.startswith('.')\
                 or dir_name in ["CVS", "backups"]:
-                    dirs.remove( dir_name )
+                    dirs2del.append( dir_name )
                     continue
                 branch.update({ dir_name : {} })
+            for dir_name in dirs2del:
+                dirs.remove( dir_name )
             # append crapstat files as paths
             for file_name in files:
                 if not file_name.startswith('.')\
