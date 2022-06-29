@@ -254,7 +254,7 @@ You can control the output on screen, like: quantity of informations printed, pe
 ![output diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/output_diff.png)
 *Normal output vs Less output*
 
-<br/><br/>
+<br/><br/><br/>
 
 ## How to configure
 
@@ -304,7 +304,7 @@ Directly modifying the script's hardcoded variables, to set pre-defined initiali
   - **Crapup**   -> line [**66**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapup/crapup.py#L66) **@** *craplog-CLI/cragup/crapup.py*
   - **Crapset**  -> line [**32**](https://github.com/elB4RTO/craplog-CLI/blob/main/crapset/crapset.py#L32) **@** *craplog-CLI/cragset/crapset.py*
 
-<br/><br/>
+<br/><br/><br/>
 
 ## How to update
 
@@ -345,7 +345,7 @@ This is the **suggested** method.
 
 You can also perform this procedure manually if you want, by following the [update with git](#git-update) guide.
 
-<br/>
+<br/><br/>
 
 ### Self-service
 
@@ -449,8 +449,32 @@ Follow these steps:
       ```
       git merge origin/main
       ```
+      <br/>
+    
+- If you're having troubles updating for refs/code mismatches, follow the following:<br/>
+  
+  - Make a backup copy of the `crapstats` and `crapconfs` folders (and whatever else you care about).<br/>
+    *Nothing should happen to the non-indexed files/folders, but who knows, right?*
+    <br/><br/>
+  
+  - Reset your local git, removing the indexed content
+    
+    ```
+    git reset --hard
+    ```
+    <br/>
+  
+  - Pull a fresh copy of this repository
+    
+    ```
+    git pull origin main
+    ```
+    <br/>
+  
+  - Restore your backups if required<br/>
+    *Hopefully you shouldn't need to*
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 ## Logs
 
@@ -506,7 +530,7 @@ IP - - [DATE:TIME] "REQUEST URI" RESPONSE "FROM URI" "USER AGENT"
 
 *[Mon Jan 01 10:20:30.456789 2000] [headers:trace2] [pid 12345] [client 123.123.123.123:45678] AH00128: File does not exist: /var/www/html/domain/readme.txt*
 
-<br/><br/>
+<br/><br/><br/>
 
 ## Statistics
 
@@ -628,7 +652,7 @@ Available **keywords** ar the following:
   Path must be composed by whitespace-separated words, as they are in the tree.<br/>
   *Example: see the Requests statistics of a particulare day:* `sessions access <year> <month> <day> REQ`
 
-<br/><br/>
+<br/><br/><br/>
 
 ## Extra features
 
