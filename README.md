@@ -449,27 +449,25 @@ Follow these steps:
       ```
       git merge origin/main
       ```
-      <br/>
+      <br/><br/>
     
 - If you're having troubles updating for refs/code mismatches, follow the following:<br/>
   
   - Make a backup copy of the `crapstats` and `crapconfs` folders (and whatever else you care about).<br/>
     *Nothing should happen to the non-indexed files/folders, but who knows, right?*
-    <br/><br/>
+    <br/>
   
   - Reset your local git, removing the indexed content
     
     ```
     git reset --hard
     ```
-    <br/>
   
   - Pull a fresh copy of this repository
     
     ```
     git pull origin main
     ```
-    <br/>
   
   - Restore your backups if required<br/>
     *Hopefully you shouldn't need to*
