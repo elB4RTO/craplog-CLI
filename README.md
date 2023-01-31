@@ -56,7 +56,7 @@ Craplog is a tool that takes Apache2 logs in their default form, parses them and
 
 Welcome to the **command line** version
 
-![screenshot](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/craplog.png)
+![screenshot](https://github.com/elB4RTO/screenshots/blob/main/Craplog/CLI/craplog.png)
 
 <br/>
 
@@ -251,7 +251,7 @@ Searching for something different? Try the [other versions of CRAPLOG](https://g
 
 You can control the output on screen, like: quantity of informations printed, performance details and the use of colors.<br/><br/>
 
-![output diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/output_diff.png)
+![output diffs](https://github.com/elB4RTO/screenshots/blob/main/Craplog/CLI/output_diff.png)
 *Normal output vs Less output*
 
 <br/><br/><br/>
@@ -612,7 +612,7 @@ Craplog saves statistics as plain-text files, so you can directly view them, but
 
 **Crapview** is a cursed application that lets you easily view your crapstats.<br/><br/>
 
-![performance diffs](https://github.com/elB4RTO/CRAPLOG/blob/main/crapshots/CLI/crapview.png)<br/>
+![performance diffs](https://github.com/elB4RTO/screenshots/blob/main/Craplog/CLI/crapview.png)<br/>
 *Viewing statistics*<br/><br/>
 
 #### Run crapview
